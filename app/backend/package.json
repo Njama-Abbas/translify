@@ -1,0 +1,19 @@
+{
+  "name": "translify-client-api",
+  "version": "1.0.0",
+  "description": "Backend application for translify [drivers & customers] modules",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/barakamulumia/translify.git"
+  },
+  "author": "Baraka Mulumia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/barakamulumia/translify/issues"
+  },
+  "homepage": "https://github.com/barakamulumia/translify#readme"
+}
