@@ -24,7 +24,12 @@ const DriverListItem = ({ driver }) => {
           </p>
           <DriverItemBox>
             <Typography component="legend">Rating</Typography>
-            <Rating name="read-only" value={2.5} precision={0.5} readOnly />
+            <Rating
+              name="read-only"
+              value={driver.rating}
+              precision={0.5}
+              readOnly
+            />
           </DriverItemBox>
           <Typography component="p">
             <i>5 minutes away</i>
