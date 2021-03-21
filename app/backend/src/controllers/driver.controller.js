@@ -113,19 +113,15 @@ module.exports = {
         if (driver) {
           return {
             id: driver._id,
-            userid: user._id,
             firstname: user.firstname,
             lastname: user.lastname,
             phoneno: user.phoneno,
-            email: user.email,
             oncall: driver.oncall,
             reserved: driver.reserved,
             rating: user.rating,
             truckno: driver.truckno,
             dlno: driver.dlno,
-            address: driver.address.place_name,
             approval_status: driver.approval_status,
-            created_at: new Date(driver.dateOfReg),
           };
         }
       })
