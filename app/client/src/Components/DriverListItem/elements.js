@@ -5,7 +5,7 @@ export const DriverContainer = styled.div`
   background-color: rgba(250, 248, 248, 0.945);
   color: #0d1117;
   margin: 5px;
-  max-width: 350px;
+  width: 400px;
 `;
 export const DriverItemBox = styled.div`
   display: grid;
