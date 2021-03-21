@@ -227,6 +227,10 @@ const set_password = (driver) => {
     personal_details: {
       ...driver.personal_details,
       password: bcrypt.hashSync("123Asd", 10),
+      verification: {
+        status: true,
+        code: 10801080,
+      },
     },
     driving_details: {
       ...driver.driving_details,
