@@ -4,6 +4,8 @@ const User = db.user;
 const Driver = db.driver;
 const bcrypt = require("bcrypt");
 
+const sample_drivers = require("./drivers");
+
 exports.createSampleUsers = function () {
   User.estimatedDocumentCount(async (err, count) => {
     if (!err && count === 0) {
@@ -27,51 +29,68 @@ exports.createSampleUsers = function () {
         name: "driver",
       });
 
-      const sample_driver1 = await User.create({
-        firstname: "Salman",
-        lastname: "Khan",
-        phoneno: "0713213543",
-        email: "salmankhan@gmail.com",
-        password: bcrypt.hashSync("123Asd", 10),
-        role: driver_role._id,
-      });
+      const approved_drivers = await Promise.all(
+        sample_drivers.approved.map(async (driver) => {
+          const d1 = await User.create({
+            ...driver.personal_details,
+            role: driver_role._id,
+          });
+          const d2 = await d1.save();
 
-      const sample_driver2 = await User.create({
-        firstname: "Aliya",
-        lastname: "Bhatt",
-        phoneno: "0713213543",
-        email: "aliya@gmail.com",
-        password: bcrypt.hashSync("123Asd", 10),
-        role: driver_role._id,
-      });
+          const d3 = await Driver.create({
+            userId: d2._id,
+            ...driver.driving_details,
+            approval_status: "A",
+          });
+          const d4 = await d3.save();
+          return true;
+        })
+      );
+      const declined_drivers = await Promise.all(
+        sample_drivers.declined.map(async (driver) => {
+          const d1 = await User.create({
+            ...driver.personal_details,
+            role: driver_role._id,
+          });
+          const d2 = await d1.save();
 
-      const driver1 = await sample_driver1.save();
+          const d3 = await Driver.create({
+            userId: d2._id,
+            ...driver.driving_details,
+            approval_status: "D",
+          });
+          const d4 = await d3.save();
+          return true;
+        })
+      );
 
-      const unverified_driver = await Driver.create({
-        userId: driver1._id,
-        truckno: "KDB 125 Q",
-        dlno: "WLX234",
-        address: {
-          place_name: "Nairobi Kenya",
-          place_id: "1234567812345678",
-        },
-      });
-      await unverified_driver.save();
-      console.log("Sample Un-Verified 'Driver' Created");
-      const driver2 = await sample_driver2.save();
+      const pending_drivers = await Promise.all(
+        sample_drivers.declined.map(async (driver) => {
+          const d1 = await User.create({
+            ...driver.personal_details,
+            role: driver_role._id,
+          });
+          const d2 = await d1.save();
 
-      const verified_driver = await Driver.create({
-        userId: driver2._id,
-        truckno: "KCX 555 Z",
-        dlno: "ZXW456",
-        address: {
-          place_name: "Nairobi Kenya",
-          place_id: "98765432112345678",
-        },
-        approval_status: "A",
-      });
-      await verified_driver.save();
-      console.log("Sample Verified 'Driver' Created");
+          const d3 = await Driver.create({
+            userId: d2._id,
+            ...driver.driving_details,
+            approval_status: "P",
+          });
+          const d4 = await d3.save();
+          return true;
+        })
+      );
+
+      const all_created = [
+        approved_drivers.every(Boolean),
+        declined_drivers.every(Boolean),
+        pending_drivers.every(Boolean),
+      ].every(Boolean);
+
+      if (all_created) {
+        console.log("SAMPLE DRIVERS CREATED");
+      }
 
       const admin_role = await Role.findOne({
         name: "admin",
