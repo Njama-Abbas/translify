@@ -20,7 +20,7 @@ module.exports = {
       role,
     } = req.body;
 
-    const $role = Role.findOne({
+    const $role = await Role.findOne({
       name: role,
     });
 
@@ -45,23 +45,32 @@ module.exports = {
     const user = await new_user.save();
 
     //send verification text message
-    sms.messages
-      .create({
+    let sendText;
+
+    try {
+      sendText = await sms.messages.create({
         body: `Tans-Code: ${user.verification.code} `,
-        to: "+254" + user.phoneno,
+        to: "+254" + user.phoneno.slice(-9),
         from: "+12027598622",
-      })
-      .then((message) => {
-        res.status(201).json({
-          userID: user._id,
-        });
       });
+    } catch (e) {
+      res.status(500).json({
+        message: `Twillio Error ${e}`,
+      });
+      return;
+    }
+
+    res.status(201).json({
+      userID: user._id,
+      phone: user.phoneno,
+      sid: sendText.sid,
+    });
   },
 
   signin: async (req, res) => {
     const { email, password, role } = req.body;
 
-    const $role = Role.findOne({
+    const $role = await Role.findOne({
       name: role,
     });
 
