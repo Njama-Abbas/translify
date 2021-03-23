@@ -54,27 +54,13 @@ export default function SignUp({ route }) {
   };
 
   const role = route;
-
   const onSubmit = (user) => {
     const { firstname, lastname, phoneno, email, password } = user;
 
     AuthAPI.register(firstname, lastname, email, phoneno, password, role).then(
       (response) => {
-        setMessage(response.data.message);
-        AuthAPI.login(email, password, role).then(
-          () => {
-            history.push(`/${route}`);
-          },
-          (error) => {
-            const resMessage =
-              (error.response &&
-                error.response.data &&
-                error.response.data.message) ||
-              error.message ||
-              error.toString();
-            setMessage(resMessage);
-          }
-        );
+        setMessage(response.data.userId);
+        history.push(`/verify-account`);
       },
       (error) => {
         const resMessage =
