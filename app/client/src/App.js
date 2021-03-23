@@ -12,7 +12,7 @@ import {
   SignIn,
   Client,
   Driver,
-  Admin,
+  Verification,
 } from "./Pages";
 
 export default function App() {
@@ -23,6 +23,7 @@ export default function App() {
       <Switch>
         <Route exact path={["/", "/home"]} component={Home} />
         <Route exact path="/discover" component={Discover} />
+        <Route exact path="/verify-account" component={Verification} />
         <Route exact path="/services">
           <Services withNav="true" />
         </Route>
@@ -40,10 +41,10 @@ export default function App() {
         <Route exact path="/client/sign-in">
           <SignIn route="client" />
         </Route>
+
         <Route exact path="/test" component={FileUploadComponent} />
         <Route path="/client" component={Client} />
         <Route path="/driver" component={Driver} />
-        <Route path="/admin" component={Admin} />
       </Switch>
     </div>
   );
