@@ -10,7 +10,6 @@ import destination from "../../Resources/Images/Destination.svg";
 import { Container } from "../../Resources/Styles/global";
 import { Box } from "./driver.elements";
 
-import OrderTruck from "../OrderPage";
 import Profile from "../Profile";
 
 import {
