@@ -15,10 +15,4 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isDriver],
     controller.driverBoard
   );
-
-  app.get(
-    "/api/user/admin",
-    [authJwt.verifyToken, authJwt.isAdmin],
-    controller.adminBoard
-  );
 };
