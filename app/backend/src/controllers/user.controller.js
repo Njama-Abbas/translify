@@ -1,66 +1,83 @@
 const db = require("../models");
 const User = db.user;
+const Role = db.role;
 
-exports.allAccess = (_req, res) => {
-  res.status(200).json({
-    content: "Public content",
-  });
-};
+module.exports = {
+  allAccess: async (_req, res) => {
+    res.status(200).json({
+      content: "Public content",
+    });
+  },
 
-exports.driverBoard = (req, res) => {
-  User.findOne(
-    {
+  driverBoard: async (req, res) => {
+    const driver_role = await Role.findOne({
+      name: "driver",
+    });
+
+    const user = await User.findOne({
       _id: req.userId,
-    },
-    (err, driver) => {
-      if (err) {
-        res.status(500).json({
-          message: err,
-        });
-        return;
-      }
-      if (!driver) {
-        res.status(404).json({
-          message: "driver not found",
-        });
-        return;
-      }
-      res.status(200).json({
-        userId: driver._id,
-        role: "driver",
-      });
-    }
-  );
-};
+    });
 
-exports.clientBoard = (req, res) => {
-  User.findOne(
-    {
+    if (!user) {
+      res.status(404).json({
+        message: "user not found",
+      });
+      return;
+    }
+
+    if (user.role !== driver_role._id) {
+      res.status(401).json({
+        message: "Require Driver Role",
+      });
+      return;
+    }
+
+    if (!user.verification.status) {
+      res.status(401).json({
+        message: "Not authorized user is unverified",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      userId: user._id,
+      role: "driver",
+    });
+  },
+
+  clientBoard: async (req, res) => {
+    const client_role = await Role.findOne({
+      name: "client",
+    });
+
+    const user = await User.findOne({
       _id: req.userId,
-    },
-    (err, client) => {
-      if (err) {
-        res.status(500).json({
-          message: err,
-        });
-        return;
-      }
-      if (!client) {
-        res.status(404).json({
-          message: "orders not found",
-        });
-        return;
-      }
-      res.status(200).json({
-        userId: client._id,
-        role: "client",
-      });
-    }
-  );
-};
+    });
 
-exports.adminBoard = (_req, res) => {
-  res.status(200).json({
-    content: "Admin content",
-  });
+    if (!user) {
+      res.status(404).json({
+        message: "user not found",
+      });
+      return;
+    }
+
+    if (user.role !== client_role._id) {
+      res.status(401).json({
+        message: "Require Client Role",
+      });
+      return;
+    }
+
+    if (!user.verification.status) {
+      res.status(401).json({
+        message: "Not authorized user is unverified",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      userId: user._id,
+      role: "client",
+    });
+  },
 };
