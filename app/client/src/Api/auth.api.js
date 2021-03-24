@@ -37,6 +37,23 @@ class AuthAPI {
   getCurrentUser() {
     return JSON.parse(localStorage.getItem("user"));
   }
+
+  verify(user) {
+    const { UID, v_code } = user;
+    return axios.post(API_URL + "verify-account", {
+      UID,
+      v_code,
+    });
+  }
+
+  resendVerificationCode(user) {
+    const { userid, phoneno } = user;
+
+    return axios.post(API_URL + "send-verification-code", {
+      userid,
+      phoneno,
+    });
+  }
 }
 
 export default new AuthAPI();
