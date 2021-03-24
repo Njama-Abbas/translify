@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AuthAPI } from "../../Api";
+import { useDispatch } from "react-redux";
+import { userSet } from "../../State/user.slice";
 
 import {
   MdLockOutline,
@@ -34,6 +36,8 @@ import ValidationError from "../Error/Validation";
 import ValidationPatterns from "../../Resources/Patterns/validation";
 
 export default function SignUp({ route }) {
+  const dispatch = useDispatch();
+
   const { register, handleSubmit, errors } = useForm({
     reValidateMode: "onChange",
     mode: "onBlur",
@@ -59,7 +63,13 @@ export default function SignUp({ route }) {
 
     AuthAPI.register(firstname, lastname, email, phoneno, password, role).then(
       (response) => {
-        setMessage(response.data.userId);
+        const { UID, phoneno } = response.data;
+        dispatch(
+          userSet({
+            UID,
+            phoneno,
+          })
+        );
         history.push(`/verify-account`);
       },
       (error) => {

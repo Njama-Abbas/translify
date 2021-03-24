@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, Redirect, useHistory } from "react-router-dom";
 import { AuthAPI } from "../../Api";
+import { useDispatch } from "react-redux";
+import { userSet } from "../../State/user.slice";
 
 import {
   MdLockOutline,
@@ -9,6 +11,7 @@ import {
   MdMailOutline,
   MdEnhancedEncryption,
 } from "react-icons/md";
+
 import { useForm } from "react-hook-form";
 
 import {
@@ -38,16 +41,19 @@ export default function SignUp({ route }) {
     mode: "onBlur",
   });
   const history = useHistory();
+  const dispatch = useDispatch();
 
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState("");
+  const [redirect, setRedirect] = useState(null);
 
   const handleShowPassword = () => {
     setShowPassword((prevState) => {
       return !prevState;
     });
   };
+
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
@@ -65,17 +71,35 @@ export default function SignUp({ route }) {
       },
 
       (error) => {
-        const resMessage =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
-        setMessage(resMessage);
+        if (error.response.status === 401) {
+          //unverified
+          // redirect to verification page
+          setRedirect("/verify-account");
+          const { UID, phoneno, message } = error.response.data;
+          dispatch(
+            userSet({
+              UID,
+              phoneno,
+            })
+          );
+          setMessage(message);
+        } else {
+          setMessage(
+            (error.response &&
+              error.response.data &&
+              error.response.data.message) ||
+              error.message ||
+              error.toString()
+          );
+        }
         setLoading(false);
       }
     );
   };
+
+  if (redirect) {
+    return <Redirect to={redirect} />;
+  }
 
   return (
     <FormContainer container route={route}>
