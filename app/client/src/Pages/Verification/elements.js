@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Grid, TextField } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import PORT_IMAGE from "../../Resources/Images/port.jpg";
 import { IoAlertCircle } from "react-icons/io5";
 
@@ -12,13 +12,18 @@ export const PageContainer = styled(Grid)`
 `;
 
 export const VerificationWrapper = styled(Grid)`
-  height: 350px;
+  max-height: 50vh;
   width: 95%;
   border-radius: 5px;
   text-align: center;
+  padding-bottom: 10px;
   background-color: rgba(0, 2, 3, 0.815);
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
     0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+
+  @media (max-width: 600px) {
+    max-height: 80vh;
+  }
 `;
 
 export const AlertIcon = styled(IoAlertCircle)`
