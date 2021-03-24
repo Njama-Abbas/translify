@@ -26,7 +26,7 @@ module.exports = {
     }
 
     if (user.role !== driver_role._id) {
-      res.status(401).json({
+      res.status(403).json({
         message: "Require Driver Role",
       });
       return;
@@ -62,7 +62,7 @@ module.exports = {
     }
 
     if (user.role !== client_role._id) {
-      res.status(401).json({
+      res.status(403).json({
         message: "Require Client Role",
       });
       return;
