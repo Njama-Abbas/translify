@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   PageContainer,
   VerificationWrapper,
@@ -6,11 +6,15 @@ import {
   AlertIcon,
   InputField,
 } from "./elements";
+import { useSelector } from "react-redux";
 import { IconContext } from "react-icons";
 import Grid from "@material-ui/core/Grid";
 import { Button } from "../../Resources/Styles/global";
+import { selectUser } from "../../State/user.slice";
 
 const Verification = () => {
+  const user = useSelector(selectUser);
+
   return (
     <IconContext.Provider
       value={{
@@ -31,7 +35,8 @@ const Verification = () => {
               </Grid>
               <Grid item>
                 <VerificationHeader>
-                  Enter 8-Digit Verification code send to 0748717044
+                  To Continue Verify Your Account. Please Enter 8-Digit Short
+                  code send to <br /> <b>{user.phoneno}</b>
                 </VerificationHeader>
               </Grid>
               <Grid item>
