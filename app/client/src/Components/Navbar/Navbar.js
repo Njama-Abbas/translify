@@ -78,7 +78,7 @@ const Navbar = () => {
             <NavbarContainer>
               <NavLogo to="/" onClick={closeMobileMenu}>
                 <NavIcon />
-                <i
+                <span
                   style={{
                     letterSpacing: "2px",
                   }}
@@ -91,7 +91,7 @@ const Navbar = () => {
                     trans
                   </b>
                   lify
-                </i>
+                </span>
               </NavLogo>
               <MobileIcon onClick={toggleMobileMenu}>
                 {click ? <FaTimes /> : <FaBars />}
