@@ -10,7 +10,6 @@ const initialState = {
 
 export const getDrivers = createAsyncThunk("drivers/getoncall", async () => {
   const response = await DriverAPI.getOnCall();
-  console.log(response);
   return response.data;
 });
 
