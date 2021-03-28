@@ -38,20 +38,23 @@ class AuthAPI {
     return JSON.parse(localStorage.getItem("user"));
   }
 
-  verify(user) {
-    const { UID, v_code } = user;
-    return axios.post(API_URL + "verify-account", {
-      UID,
-      v_code,
-    });
+  verify(ID, v_code) {
+    return axios
+      .post(API_URL + "verify-account", {
+        ID,
+        v_code,
+      })
+      .then((response) => {
+        if (response.data.accessToken) {
+          localStorage.setItem("user", JSON.stringify(response.data));
+        }
+        return response.data;
+      });
   }
 
-  resendVerificationCode(user) {
-    const { userid, phoneno } = user;
-
-    return axios.post(API_URL + "send-verification-code", {
-      userid,
-      phoneno,
+  resendVerificationCode(userID) {
+    return axios.post(API_URL + "resend-vcode", {
+      userID,
     });
   }
 }
