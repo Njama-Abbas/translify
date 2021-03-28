@@ -6,13 +6,13 @@ module.exports = function (app) {
 
   app.get(
     "/api/user/client",
-    [authJwt.verifyToken, authJwt.isClient],
-    controller.clientBoard
+    [authJwt.verifyToken, authJwt.verifyStatus, authJwt.isClient],
+    controller.userDashBoard
   );
 
   app.get(
     "/api/user/driver",
-    [authJwt.verifyToken, authJwt.isDriver],
-    controller.driverBoard
+    [authJwt.verifyToken, authJwt.verifyStatus, authJwt.isDriver],
+    controller.userDashBoard
   );
 };
