@@ -6,7 +6,8 @@ const config = require("../config/auth.config"),
   bcrypt = require("bcrypt");
 
 const User = db.user,
-  Role = db.role;
+  Role = db.role,
+  sms = new twilio(config.TWILLIO_ACCOUNT_SID, config.TWILLIO_AUTH_TOKEN);
 
 module.exports = {
   signup: async (req, res) => {
@@ -51,44 +52,33 @@ module.exports = {
 
     const user = await new_user.save();
 
-    let sms;
-    try {
-      sms = new twilio(config.TWILLIO_ACCOUNT_SID, config.TWILLIO_AUTH_TOKEN);
-    } catch (e) {
-      res.status(500).json({
-        message: `Twillio Authentication Error ${e}`,
-      });
-      return;
-    }
-
     //send verification text message
-    let sendText;
+    // let sendText;
 
-    try {
-      sendText = await sms.messages.create({
-        body: `Tans-Code: ${user.verification.code} `,
-        to: "+254" + user.phoneno.slice(-9),
-        from: "+12027598622",
-      });
-    } catch (e) {
-      res.status(500).json({
-        message: `Twillio Send Text Error ${e}`,
-      });
-      return;
-    }
+    // try {
+    //   sendText = await sms.messages.create({
+    //     body: `Tans-Code: ${user.verification.code} `,
+    //     to: "+254" + user.phoneno.slice(-9),
+    //     from: "+12027598622",
+    //   });
+    // } catch (e) {
+    //   res.status(500).json({
+    //     message: `Twillio Send Text Error ${e}`,
+    //   });
+    //   return;
+    // }
 
     res.status(201).json({
       UID: user._id,
       phoneno: user.phoneno,
-      sid: sendText.sid,
     });
   },
 
   verify: async (req, res) => {
-    const { UID, v_code } = req.body;
+    const { ID, v_code } = req.body;
 
     const user = await User.findOne({
-      _id: UID,
+      _id: ID,
     });
 
     if (!user) {
@@ -105,7 +95,7 @@ module.exports = {
       return;
     }
 
-    if (user.verification.code !== v_code) {
+    if (user.verification.code !== Number(v_code)) {
       res.status(401).json({
         message: "Wrong verification code",
       });
@@ -113,26 +103,41 @@ module.exports = {
     }
 
     /**
-     * if code entered by user
+     *  if code entered by user
      * is equal to code in the database
+     * change verification status to true
+     */
+
+    const updatedUser = await User.findByIdAndUpdate(user._id, {
+      verification: {
+        status: true,
+        code: user.verification.code,
+      },
+    });
+
+    /**
+     * get the users role
+     */
+
+    const $role = await Role.findOne({
+      _id: updatedUser.role,
+    });
+
+    /**
      * generate a json-web-token
      * to sign in the user;
      */
 
-    const $role = await Role.findOne({
-      _id: user.role,
-    });
-
-    let token = jwt.sign({ id: user.id }, config.secret, {
+    let token = jwt.sign({ id: updatedUser.id }, config.secret, {
       expiresIn: 86400,
     });
 
     res.status(200).json({
-      id: user._id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      phoneno: user.phoneno,
+      id: updatedUser._id,
+      firstname: updatedUser.firstname,
+      lastname: updatedUser.lastname,
+      email: updatedUser.email,
+      phoneno: updatedUser.phoneno,
       role: $role.name,
       accessToken: token,
     });
@@ -192,6 +197,48 @@ module.exports = {
       phoneno: user.phoneno,
       role: $role.name,
       accessToken: token,
+    });
+  },
+
+  resendVerificationCode: async (req, res) => {
+    //generate sms verification code
+    const generated_code = phoneToken(8, {
+      type: "number",
+    });
+
+    //change the existing token in the database;
+    let updatedUser;
+    try {
+      updatedUser = await User.findByIdAndUpdate(req.body.userID, {
+        verification: {
+          code: generated_code,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: `An Error Occured Cannot update details ${e}`,
+      });
+      return;
+    }
+
+    //Send the text
+    let sendText;
+    try {
+      sendText = await sms.messages.create({
+        body: `Tans-Code: ${updatedUser.verification.code} `,
+        to: "+254" + updatedUser.phoneno.slice(-9),
+        from: "+12027598622",
+      });
+    } catch (e) {
+      res.status(500).json({
+        message: `Twillio Send Text Error ${e}`,
+      });
+      return;
+    }
+
+    res.status(201).json({
+      UID: updatedUser._id,
+      phoneno: updatedUser.phoneno,
     });
   },
 };
