@@ -19,6 +19,9 @@ exports.createSampleUsers = function () {
         phoneno: "0723664497",
         email: "jason@gmail.com",
         password: bcrypt.hashSync("123Asd", 10),
+        verification: {
+          code: 10801080,
+        },
         role: client_role._id,
       });
 
@@ -65,7 +68,7 @@ exports.createSampleUsers = function () {
       );
 
       const pending_drivers = await Promise.all(
-        sample_drivers.declined.map(async (driver) => {
+        sample_drivers.pending.map(async (driver) => {
           const d1 = await User.create({
             ...driver.personal_details,
             role: driver_role._id,
