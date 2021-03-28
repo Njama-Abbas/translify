@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useToasts } from "react-toast-notifications";
+
 import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import { useSelector, useDispatch } from "react-redux";
@@ -22,6 +24,7 @@ import Profile from "../Profile";
 
 export default function Client() {
   const { path } = useRouteMatch();
+  const { addToast } = useToasts();
 
   const orders = useSelector(selectOrders);
   const dispatch = useDispatch();
@@ -40,24 +43,22 @@ export default function Client() {
       setRedirect("/home");
     }
 
-    UserAPI.getClientBoard()
-      .then((response) => {
-        if (response.status === 200) {
-          const { userId, role } = response.data;
-          setUser({
-            userId,
-            role,
-          });
-          setUserReady(true);
-        } else {
-          setUser(undefined);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
+    UserAPI.getClientBoard().then(
+      (response) => {
+        const { _id: userId } = response.data;
+        setUser({
+          userId,
+        });
+        setUserReady(true);
+      },
+      (error) => {
+        addToast(`An error occured ${error.response.data.message} `, {
+          appearance: "error",
+        });
         setUser(undefined);
-      });
-  }, []);
+      }
+    );
+  }, [addToast]);
 
   if (redirect) {
     return <Redirect to={redirect} />;

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
+import { useToasts } from "react-toast-notifications";
+
 import { Grid } from "@material-ui/core";
 
 import { DriverAPI, UserAPI, AuthAPI } from "../../Api";
@@ -22,6 +24,7 @@ import {
 } from "../../Components";
 
 export default function Driver() {
+  const { addToast } = useToasts();
   const { path } = useRouteMatch();
   const dispatch = useDispatch();
   const orders = useSelector(selectOrders);
@@ -41,35 +44,36 @@ export default function Driver() {
       setRedirect("/home");
     }
 
-    UserAPI.getDriverBoard()
-      .then((response) => {
-        if (response.status === 200) {
-          const { userId, role } = response.data;
-          setUser({
-            userId,
-            role,
-          });
-          setUserReady(true);
-          DriverAPI.check_approval(userId).then(
-            (response) => {
-              setApprovalStatus(response.data.approval_status);
-            },
-            (error) => {
-              const { status } = error.response;
-              if (status === 404) {
-                setApprovalStatus(null);
-              }
+    UserAPI.getDriverBoard().then(
+      (response) => {
+        const { _id: userId } = response.data;
+        setUser({
+          userId,
+        });
+        setUserReady(true);
+        DriverAPI.check_approval(userId).then(
+          (response) => {
+            setApprovalStatus(response.data.approval_status);
+          },
+          (error) => {
+            const { status } = error.response;
+            if (status === 404) {
+              setApprovalStatus(null);
+              addToast(error.response.data.message, {
+                appearance: "error",
+              });
             }
-          );
-        } else {
-          setUser(undefined);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
+          }
+        );
+      },
+      (error) => {
         setUser(undefined);
-      });
-  }, []);
+        addToast(`An error occured ${error} `, {
+          appearance: "error",
+        });
+      }
+    );
+  }, [addToast]);
 
   if (redirect) {
     return <Redirect to={redirect} />;
