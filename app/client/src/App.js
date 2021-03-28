@@ -3,6 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import ScrollToTop from "./Components/ScrollToTop";
 import GlobalStyle from "./Resources/Styles/global";
 import FileUploadComponent from "./Components/UploadPhoto";
+import { ToastProvider } from "react-toast-notifications";
 
 import {
   Home,
@@ -17,7 +18,7 @@ import {
 
 export default function App() {
   return (
-    <div>
+    <ToastProvider autoDismiss autoDismissTimeout={7000}>
       <GlobalStyle />
       <ScrollToTop />
       <Switch>
@@ -46,6 +47,6 @@ export default function App() {
         <Route path="/client" component={Client} />
         <Route path="/driver" component={Driver} />
       </Switch>
-    </div>
+    </ToastProvider>
   );
 }
