@@ -38,7 +38,7 @@ module.exports = {
 
     if (!driver) {
       res.status(404).json({
-        message: "Driver not found",
+        message: "Sorry!! You aint approved Yet",
       });
       return;
     }
@@ -95,6 +95,7 @@ module.exports = {
       return;
     }
 
+    //get all users who have a role of driver
     const users = await User.find({
       role: driver_role._id,
     });
@@ -105,6 +106,8 @@ module.exports = {
       });
       return;
     }
+
+    //map the driving details and personal details
     const drivers = await Promise.all(
       users.map(async (user) => {
         const driver = await Driver.findOne({
@@ -126,7 +129,12 @@ module.exports = {
         }
       })
     );
-    const availableDrivers = drivers.filter(
+
+    //filter out unregistred drivers
+    const $drivers = drivers.filter((driver) => driver);
+
+    //get approved drivers currently on call and not reserved
+    const availableDrivers = $drivers.filter(
       (driver) =>
         driver.oncall && driver.approval_status === "A" && !driver.reserved
     );
