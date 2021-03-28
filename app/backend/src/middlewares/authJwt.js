@@ -1,126 +1,111 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/auth.config");
 const db = require("../models");
-
 const User = db.user;
 const Role = db.role;
 
-const verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];
+module.exports = {
+  verifyToken: async (req, res, next) => {
+    let token = req.headers["x-access-token"];
 
-  if (!token) {
-    return res.status(403).json({ message: "No token provided!" });
-  }
-
-  jwt.verify(token, config.secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: "Unauthourized" });
+    if (!token) {
+      return res.status(403).json({ message: "No token provided!" });
     }
-    req.userId = decoded.id;
+
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Unauthourized" });
+      }
+      req.userId = decoded.id;
+      next();
+    });
+  },
+
+  verifyStatus: async (req, res, next) => {
+    const user = await User.findOne({
+      _id: req.userId,
+    });
+
+    if (!user) {
+      res.status(404).json({
+        message: "user not found",
+      });
+      return;
+    }
+
+    if (!user.verification.status) {
+      res.status(403).json({
+        message:
+          "You are Not authorized to view this page. Please Verify your account",
+      });
+      return;
+    }
     next();
-  });
-};
+  },
 
-const isClient = (req, res, next) => {
-  User.findById(req.userId).exec((err, user) => {
-    if (err) {
-      res.status(500).json({ message: err });
-      return;
-    }
+  isClient: async (req, res, next) => {
+    const user = await User.findOne({
+      _id: req.userId,
+    });
+
     if (!user) {
-      res.status(404).json({ message: "user not found" });
+      res.status(404).json({
+        message: "user not found",
+      });
+      return;
+    }
+    console.log(user);
+
+    const client_role = await Role.findOne({
+      _id: user.role,
+    });
+
+    if (!client_role) {
+      res.status(404).json({
+        message: "We Could'nt Find Your role",
+      });
       return;
     }
 
-    Role.findOne(
-      {
-        _id: user.role,
-      },
-      (err, role) => {
-        if (err) {
-          res.status(500).json({ message: err });
-          return;
-        }
-        if (role.name === "client") {
-          next();
-          return;
-        }
-
-        res.status(403).json({ message: "Require Client role" });
-        return;
-      }
-    );
-  });
-};
-
-const isAdmin = (req, res, next) => {
-  User.findById(req.userId).exec((err, user) => {
-    if (err) {
-      res.status(500).json({ message: err });
+    if (client_role.name !== "client") {
+      res.status(403).json({
+        message: "You Require to have a Client Role to access the page",
+      });
       return;
     }
+    next();
+  },
+
+  isDriver: async (req, res, next) => {
+    const user = await User.findOne({
+      _id: req.userId,
+    });
+
     if (!user) {
-      res.status(404).json({ message: "user not found" });
-      return;
-    }
-    Role.find(
-      {
-        _id: user.role,
-      },
-      (err, role) => {
-        if (err) {
-          res.status(500).json({ message: err });
-          return;
-        }
-        if (role.name === "admin") {
-          next();
-          return;
-        }
-        res.status(403).json({ message: "Require Admin role" });
-        return;
-      }
-    );
-  });
-};
-
-const isDriver = (req, res, next) => {
-  User.findById(req.userId).exec((err, user) => {
-    if (!user) {
-      res.status(404).json({ message: "user not found" });
+      res.status(404).json({
+        message: "user not found",
+      });
       return;
     }
 
-    if (err) {
-      res.status(500).json({ message: err });
+    const driver_role = await Role.findOne({
+      _id: user.role,
+    });
+
+    if (!driver_role) {
+      res.status(404).json({
+        message: "We Could'nt Find Your role",
+      });
       return;
     }
-    Role.findOne(
-      {
-        _id: user.role,
-      },
-      (err, role) => {
-        if (err) {
-          res.status(500).json({ message: err });
-          return;
-        }
 
-        if (role.name === "driver") {
-          next();
-          return;
-        }
+    if (driver_role.name !== "driver") {
+      res.status(403).json({
+        message: "You Require to have a Driver Role to access the page",
+      });
+      return;
+    }
 
-        res.status(403).json({ message: "Require Driver Role!" });
-        return;
-      }
-    );
-  });
+    next();
+  },
 };
-
-const authJwt = {
-  verifyToken,
-  isClient,
-  isAdmin,
-  isDriver,
-};
-
-module.exports = authJwt;
