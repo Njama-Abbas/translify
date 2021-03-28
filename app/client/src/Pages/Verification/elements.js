@@ -12,8 +12,8 @@ export const PageContainer = styled(Grid)`
 `;
 
 export const VerificationWrapper = styled(Grid)`
-  max-height: 50vh;
-  width: 95%;
+  height: 50vh;
+  width: 600px;
   border-radius: 5px;
   text-align: center;
   padding-bottom: 10px;
@@ -39,7 +39,7 @@ export const AlertIcon = styled(IoAlertCircle)`
 
 export const VerificationHeader = styled.p`
   font-weight: 300;
-  font-size: 30px;
+  font-size: 25px;
   padding: 0 4px;
   color: #fff;
   text-align: center;
