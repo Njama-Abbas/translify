@@ -32,6 +32,16 @@ app.use(function (_req, res, next) {
   next();
 });
 
+app.use(function handleDatabaseError(error, request, response, next) {
+  if (error instanceof db.mongoose.Error) {
+    return response.status(500).json({
+      type: "MongoError",
+      message: error.message,
+    });
+  }
+  next(error);
+});
+
 db.mongoose
   .connect(URI, {
     useNewUrlParser: true,
@@ -56,16 +66,6 @@ require("./routes/order.routes")(app);
 require("./routes/client.routes")(app);
 require("./routes/driver.routes")(app);
 require("./routes/photos.routes")(app);
-
-app.use(function handleDatabaseError(error, request, response, next) {
-  if (error instanceof db.mongoose.Error) {
-    return response.status(500).json({
-      type: "MongoError",
-      message: error.message,
-    });
-  }
-  next(error);
-});
 
 app.get("/", (_req, res) => res.send("Hello World!"));
 
