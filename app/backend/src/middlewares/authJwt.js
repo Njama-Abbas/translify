@@ -54,7 +54,6 @@ module.exports = {
       });
       return;
     }
-    console.log(user);
 
     const client_role = await Role.findOne({
       _id: user.role,
