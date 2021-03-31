@@ -7,7 +7,6 @@ import { Grid } from "@material-ui/core";
 
 import {
   getDrivers,
-  selectAllDrivers,
   selectDriversStatus,
   selectDesignatedDriver,
 } from "../../State/drivers.slice";
@@ -16,7 +15,8 @@ import { useHistory } from "react-router-dom";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { addNewOrder, ordersFilterChanged } from "../../State/orders.slice";
 
-import DriverListItem from "../../Components/DriverListItem";
+import { DriverList } from "../../Components";
+
 import {
   selectDestination,
   selectPickUp,
@@ -26,13 +26,11 @@ import {
 } from "../../State/navigation.slice";
 import { AuthAPI } from "../../Api";
 import calcPriceFromLatLng from "../../Resources/Utils/price";
-import { DriverBox, DriverBoxHeader, ErrorNotification } from "./elements";
 
 export default function OrderTruck() {
   const client = AuthAPI.getCurrentUser();
   const dispatch = useDispatch();
   const drivers_status = useSelector(selectDriversStatus);
-  const drivers = useSelector(selectAllDrivers);
   const designatedDriver = useSelector(selectDesignatedDriver);
   const pickup = useSelector(selectPickUp);
   const destination = useSelector(selectDestination);
@@ -43,6 +41,8 @@ export default function OrderTruck() {
   const [proceedRequestStatus, setProceedRequestStatus] = useState("idle");
 
   const canProceed = proceedRequestStatus === "idle";
+
+  const canSave = [moveType, pickup, destination, load].every(Boolean);
 
   const handleOrderRequest = async () => {
     if (canProceed) {
@@ -60,7 +60,7 @@ export default function OrderTruck() {
         const resultAction = await dispatch(addNewOrder(orderObj));
         unwrapResult(resultAction);
         dispatch(ordersFilterChanged("pending"));
-        history.push("/client#orders");
+        history.push("/client");
       } catch (err) {
         console.error("Failed to save the order: ", err);
       } finally {
@@ -76,32 +76,6 @@ export default function OrderTruck() {
       dispatch(getDrivers());
     }
   }, [dispatch, drivers_status]);
-
-  let content;
-
-  if (drivers_status === "loading") {
-    content = <div>Loading....</div>;
-  } else if (drivers_status === "succeeded") {
-    content = (
-      <DriverBox>
-        {drivers.length ? (
-          <div>
-            <DriverBoxHeader>Please Select A Driver</DriverBoxHeader>
-            {drivers.map((driver) => (
-              <DriverListItem driver={driver} key={driver.id} />
-            ))}
-            <Button>Procceed to Pay</Button>
-          </div>
-        ) : (
-          <ErrorNotification>
-            No Drivers Around Place of pickup
-          </ErrorNotification>
-        )}
-      </DriverBox>
-    );
-  } else if (drivers_status === "failed") {
-    content = <div>An error occured</div>;
-  }
 
   if (!client) {
     return <div>You need to log in</div>;
@@ -120,12 +94,33 @@ export default function OrderTruck() {
               <OrderForm />
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-              <Grid container direction="column">
-                <Grid item>
-                  <Price />
+              {canSave ? (
+                <Grid container direction="column">
+                  <Grid
+                    item
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      paddingTop: "20px",
+                    }}
+                  >
+                    <Price />
+                  </Grid>
+                  <Grid item>
+                    <DriverList />
+                  </Grid>
+                  <Grid
+                    item
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      paddingTop: "20px",
+                    }}
+                  >
+                    <Button big>Proceed To Pay</Button>
+                  </Grid>
                 </Grid>
-                <Grid item>{content}</Grid>
-              </Grid>
+              ) : null}
             </Grid>
           </Grid>
         </Container>
