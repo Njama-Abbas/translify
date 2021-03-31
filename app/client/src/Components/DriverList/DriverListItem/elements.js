@@ -1,19 +1,28 @@
 import styled from "styled-components";
-export const DriverContainer = styled.div`
+
+export const DriverItem = styled.div`
   padding: 4px 8px;
-  letter-spacing: 3px;
-  background-color: rgba(250, 248, 248, 0.945);
-  color: #0d1117;
-  margin: 5px;
-  width: 400px;
+  background-color: ${({ designated }) =>
+    designated ? "navy" : "rgba(8, 0, 0, 0.829)"};
+  margin: 2px 4px;
+  color: #fff;
+  max-width: 300px;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #0231a7;
+  }
 `;
-export const DriverItemBox = styled.div`
+export const DriverItemWrapper = styled.div`
   display: grid;
   grid-template-columns: auto auto;
   grid-template-rows: auto;
+  justify-content: start;
+  align-items: center;
   margin-bottom: 10px;
 `;
-export const ProfileImage = styled.img`
+
+export const DriverProfileImage = styled.img`
   width: 50px;
   height: 50px;
   border: 1px solid #fff;
