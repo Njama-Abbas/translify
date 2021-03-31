@@ -5,6 +5,7 @@ const Driver = db.driver;
 const bcrypt = require("bcrypt");
 
 const sample_drivers = require("./drivers");
+const sample_clients = require("./clients");
 
 exports.createSampleUsers = function () {
   User.estimatedDocumentCount(async (err, count) => {
@@ -13,21 +14,20 @@ exports.createSampleUsers = function () {
         name: "client",
       });
 
-      const sample_client = await User.create({
-        firstname: "Jayson",
-        lastname: "Bourne",
-        phoneno: "0723664497",
-        email: "jason@gmail.com",
-        password: bcrypt.hashSync("123Asd", 10),
-        verification: {
-          status: true,
-          code: 10801080,
-        },
-        role: client_role._id,
-      });
+      const $sample_clients = await Promise.all(
+        sample_clients.map(async (client) => {
+          const c1 = await User.create({
+            ...client,
+            role: client_role._id,
+          });
+          const c2 = await c1.save();
+          return true;
+        })
+      );
 
-      await sample_client.save();
-      console.log("Sample 'Client' Created");
+      if ($sample_clients.every(Boolean)) {
+        console.log("SAMPLE 'CLIENTS' CREATED");
+      }
 
       const driver_role = await Role.findOne({
         name: "driver",
@@ -93,7 +93,7 @@ exports.createSampleUsers = function () {
       ].every(Boolean);
 
       if (all_created) {
-        console.log("SAMPLE DRIVERS CREATED");
+        console.log("SAMPLE 'DRIVERS' CREATED");
       }
 
       const admin_role = await Role.findOne({
