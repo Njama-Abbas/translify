@@ -40,6 +40,7 @@ module.exports = {
     }
     res.status(201).json(user);
   },
+
   fetch: async (req, res) => {
     const client_role = await Role.findOne({
       name: "client",
