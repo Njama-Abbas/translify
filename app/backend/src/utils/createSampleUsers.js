@@ -20,6 +20,7 @@ exports.createSampleUsers = function () {
         email: "jason@gmail.com",
         password: bcrypt.hashSync("123Asd", 10),
         verification: {
+          status: true,
           code: 10801080,
         },
         role: client_role._id,
