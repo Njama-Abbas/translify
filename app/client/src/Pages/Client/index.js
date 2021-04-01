@@ -16,7 +16,7 @@ import {
   OrderDetails,
   ClientInfoSection,
   Footer,
-  Orders,
+  OrderList,
 } from "../../Components";
 
 import OrderTruck from "../OrderPage";
@@ -77,7 +77,7 @@ export default function Client() {
                 <Container>
                   <Grid container spacing={8} justify="center">
                     <Grid item xs={12} sm={8} md={6}>
-                      <Orders setActiveIndex={setActiveIndex} user={user} />
+                      <OrderList setActiveIndex={setActiveIndex} user={user} />
                     </Grid>
                     <Grid item xs={12} sm={8} md={6}>
                       {orders.length ? <OrderDetails user={user} /> : null}
