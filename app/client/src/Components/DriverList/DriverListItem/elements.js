@@ -3,14 +3,15 @@ import styled from "styled-components";
 export const DriverItem = styled.div`
   padding: 4px 8px;
   background-color: ${({ designated }) =>
-    designated ? "navy" : "rgba(8, 0, 0, 0.829)"};
+    designated ? "#fdfeff" : "rgba(8, 0, 0, 0.829)"};
   margin: 2px 4px;
-  color: #fff;
-  max-width: 300px;
+  color: ${({ designated }) => (designated ? "#0d1117" : "#fff")};
+  width: 300px;
   border-radius: 5px;
   cursor: pointer;
   &:hover {
-    background-color: #0231a7;
+    background-color: #fdfeff;
+    color: #0d1117;
   }
 `;
 export const DriverItemWrapper = styled.div`
