@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import { Footer, OrderForm, Price } from "../../Components";
 import { useDispatch, useSelector } from "react-redux";
 import { Box } from "../Client/client.elements";
-import { Button, Container } from "../../Resources/Styles/global";
+import { Container } from "../../Resources/Styles/global";
 import { Grid } from "@material-ui/core";
 
 import {
@@ -15,7 +15,7 @@ import { useHistory } from "react-router-dom";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { addNewOrder, ordersFilterChanged } from "../../State/orders.slice";
 
-import { DriverList } from "../../Components";
+import { DriverList, OrderInfoDialog } from "../../Components";
 
 import {
   selectDestination,
@@ -90,34 +90,36 @@ export default function OrderTruck() {
           }}
         >
           <Grid container spacing={2} justify="center" alignContent="center">
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid item sm={12} md={6}>
               <OrderForm />
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid item sm={12} md={6}>
               {canSave ? (
                 <Grid container direction="column">
-                  <Grid
-                    item
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      paddingTop: "20px",
-                    }}
-                  >
-                    <Price />
+                  <Grid item xs={12}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        paddingTop: "20px",
+                      }}
+                    >
+                      <Price />
+                    </div>
                   </Grid>
-                  <Grid item>
+                  <Grid item xs={12}>
                     <DriverList />
                   </Grid>
-                  <Grid
-                    item
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      paddingTop: "20px",
-                    }}
-                  >
-                    <Button big>Proceed To Pay</Button>
+                  <Grid item xs={12}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        paddingTop: "20px",
+                      }}
+                    >
+                      <OrderInfoDialog />
+                    </div>
                   </Grid>
                 </Grid>
               ) : null}
