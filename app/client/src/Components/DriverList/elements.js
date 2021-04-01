@@ -9,11 +9,19 @@ export const DriverListHeader = styled.p`
   background-color: #0d1117;
   color: #fff;
   text-align: center;
-  font-size: 3em;
+  word-wrap: wrap;
+  font-size: 2em;
 `;
 export const DriverListItems = styled.div`
   display: grid;
   grid-template-columns: auto auto;
+  grid-template-rows: auto;
+  justify-content: center;
+
+  @media (max-width: 620px) {
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+  }
 `;
 
 export const ErrorNotification = styled.p`
