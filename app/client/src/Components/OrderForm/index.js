@@ -98,8 +98,8 @@ const OderForm = () => {
                     <Option value={1}>0-1 Tone(s)</Option>
                     <Option value={2}>1-2 Tone(s)</Option>
                     <Option value={3}>2-3 Tone(s)</Option>
-                    <Option value={4}>4-5 Tone(s)</Option>
-                    <Option value={5}>More than 5 Tone(s)</Option>
+                    <Option value={4}>3-4 Tone(s)</Option>
+                    <Option value={5}>More than 4 Tone(s)</Option>
                   </Select>
                 </FormControlWrapper>
               </Grid>
@@ -121,7 +121,7 @@ const OderForm = () => {
                     <Option value={2}>2 Bed Rooms</Option>
                     <Option value={3}>3 Bed Rooms</Option>
                     <Option value={4}>4 Bed Rooms</Option>
-                    <Option value={5}>5 Bed Rooms</Option>
+                    <Option value={5}> Above 4 Bed Rooms</Option>
                   </Select>
                 </FormControlWrapper>
               </Grid>
