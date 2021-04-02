@@ -45,10 +45,7 @@ export default function Client() {
 
     UserAPI.getClientBoard().then(
       (response) => {
-        const { _id: userId } = response.data;
-        setUser({
-          userId,
-        });
+        setUser(response.data);
         setUserReady(true);
       },
       (error) => {
@@ -63,7 +60,6 @@ export default function Client() {
   if (redirect) {
     return <Redirect to={redirect} />;
   }
-
   return (
     <Switch>
       <Route path={path} exact>

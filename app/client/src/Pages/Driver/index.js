@@ -46,12 +46,10 @@ export default function Driver() {
 
     UserAPI.getDriverBoard().then(
       (response) => {
-        const { _id: userId } = response.data;
-        setUser({
-          userId,
-        });
+        const { id } = response.data;
+        setUser(response.data);
         setUserReady(true);
-        DriverAPI.check_approval(userId).then(
+        DriverAPI.check_approval(id).then(
           (response) => {
             setApprovalStatus(response.data.approval_status);
           },

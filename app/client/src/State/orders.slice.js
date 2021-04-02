@@ -12,8 +12,8 @@ const initialState = {
 const user = AuthAPI.getCurrentUser();
 
 export const fetchOrders = createAsyncThunk("orders/fetchOrders", async () => {
-  const response = await OrderAPI.getAllOrders(user.id, user.role);
-  return response.data.orders;
+  const response = await OrderAPI.getAllOrders(user.id);
+  return response.data;
 });
 
 export const addNewOrder = createAsyncThunk(
@@ -44,7 +44,7 @@ const OrdersSlice = createSlice({
     },
     activeOrderChanged(state, action) {
       state.activeOrder = state.orders.find(
-        (order) => order._id === action.payload
+        (order) => order.id === action.payload
       );
     },
   },
@@ -54,10 +54,13 @@ const OrdersSlice = createSlice({
     },
     [fetchOrders.fulfilled]: (state, action) => {
       state.status = "succeeded";
+      console.log(action.payload);
       state.orders = state.orders.concat(action.payload);
-      state.activeOrder = state.orders.filter(
-        (order) => order.status === state.filter
-      )[0];
+      if (state.orders.length) {
+        state.activeOrder = state.orders.filter(
+          (order) => order.status === state.filter
+        )[0];
+      }
     },
     [fetchOrders.rejected]: (state, action) => {
       state.status = "failed";

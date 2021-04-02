@@ -10,7 +10,7 @@ const OrderItem = ({ order, SET_ACTIVE_INDEX }) => {
       : "Freight";
 
   return (
-    <OrderContainer elevation={6} onClick={() => SET_ACTIVE_INDEX(order._id)}>
+    <OrderContainer elevation={6} onClick={() => SET_ACTIVE_INDEX(order.id)}>
       <OrderItemHeader>{formatMoveType(order.moveType)}</OrderItemHeader>
       <OrderDestination>{order.destination.address}</OrderDestination>
     </OrderContainer>

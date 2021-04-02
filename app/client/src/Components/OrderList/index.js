@@ -58,7 +58,7 @@ const Orders = ({ setActiveIndex, user }) => {
           orders.map((order) => (
             <OrderItem
               order={order}
-              key={order._id}
+              key={order.id}
               SET_ACTIVE_INDEX={setActiveIndex}
             />
           ))
