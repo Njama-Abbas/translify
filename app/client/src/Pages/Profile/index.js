@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
-import { PersonalDetails, MobileMoney } from "../../Components";
+import { PersonalDetails, PersonalActions } from "../../Components";
 import { AuthAPI } from "../../Api";
 import { ImageBgContainer } from "../../Resources/Styles/global";
 import { Grid } from "@material-ui/core";
-
 import {
   GreetingLine,
-  ProfileSection,
-  ProfileSectionHeader,
-  Transaction,
-  TransactionType,
-  TransactionAmount,
+  ProfileImage,
+  ProfileImageWrapper,
 } from "./profile.elements";
-
+import DefaultProfileImage from "../../Resources/Images/undraw_profile_pic.svg";
 export default function Profile() {
   const [redirect, setRedirect] = useState(null);
   const [userReady, setUserReady] = useState(null);
@@ -38,40 +34,16 @@ export default function Profile() {
       {userReady ? (
         <ImageBgContainer>
           <GreetingLine>
+            {/**to be determined by current time */}
             Greetings&nbsp;&nbsp;{currentUser.firstname}
           </GreetingLine>
-          <Grid container spacing={2} justify="space-between">
-            <PersonalDetails currentUser={currentUser} />
-            <Grid item md={5} sm={8} xs={12}>
-              <ProfileSection>
-                <ProfileSectionHeader>Transacations</ProfileSectionHeader>
-                <Transaction>
-                  <TransactionType>Xpress Payment</TransactionType>
-                  <TransactionAmount>Ksh: 3000</TransactionAmount>
-                </Transaction>
-                <Transaction>
-                  <TransactionType>Xpress Payment</TransactionType>
-                  <TransactionAmount>Ksh: 3000</TransactionAmount>
-                </Transaction>
-                <Transaction>
-                  <TransactionType>customer deposit</TransactionType>
-                  <TransactionAmount>Ksh: 30,000</TransactionAmount>
-                </Transaction>
-              </ProfileSection>
-            </Grid>
+          <ProfileImageWrapper>
+            <ProfileImage src={DefaultProfileImage} />
+          </ProfileImageWrapper>
+          <Grid container spacing={2} justify="center">
+            <PersonalDetails user={currentUser} />
+            <PersonalActions user={currentUser} />
           </Grid>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: "20px",
-              padding: "10px",
-            }}
-          >
-            <MobileMoney user={currentUser} />
-          </div>
         </ImageBgContainer>
       ) : null}
     </div>

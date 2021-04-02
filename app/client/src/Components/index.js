@@ -14,7 +14,7 @@ export { default as ClientInfoSection } from "./InfoSection/ClientInfoSection";
 export { default as OrderList } from "./OrderList";
 export { default as Price } from "./Price";
 export { default as PersonalDetails } from "./Profile/PersonalDetails";
-export { default as MobileMoney } from "./Profile/MobileMoney";
 export { default as LoadingComponent } from "./LoadingComponent";
 export { default as DriverList } from "./DriverList";
 export { default as OrderInfoDialog } from "./OrderInfoDialog";
+export { default as PersonalActions } from "./Profile/PersonalActions";

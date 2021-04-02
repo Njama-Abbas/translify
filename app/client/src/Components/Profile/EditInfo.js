@@ -35,8 +35,8 @@ export default function EditInfoDialog({ user }) {
 
   return (
     <div>
-      <Button fullWidth onClick={handleClickOpen}>
-        Edit Info
+      <Button fullWidth primary onClick={handleClickOpen}>
+        Edit Personal Info
       </Button>
       <Dialog
         open={open}

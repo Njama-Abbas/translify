@@ -1,41 +1,35 @@
 import React from "react";
 import { Grid } from "@material-ui/core";
-import {
-  ProfileSection,
-  ProfileSectionHeader,
-  PersonalDetailsItem,
-} from "./Profile.elements";
+import { ProfileSection, PersonalDetailsItem } from "./Profile.elements";
 import EditInfoDialog from "./EditInfo";
-import ChangePasswordDialog from "./ChangePassword";
 
-export default function PersonalInfo({ currentUser }) {
+export default function PersonalInfo({ user }) {
   return (
-    <Grid item md={5} sm={8} xs={12}>
+    <Grid item md={6} sm={8} xs={12}>
       <ProfileSection>
-        <ProfileSectionHeader>Personal Information</ProfileSectionHeader>
         <PersonalDetailsItem>
           <p>
             <strong>Email:</strong>
           </p>
-          <p>{currentUser.email}</p>
+          <p>{user.email}</p>
         </PersonalDetailsItem>
         <PersonalDetailsItem>
           <p>
             <strong>First Name:</strong>
           </p>
-          <p>{currentUser.firstname}</p>
+          <p>{user.firstname}</p>
         </PersonalDetailsItem>
         <PersonalDetailsItem>
           <p>
             <strong>Last Name:</strong>
           </p>
-          <p>{currentUser.lastname}</p>
+          <p>{user.lastname}</p>
         </PersonalDetailsItem>
         <PersonalDetailsItem>
           <p>
             <strong>Phone No:</strong>
           </p>
-          <p>{currentUser.phoneno}</p>
+          <p>{user.phoneno}</p>
         </PersonalDetailsItem>
         <div
           style={{
@@ -43,8 +37,7 @@ export default function PersonalInfo({ currentUser }) {
             flexDirection: "column",
           }}
         >
-          <EditInfoDialog user={currentUser} />
-          <ChangePasswordDialog />
+          <EditInfoDialog user={user} />
         </div>
       </ProfileSection>
     </Grid>
