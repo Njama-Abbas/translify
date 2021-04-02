@@ -13,6 +13,15 @@ module.exports = {
       });
       return;
     }
-    res.status(200).json(user);
+    const clientRole = await Role.findOne({
+      name: "client",
+    });
+
+    res.status(200).json({
+      id: user._id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      role: clientRole.name,
+    });
   },
 };
