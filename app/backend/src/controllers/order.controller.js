@@ -1,6 +1,9 @@
+const { role } = require("../models");
 const db = require("../models");
-const Order = db.order;
-const Driver = db.driver;
+const ORDER = db.order;
+const DRIVER = db.driver;
+const ROLE = db.role;
+const USER = db.user;
 
 exports.creteOrder = (req, res) => {
   const {
@@ -13,7 +16,7 @@ exports.creteOrder = (req, res) => {
     charges,
   } = req.body;
 
-  const newOrder = new Order({
+  const newOrder = new ORDER({
     moveType,
     clientId,
     driverId,
@@ -38,89 +41,108 @@ exports.creteOrder = (req, res) => {
   });
 };
 
-exports.getAllOrdersByUserId = (req, res) => {
-  const { userid, role } = req.headers;
+exports.getAllOrdersByUserId = async (req, res) => {
+  const { userid } = req.headers;
 
-  if (role === "client") {
-    Order.find(
-      {
-        clientId: userid,
-      },
-      (err, orders) => {
-        if (err) {
-          res.status(500).json({
-            message: err,
-          });
-          return;
-        }
+  const user = await USER.findById(userid);
 
-        if (!orders) {
-          res.status(404).json({
-            message: "orders not found",
-          });
-          return;
-        }
-        res.status(200).json({
-          orders,
-        });
-      }
-    );
-  } else if (role === "driver") {
-    Driver.findOne(
-      {
-        userId: userid,
-      },
-      (err, driver) => {
-        if (err) {
-          res.status(500).json({
-            message: err,
-          });
-          return;
-        }
-        if (!driver) {
-          res.status(404).json({
-            message: "orders not found",
-          });
-          return;
-        }
-
-        Order.find(
-          {
-            driverId: driver._id,
-          },
-          (err, orders) => {
-            if (err) {
-              res.status(500).json({
-                message: err,
-              });
-              return;
-            }
-
-            if (!orders) {
-              res.status(404).json({
-                message: "orders not found",
-              });
-              return;
-            }
-            res.status(200).json({
-              orders,
-            });
-          }
-        );
-      }
-    );
-  } else {
-    res.status(401).json({
-      message: "Invalid request headers",
+  if (!user) {
+    res.status(404).json({
+      message: "User not found",
     });
     return;
   }
+  const role = await ROLE.findById(user.role);
+
+  if (!role) {
+    res.status(404).json({
+      message: "We could not locate the supplied role",
+    });
+  }
+
+  let orders = [];
+
+  if (role.name === "client") {
+    orders = await ORDER.find({
+      clientId: userid,
+    });
+  } else if (role.name === "driver") {
+    const driver = await DRIVER.findOne({
+      userId: userid,
+    });
+    if (!driver) {
+      res.status(404).json({
+        message: "Driver not found",
+      });
+      return;
+    }
+    orders = await ORDER.find({
+      driverId: driver._id,
+    });
+  }
+  if (!orders) {
+    res.status(404).json({
+      message: "orders not found",
+    });
+    return;
+  }
+  if (orders.length === 0) {
+    res.status(204).json(orders);
+    return;
+  }
+
+  const mappedOrders = await Promise.all(
+    orders.map(async (order) => {
+      const {
+        pickup,
+        destination,
+        charges,
+        load,
+        status,
+        orderDate,
+        clientId,
+        driverId,
+        _id: id,
+      } = order;
+
+      const designatedDriver = await DRIVER.findOne({
+        _id: driverId,
+      });
+      const driver = await USER.findOne({
+        _id: designatedDriver.userId,
+      });
+
+      const client = await USER.findOne({
+        _id: clientId,
+      });
+
+      return {
+        id,
+        driver: {
+          firstname: driver.firstname,
+          lastname: driver.lastname,
+          truckno: designatedDriver.truckno,
+        },
+        client: {
+          firstname: client.firstname,
+          lastname: client.lastname,
+        },
+        pickup,
+        destination,
+        charges,
+        load,
+        status,
+        orderDate,
+      };
+    })
+  );
+  res.status(200).json(mappedOrders);
 };
 
 exports.updateOrder = (req, res) => {
   const { orderId: _id, status } = req.body;
 
-  Order.findOne(
+  ORDER.findOne(
     {
       _id,
     },

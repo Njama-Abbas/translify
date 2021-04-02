@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { currencyToString } from "../../Resources/Utils/price";
 
@@ -8,7 +8,6 @@ import {
   selectActiveOrder,
 } from "../../State/orders.slice";
 
-import { DriverAPI, ClientAPI } from "../../Api";
 import { Button } from "../../Resources/Styles/global";
 
 import {
@@ -22,14 +21,11 @@ import {
 
 const OrderDetails = ({ user }) => {
   const order = useSelector(selectActiveOrder);
-
-  const { _id: orderId } = order;
-  const [driver, setDriver] = useState(null);
-  const [client, setClient] = useState(null);
+  const id = order.id;
   const dispatch = useDispatch();
 
   const OrderUpdate = (status) => {
-    dispatch(updateOrder({ orderId, status }));
+    dispatch(updateOrder({ id, status }));
   };
 
   const handleOrderCancel = () => {
@@ -47,33 +43,19 @@ const OrderDetails = ({ user }) => {
     dispatch(ordersFilterChanged("successfull"));
   };
 
-  useEffect(() => {
-    DriverAPI.getDriverById(order.driverId)
-      .then((res) => {
-        setDriver(res.data);
-      })
-      .catch((_err) => {
-        setDriver(null);
-      });
-
-    ClientAPI.getClientById(order.clientId)
-      .then((res) => {
-        setClient(res.data);
-      })
-      .catch((_err) => {
-        setClient(null);
-      });
-  }, [order.driverId, order.clientId]);
-
   if (!order) {
     return null;
   }
+
   return (
     <OrderDetailsContainer>
       <OrderDetailsHeader>translify</OrderDetailsHeader>
       <OrderColumn>
         <OrderItem>Order No:</OrderItem>
-        <OrderValue>{orderId.slice(0, 8)}</OrderValue>
+        <OrderValue>
+          {id.slice(0, 4)}
+          {id.slice(-4)}
+        </OrderValue>
       </OrderColumn>
       <OrderColumn>
         <OrderItem>Pick Up: </OrderItem>
@@ -93,28 +75,25 @@ const OrderDetails = ({ user }) => {
           Ksh:&nbsp;{currencyToString(order.charges)}
         </OrderValue>
       </OrderColumn>
-      {user.role === "client"
-        ? driver && (
-            <OrderColumn>
-              <OrderItem>Driver</OrderItem>
-              <OrderValue>
-                {driver.firstname} - {driver.truckno}
-              </OrderValue>
-            </OrderColumn>
-          )
-        : user.role === "driver"
-        ? client && (
-            <OrderColumn>
-              <OrderItem>Client</OrderItem>
-              <OrderValue>
-                {client.firstname}&nbsp;{client.lastname}
-              </OrderValue>
-            </OrderColumn>
-          )
-        : null}
+      {user.role === "client" ? (
+        <OrderColumn>
+          <OrderItem>Driver</OrderItem>
+          <OrderValue>
+            {order.driver.firstname} - {order.driver.truckno}
+          </OrderValue>
+        </OrderColumn>
+      ) : user.role === "driver" ? (
+        <OrderColumn>
+          <OrderItem>Client</OrderItem>
+          <OrderValue>
+            {order.client.firstname}&nbsp;{order.client.lastname}
+          </OrderValue>
+        </OrderColumn>
+      ) : null}
+
       <OrderColumn>
         <OrderItem>Date: </OrderItem>
-        <OrderValue>{new Date(order.dateTime).toLocaleString()}</OrderValue>
+        <OrderValue>{new Date(order.orderDate).toLocaleString()}</OrderValue>
       </OrderColumn>
       <OrderColumn>
         <OrderItem>Status: </OrderItem>
