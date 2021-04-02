@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { Footer, OrderForm, Price } from "../../Components";
+import { Footer, LoadingComponent, OrderForm, Price } from "../../Components";
 import { useDispatch, useSelector } from "react-redux";
 import { Box } from "../Client/client.elements";
 import { Container } from "../../Resources/Styles/global";
@@ -39,6 +39,7 @@ export default function OrderTruck() {
   const history = useHistory();
 
   const [proceedRequestStatus, setProceedRequestStatus] = useState("idle");
+  const [isLoading, setIsLoading] = useState(false);
 
   const canProceed = proceedRequestStatus === "idle";
 
@@ -46,6 +47,7 @@ export default function OrderTruck() {
 
   const handleOrderRequest = async () => {
     if (canProceed) {
+      setIsLoading(true);
       try {
         setProceedRequestStatus("pending");
         const orderObj = {
@@ -60,6 +62,7 @@ export default function OrderTruck() {
         const resultAction = await dispatch(addNewOrder(orderObj));
         unwrapResult(resultAction);
         dispatch(ordersFilterChanged("pending"));
+        setIsLoading(false);
         history.push("/client");
       } catch (err) {
         console.error("Failed to save the order: ", err);
@@ -67,6 +70,7 @@ export default function OrderTruck() {
         setProceedRequestStatus("idle");
         dispatch(locationUpdated({ inputType: "pickup", details: null }));
         dispatch(locationUpdated({ inputType: "destination", details: null }));
+        setIsLoading(false);
       }
     }
   };
@@ -77,57 +81,64 @@ export default function OrderTruck() {
     }
   }, [dispatch, drivers_status]);
 
-  if (!client) {
-    return <div>You need to log in</div>;
-  }
+  let content;
 
-  return (
-    <Fragment>
-      <Box>
-        <Container
-          style={{
-            minHeight: "100vh",
-          }}
-        >
-          <Grid container spacing={2} justify="center" alignContent="center">
-            <Grid item sm={12} md={6}>
-              <OrderForm />
+  if (!client) {
+    content = <div>You need to log in</div>;
+  } else if (isLoading) {
+    content = <LoadingComponent />;
+  } else {
+    content = (
+      <Fragment>
+        <Box>
+          <Container
+            style={{
+              minHeight: "100vh",
+            }}
+          >
+            <Grid container spacing={2} justify="center" alignContent="center">
+              <Grid item sm={12} md={6}>
+                <OrderForm />
+              </Grid>
+              <Grid item sm={12} md={6}>
+                {canSave ? (
+                  <Grid container direction="column">
+                    <Grid item xs={12}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          paddingTop: "20px",
+                        }}
+                      >
+                        <Price />
+                      </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <DriverList />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          paddingTop: "20px",
+                        }}
+                      >
+                        <OrderInfoDialog
+                          handleOrderRequest={handleOrderRequest}
+                        />
+                      </div>
+                    </Grid>
+                  </Grid>
+                ) : null}
+              </Grid>
             </Grid>
-            <Grid item sm={12} md={6}>
-              {canSave ? (
-                <Grid container direction="column">
-                  <Grid item xs={12}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        paddingTop: "20px",
-                      }}
-                    >
-                      <Price />
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <DriverList />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        paddingTop: "20px",
-                      }}
-                    >
-                      <OrderInfoDialog />
-                    </div>
-                  </Grid>
-                </Grid>
-              ) : null}
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-      <Footer />
-    </Fragment>
-  );
+          </Container>
+        </Box>
+        <Footer />
+      </Fragment>
+    );
+  }
+  return content;
 }
