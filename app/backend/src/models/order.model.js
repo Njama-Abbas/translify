@@ -42,7 +42,7 @@ const Order = mongoose.model(
       enum: ["pending", "cancelled", "in-progress", "successfull"],
       default: "pending",
     },
-    dateTime: {
+    orderDate: {
       type: Date,
       default: new Date(),
     },
