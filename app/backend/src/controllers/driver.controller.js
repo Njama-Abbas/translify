@@ -47,7 +47,8 @@ module.exports = {
   },
 
   getById: async (req, res) => {
-    const id = req.headers.id;
+    const id = req.headers.driverid;
+
     const driver = await Driver.findById(id);
 
     if (!driver) {
@@ -58,7 +59,7 @@ module.exports = {
     }
 
     const user = await User.findOne({
-      userId: driver.userId,
+      _id: driver.userId,
     });
 
     if (!user) {
@@ -70,17 +71,11 @@ module.exports = {
 
     res.status(200).json({
       id: driver._id,
-      userid: user._id,
+      userId: user._id,
       firstname: user.firstname,
       lastname: user.lastname,
       phoneno: user.phoneno,
-      email: user.email,
-      rating: user.rating,
       truckno: driver.truckno,
-      dlno: driver.dlno,
-      address: driver.address.place_name,
-      approval_status: format_approval(driver.approval_status),
-      created_at: new Date(driver.dateOfReg),
     });
   },
 
