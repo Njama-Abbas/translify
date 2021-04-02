@@ -29,13 +29,14 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const OrderInfoDialog = () => {
+const OrderInfoDialog = ({ handleOrderRequest }) => {
   const [open, setOpen] = useState(false);
   const designatedDriver = useSelector(selectDesignatedDriver);
   const destination = useSelector(selectDestination);
   const moveType = useSelector(selectMoveType);
   const pickup = useSelector(selectPickUp);
   const load = useSelector(selectLoad);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -43,7 +44,6 @@ const OrderInfoDialog = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
   const OrderInfo = (
     <Container component="main" maxWidth="xs">
       <InfoPaper>
@@ -88,7 +88,9 @@ const OrderInfoDialog = () => {
           <Button warning onClick={handleClose}>
             Go Back
           </Button>
-          <Button primary>Mpesa Pay</Button>
+          <Button primary onClick={handleOrderRequest}>
+            Mpesa Pay
+          </Button>
         </OrderInfoWraper>
       </InfoPaper>
     </Container>
