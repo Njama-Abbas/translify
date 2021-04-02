@@ -32,15 +32,15 @@ app.use(function (_req, res, next) {
   next();
 });
 
-app.use(function handleDatabaseError(error, request, response, next) {
-  if (error instanceof db.mongoose.Error) {
-    return response.status(500).json({
-      type: "MongoError",
-      message: error.message,
-    });
-  }
-  next(error);
-});
+// app.use(function handleDatabaseError(error, request, response, next) {
+//   if (error instanceof db.mongoose.Error) {
+//     return response.status(500).json({
+//       type: "MongoError",
+//       message: error.message,
+//     });
+//   }
+//   next(error);
+// });
 
 db.mongoose
   .connect(URI, {
