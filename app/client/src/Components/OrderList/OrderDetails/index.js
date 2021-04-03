@@ -1,5 +1,4 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { currencyToString } from "../../../Resources/Utils/price";
 import {
   OrderDetailsContainer,
@@ -10,8 +9,6 @@ import {
   OrderStatus,
 } from "./elements";
 
-import { updateOrder, ordersFilterChanged } from "../../../State/orders.slice";
-
 import { Button } from "../../../Resources/Styles/global";
 
 import { Dialog, DialogContent, Slide } from "@material-ui/core";
@@ -20,33 +17,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const OrderDetails = ({ user, close, order }) => {
+const OrderDetails = ({ user, close, order, controls }) => {
   const id = order.id;
-  const dispatch = useDispatch();
-
-  const OrderUpdate = (status) => {
-    dispatch(updateOrder({ id, status }));
-  };
-
-  const handleOrderCancel = () => {
-    OrderUpdate("cancelled");
-    dispatch(ordersFilterChanged("cancelled"));
-  };
-
-  const handleOrderAccept = () => {
-    OrderUpdate("in-progress");
-    dispatch(ordersFilterChanged("in-progress"));
-  };
-
-  const handleOrderComplete = () => {
-    OrderUpdate("successfull");
-    dispatch(ordersFilterChanged("successfull"));
-  };
-
-  if (!order) {
-    return null;
-  }
-
   return (
     <OrderDetailsContainer>
       <OrderDetailsHeader>translify</OrderDetailsHeader>
@@ -101,10 +73,10 @@ const OrderDetails = ({ user, close, order }) => {
       {order.status === "pending" &&
         (user.role === "driver" ? (
           <OrderColumn>
-            <Button small primary onClick={handleOrderAccept}>
+            <Button small primary onClick={controls.accept}>
               Accept
             </Button>
-            <Button small warning primary>
+            <Button small warning primary onClick={controls.cancel}>
               Decline
             </Button>
             <Button small secondary onClick={close}>
@@ -114,7 +86,7 @@ const OrderDetails = ({ user, close, order }) => {
         ) : (
           user.role === "client" && (
             <OrderColumn>
-              <Button small warning onClick={handleOrderCancel}>
+              <Button small warning onClick={controls.cancel}>
                 Cancel
               </Button>
               <Button small secondary onClick={close}>
@@ -126,10 +98,10 @@ const OrderDetails = ({ user, close, order }) => {
 
       {order.status === "in-progress" && (
         <OrderColumn>
-          <Button small onClick={handleOrderComplete}>
+          <Button small onClick={controls.complete}>
             Complete Trip
           </Button>
-          <Button small secondary onClick={handleOrderCancel}>
+          <Button small secondary onClick={close}>
             Exit
           </Button>
         </OrderColumn>
@@ -138,7 +110,7 @@ const OrderDetails = ({ user, close, order }) => {
   );
 };
 
-export default function ViewOrderDetailsDialog({ user, order }) {
+export default function ViewOrderDetailsDialog({ user, order, controls }) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -167,7 +139,12 @@ export default function ViewOrderDetailsDialog({ user, order }) {
         }}
       >
         <DialogContent>
-          <OrderDetails user={user} order={order} close={handleClose} />
+          <OrderDetails
+            user={user}
+            order={order}
+            close={handleClose}
+            controls={controls}
+          />
         </DialogContent>
       </Dialog>
     </div>
