@@ -2,22 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useToasts } from "react-toast-notifications";
 
 import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
-import { Grid } from "@material-ui/core";
-import { useSelector, useDispatch } from "react-redux";
 
 import { UserAPI, AuthAPI } from "../../Api";
-import { activeOrderChanged, selectOrders } from "../../State/orders.slice";
 import { Container } from "../../Resources/Styles/global";
 import { ClientInfo } from "../../Resources/Data/clientinfo";
 import { Box } from "./client.elements";
 
-import {
-  Navbar,
-  OrderDetails,
-  ClientInfoSection,
-  Footer,
-  OrderList,
-} from "../../Components";
+import { Navbar, ClientInfoSection, Footer, OrderList } from "../../Components";
 
 import OrderTruck from "../OrderPage";
 import Profile from "../Profile";
@@ -26,15 +17,9 @@ export default function Client() {
   const { path } = useRouteMatch();
   const { addToast } = useToasts();
 
-  const orders = useSelector(selectOrders);
-  const dispatch = useDispatch();
   const [redirect, setRedirect] = useState(null);
   const [userReady, setUserReady] = useState(null);
   const [user, setUser] = useState(undefined);
-
-  const setActiveIndex = (id) => {
-    dispatch(activeOrderChanged(id));
-  };
 
   useEffect(() => {
     const currentUser = AuthAPI.getCurrentUser();
@@ -71,7 +56,7 @@ export default function Client() {
                   <Navbar />
                 </Container>
                 <Container>
-                  <OrderList setActiveIndex={setActiveIndex} user={user} />
+                  <OrderList user={user} />
                   <ClientInfoSection {...ClientInfo} />
                 </Container>
               </Box>

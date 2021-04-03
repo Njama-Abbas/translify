@@ -9,7 +9,6 @@ export { default as OrderForm } from "./OrderForm";
 export { default as Image } from "./Image";
 export { default as DriverRegistrationForm } from "./Driver-Registration";
 export { default as TruckCard } from "./TruckCard";
-export { default as OrderDetails } from "./OrderDetails/";
 export { default as ClientInfoSection } from "./InfoSection/ClientInfoSection";
 export { default as OrderList } from "./OrderList";
 export { default as Price } from "./Price";
