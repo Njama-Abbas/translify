@@ -1,15 +1,6 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { currencyToString } from "../../Resources/Utils/price";
-
-import {
-  updateOrder,
-  ordersFilterChanged,
-  selectActiveOrder,
-} from "../../State/orders.slice";
-
-import { Button } from "../../Resources/Styles/global";
-
+import { useDispatch } from "react-redux";
+import { currencyToString } from "../../../Resources/Utils/price";
 import {
   OrderDetailsContainer,
   OrderDetailsHeader,
@@ -19,8 +10,17 @@ import {
   OrderStatus,
 } from "./elements";
 
-const OrderDetails = ({ user }) => {
-  const order = useSelector(selectActiveOrder);
+import { updateOrder, ordersFilterChanged } from "../../../State/orders.slice";
+
+import { Button } from "../../../Resources/Styles/global";
+
+import { Dialog, DialogContent, Slide } from "@material-ui/core";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+const OrderDetails = ({ user, close, order }) => {
   const id = order.id;
   const dispatch = useDispatch();
 
@@ -52,7 +52,12 @@ const OrderDetails = ({ user }) => {
       <OrderDetailsHeader>translify</OrderDetailsHeader>
       <OrderColumn>
         <OrderItem>Order No:</OrderItem>
-        <OrderValue>
+        <OrderValue
+          style={{
+            textAlign: "right",
+            textTransform: "uppercase",
+          }}
+        >
           {id.slice(0, 4)}
           {id.slice(-4)}
         </OrderValue>
@@ -67,13 +72,7 @@ const OrderDetails = ({ user }) => {
       </OrderColumn>
       <OrderColumn>
         <OrderItem>Charges: </OrderItem>
-        <OrderValue
-          style={{
-            letterSpacing: "3px",
-          }}
-        >
-          Ksh:&nbsp;{currencyToString(order.charges)}
-        </OrderValue>
+        <OrderValue>Ksh:&nbsp;{currencyToString(order.charges)}</OrderValue>
       </OrderColumn>
       {user.role === "client" ? (
         <OrderColumn>
@@ -102,25 +101,75 @@ const OrderDetails = ({ user }) => {
       {order.status === "pending" &&
         (user.role === "driver" ? (
           <OrderColumn>
-            <Button primary onClick={handleOrderAccept}>
+            <Button small primary onClick={handleOrderAccept}>
               Accept
             </Button>
-            <Button primary>Decline</Button>
+            <Button small warning primary>
+              Decline
+            </Button>
+            <Button small secondary onClick={close}>
+              Exit
+            </Button>
           </OrderColumn>
         ) : (
           user.role === "client" && (
             <OrderColumn>
-              <Button onClick={handleOrderCancel}>Cancel</Button>
+              <Button small warning onClick={handleOrderCancel}>
+                Cancel
+              </Button>
+              <Button small secondary onClick={close}>
+                Exit
+              </Button>
             </OrderColumn>
           )
         ))}
+
       {order.status === "in-progress" && (
         <OrderColumn>
-          <Button onClick={handleOrderComplete}>Complete Trip</Button>
+          <Button small onClick={handleOrderComplete}>
+            Complete Trip
+          </Button>
+          <Button small secondary onClick={handleOrderCancel}>
+            Exit
+          </Button>
         </OrderColumn>
       )}
     </OrderDetailsContainer>
   );
 };
 
-export default OrderDetails;
+export default function ViewOrderDetailsDialog({ user, order }) {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <div>
+      <Button small onClick={handleClickOpen}>
+        view
+      </Button>
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleClose}
+        aria-labelledby="edit-info-dialog-slide-title"
+        aria-describedby="edit-info-dialog-slide-description"
+        style={{
+          minWidth: "400px",
+          margin: "auto",
+        }}
+      >
+        <DialogContent>
+          <OrderDetails user={user} order={order} close={handleClose} />
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
