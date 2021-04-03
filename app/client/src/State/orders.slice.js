@@ -6,7 +6,6 @@ const initialState = {
   status: "idle",
   error: null,
   filter: "in-progress",
-  activeOrder: {},
 };
 
 const user = AuthAPI.getCurrentUser();
@@ -25,11 +24,8 @@ export const addNewOrder = createAsyncThunk(
 );
 
 export const updateOrder = createAsyncThunk("orders/update", async (order) => {
-  const update_order_response = await OrderAPI.updateOrder(order);
-  if (update_order_response.status === 200) {
-    const response = await OrderAPI.getAllOrders(user.id, user.role);
-    return response.data.orders;
-  }
+  const response = await OrderAPI.updateOrder(order);
+  return response.data;
 });
 
 const OrdersSlice = createSlice({
@@ -38,14 +34,6 @@ const OrdersSlice = createSlice({
   reducers: {
     ordersFilterChanged(state, action) {
       state.filter = action.payload;
-      state.activeOrder = state.orders.filter(
-        (order) => order.status === state.filter
-      )[0];
-    },
-    activeOrderChanged(state, action) {
-      state.activeOrder = state.orders.find(
-        (order) => order.id === action.payload
-      );
     },
   },
   extraReducers: {
@@ -54,13 +42,7 @@ const OrdersSlice = createSlice({
     },
     [fetchOrders.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      console.log(action.payload);
-      state.orders = state.orders.concat(action.payload);
-      if (state.orders.length) {
-        state.activeOrder = state.orders.filter(
-          (order) => order.status === state.filter
-        )[0];
-      }
+      state.orders = action.payload;
     },
     [fetchOrders.rejected]: (state, action) => {
       state.status = "failed";
@@ -73,14 +55,13 @@ const OrdersSlice = createSlice({
     [updateOrder.fulfilled]: (state, action) => {
       state.status = "succeeded";
       state.orders = action.payload;
-      state.activeOrder = state.orders.filter(
-        (order) => order.status === state.filter
-      )[0];
     },
   },
 });
 
 export const { ordersFilterChanged, activeOrderChanged } = OrdersSlice.actions;
+
+export const selectAllOrders = (state) => state.orders.orders;
 
 export const selectOrders = (state) => {
   return state.orders.orders.filter(
@@ -90,8 +71,6 @@ export const selectOrders = (state) => {
 
 export const selectOrderById = (state, orderId) =>
   state.orders.orders.find((order) => order._id === orderId);
-
-export const selectActiveOrder = (state) => state.orders.activeOrder;
 
 export const selectFilter = (state) => state.orders.filter;
 export default OrdersSlice.reducer;
