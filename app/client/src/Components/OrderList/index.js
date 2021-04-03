@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from "react";
+import React, { useEffect } from "react";
 import { Grid } from "@material-ui/core";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -6,6 +6,7 @@ import {
   fetchOrders,
   ordersFilterChanged,
   selectFilter,
+  selectAllOrders,
 } from "../../State/orders.slice";
 
 import { LinkButton } from "../../Resources/Styles/global";
@@ -23,23 +24,27 @@ import {
   OrderCardContainer,
   OrderCardHeader,
   OrdersNav,
-  FilterButton,
-  Icon,
+  FilterControlItem,
+  FilterCount,
+  FilterIcon,
   FilterText,
   Notification,
   Message,
 } from "./elements";
 
-const Orders = ({ setActiveIndex, user }) => {
+const Orders = ({ user }) => {
   const dispatch = useDispatch();
   const orders = useSelector(selectOrders);
   const order_status = useSelector((state) => state.orders.status);
   const error = useSelector((state) => state.orders.error);
   const filter = useSelector(selectFilter);
+  const allOrders = useSelector(selectAllOrders);
 
   const handleFilterChange = (filter) => dispatch(ordersFilterChanged(filter));
 
   const active_filter = (current_filter) => current_filter === filter;
+
+  const countOrders = (f) => allOrders.filter((o) => o.status === f).length;
 
   useEffect(() => {
     if (order_status === "idle") {
@@ -53,14 +58,10 @@ const Orders = ({ setActiveIndex, user }) => {
     content = <div className="loader">Loading...</div>;
   } else if (order_status === "succeeded") {
     content = (
-      <Fragment>
+      <div>
         {orders.length ? (
           orders.map((order) => (
-            <OrderItem
-              order={order}
-              key={order.id}
-              SET_ACTIVE_INDEX={setActiveIndex}
-            />
+            <OrderItem order={order} user={user} key={order.id} />
           ))
         ) : (
           <Notification>
@@ -73,7 +74,7 @@ const Orders = ({ setActiveIndex, user }) => {
             )}
           </Notification>
         )}
-      </Fragment>
+      </div>
     );
   } else if (order_status === "failed") {
     content = <div>{error}</div>;
@@ -82,55 +83,74 @@ const Orders = ({ setActiveIndex, user }) => {
   return (
     <IconContext.Provider
       value={{
-        color: "#00f",
-        width: "100%",
-        height: "100%",
+        color: "#fff",
       }}
     >
-      <Grid item>
-        <OrderCardContainer>
-          <OrderCardHeader>My Transits</OrderCardHeader>
-          <OrdersNav>
-            <FilterButton
-              warning={active_filter("pending")}
-              onClick={() => handleFilterChange("pending")}
-            >
-              <Icon>
-                <MdAccessAlarm />
-              </Icon>
-              <FilterText>Pending</FilterText>
-            </FilterButton>
-            <FilterButton
-              warning={active_filter("cancelled")}
-              onClick={() => handleFilterChange("cancelled")}
-            >
-              <Icon>
-                <MdWarning />
-              </Icon>
-              <FilterText>Cancelled</FilterText>
-            </FilterButton>
-            <FilterButton
-              warning={active_filter("in-progress")}
-              onClick={() => handleFilterChange("in-progress")}
-            >
-              <Icon>
-                <MdImportExport />
-              </Icon>
-              <FilterText>InProgress</FilterText>
-            </FilterButton>
-            <FilterButton
-              warning={active_filter("successfull")}
-              onClick={() => handleFilterChange("successfull")}
-            >
-              <Icon>
-                <MdCheck />
-              </Icon>
-              <FilterText>Successfull</FilterText>
-            </FilterButton>
-          </OrdersNav>
-          {content}
-        </OrderCardContainer>
-      </Grid>
+      <div
+        style={{
+          height: "100vh",
+          overflowY: "scroll",
+        }}
+      >
+        <Grid container direction="column">
+          <Grid item xs={12}>
+            <OrderCardHeader>My Transits</OrderCardHeader>
+          </Grid>
+          <Grid item>
+            <OrderCardContainer>
+              <Grid container justify="space-evenly">
+                <Grid item md={3} sm={8}>
+                  <OrdersNav>
+                    <FilterControlItem
+                      selected={active_filter("pending")}
+                      onClick={() => handleFilterChange("pending")}
+                    >
+                      <FilterIcon>
+                        <MdAccessAlarm size="30px" />
+                      </FilterIcon>
+                      <FilterText>Pending</FilterText>
+                      <FilterCount>{countOrders("pending")}</FilterCount>
+                    </FilterControlItem>
+                    <FilterControlItem
+                      selected={active_filter("cancelled")}
+                      onClick={() => handleFilterChange("cancelled")}
+                    >
+                      <FilterIcon>
+                        <MdWarning size="30px" />
+                      </FilterIcon>
+                      <FilterText>Cancelled</FilterText>
+                      <FilterCount>{countOrders("cancelled")}</FilterCount>
+                    </FilterControlItem>
+                    <FilterControlItem
+                      selected={active_filter("in-progress")}
+                      onClick={() => handleFilterChange("in-progress")}
+                    >
+                      <FilterIcon>
+                        <MdImportExport size="30px" />
+                      </FilterIcon>
+                      <FilterText>InTransit</FilterText>
+                      <FilterCount>{countOrders("in-progress")}</FilterCount>
+                    </FilterControlItem>
+                    <FilterControlItem
+                      selected={active_filter("successfull")}
+                      onClick={() => handleFilterChange("successfull")}
+                    >
+                      <FilterIcon>
+                        <MdCheck size="30px" />
+                      </FilterIcon>
+                      <FilterText>Successfull</FilterText>
+                      <FilterCount>{countOrders("successfull")}</FilterCount>
+                    </FilterControlItem>
+                  </OrdersNav>
+                </Grid>
+                <Grid item md={9} sm={12}>
+                  {content}
+                </Grid>
+              </Grid>
+            </OrderCardContainer>
+          </Grid>
+        </Grid>
+      </div>
     </IconContext.Provider>
   );
 };
