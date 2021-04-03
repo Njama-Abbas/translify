@@ -9,20 +9,20 @@ export const OrderContainer = styled(Paper)`
   cursor: pointer;
   padding: 4px 16px;
   width: 100%;
-
   &:hover {
-    background-color: #d6d6d6;
+    background-color: #0d1117 !important;
   }
 `;
 
 export const OrderItemHeader = styled.p`
-  font-weight: 500;
+  font-weight: 600;
   color: #fff;
   font-size: 1.3rem;
 `;
 
-export const OrderDestination = styled.p`
-  font-style: italic;
+export const OrderItemRow = styled.p`
+  letter-spacing: 2px;
+  color: #ddd;
   font-weight: 300;
-  color: #fff;
+  font-style: italic;
 `;

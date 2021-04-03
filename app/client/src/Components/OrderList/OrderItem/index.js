@@ -1,7 +1,12 @@
 import React from "react";
-import { OrderContainer, OrderItemHeader, OrderDestination } from "./elements";
+import { OrderContainer, OrderItemHeader, OrderItemRow } from "./elements";
+import { useDispatch } from "react-redux";
+import { Button } from "../../../Resources/Styles/global";
+import ViewOrderDetailsDialog from "../OrderDetails";
+import { updateOrder, ordersFilterChanged } from "../../../State/orders.slice";
 
-const OrderItem = ({ order, SET_ACTIVE_INDEX }) => {
+import Grid from "@material-ui/core/Grid";
+const OrderItem = ({ order, user, close }) => {
   const formatMoveType = (moveType) =>
     moveType === "hm"
       ? "House Moving"
@@ -9,10 +14,96 @@ const OrderItem = ({ order, SET_ACTIVE_INDEX }) => {
       ? "Office Moving"
       : "Freight";
 
+  const OID = order.id;
+  const UID = user.id;
+  const dispatch = useDispatch();
+
+  const OrderUpdate = (status) => {
+    dispatch(updateOrder({ OID, status, UID }));
+  };
+
+  const handleOrderCancel = () => {
+    OrderUpdate("cancelled");
+    dispatch(ordersFilterChanged("cancelled"));
+  };
+
+  const handleOrderAccept = () => {
+    OrderUpdate("in-progress");
+    dispatch(ordersFilterChanged("in-progress"));
+  };
+
+  const handleOrderComplete = () => {
+    OrderUpdate("successfull");
+    dispatch(ordersFilterChanged("successfull"));
+  };
+
   return (
-    <OrderContainer elevation={6} onClick={() => SET_ACTIVE_INDEX(order.id)}>
-      <OrderItemHeader>{formatMoveType(order.moveType)}</OrderItemHeader>
-      <OrderDestination>{order.destination.address}</OrderDestination>
+    <OrderContainer elevation={6}>
+      <Grid container justify="space-between">
+        <Grid item xs={12} sm={6}>
+          <Grid container justify="center" direction="column">
+            <Grid item>
+              <OrderItemHeader>
+                {user.role === "client"
+                  ? ` ${order.driver.firstname} ${order.driver.lastname}`
+                  : user.role === "driver"
+                  ? `${order.client.firstname} ${order.client.lastname}`
+                  : null}
+              </OrderItemHeader>
+            </Grid>
+            <Grid item>
+              <OrderItemRow>{formatMoveType(order.moveType)}</OrderItemRow>
+            </Grid>
+          </Grid>
+          <Grid item>
+            <OrderItemRow>{order.destination.address}</OrderItemRow>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Grid container spacing={1} justify="center" alignContent="center">
+            {order.status === "pending" ? (
+              user.role === "driver" ? (
+                <React.Fragment>
+                  <Grid item>
+                    <Button small primary onClick={handleOrderAccept}>
+                      Accept
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button small warning onClick={handleOrderCancel}>
+                      Decline
+                    </Button>
+                  </Grid>
+                </React.Fragment>
+              ) : (
+                <Grid item>
+                  <Button small warning onClick={handleOrderCancel}>
+                    Cancel
+                  </Button>
+                </Grid>
+              )
+            ) : order.status === "in-progress" ? (
+              <Grid item>
+                <Button small onClick={handleOrderComplete}>
+                  complete
+                </Button>
+              </Grid>
+            ) : null}
+            <Grid item>
+              <ViewOrderDetailsDialog
+                user={user}
+                order={order}
+                close={close}
+                constrols={{
+                  cancel: handleOrderCancel,
+                  accept: handleOrderAccept,
+                  complete: handleOrderComplete,
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
     </OrderContainer>
   );
 };
