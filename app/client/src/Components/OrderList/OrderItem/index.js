@@ -6,7 +6,7 @@ import ViewOrderDetailsDialog from "../OrderDetails";
 import { updateOrder, ordersFilterChanged } from "../../../State/orders.slice";
 
 import Grid from "@material-ui/core/Grid";
-const OrderItem = ({ order, user, close }) => {
+const OrderItem = ({ order, user }) => {
   const formatMoveType = (moveType) =>
     moveType === "hm"
       ? "House Moving"
@@ -93,7 +93,6 @@ const OrderItem = ({ order, user, close }) => {
               <ViewOrderDetailsDialog
                 user={user}
                 order={order}
-                close={close}
                 constrols={{
                   cancel: handleOrderCancel,
                   accept: handleOrderAccept,
