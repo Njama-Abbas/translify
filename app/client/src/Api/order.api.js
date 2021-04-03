@@ -35,10 +35,11 @@ class OrderAPI {
   }
 
   updateOrder(order) {
-    const { orderId, status } = order;
+    const { OID, status, UID } = order;
     return axios.post(API_URL + "update", {
-      orderId,
+      OID,
       status,
+      UID,
     });
   }
 }
