@@ -71,14 +71,7 @@ export default function Client() {
                   <Navbar />
                 </Container>
                 <Container>
-                  <Grid container spacing={8} justify="center">
-                    <Grid item xs={12} sm={8} md={6}>
-                      <OrderList setActiveIndex={setActiveIndex} user={user} />
-                    </Grid>
-                    <Grid item xs={12} sm={8} md={6}>
-                      {orders.length ? <OrderDetails user={user} /> : null}
-                    </Grid>
-                  </Grid>
+                  <OrderList setActiveIndex={setActiveIndex} user={user} />
                   <ClientInfoSection {...ClientInfo} />
                 </Container>
               </Box>

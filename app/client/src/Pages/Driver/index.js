@@ -3,10 +3,7 @@ import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 
 import { Grid } from "@material-ui/core";
-
 import { DriverAPI, UserAPI, AuthAPI } from "../../Api";
-import { useSelector, useDispatch } from "react-redux";
-import { selectOrders, activeOrderChanged } from "../../State/orders.slice";
 
 import destination from "../../Resources/Images/Destination.svg";
 import { Container } from "../../Resources/Styles/global";
@@ -18,7 +15,6 @@ import {
   Navbar,
   DriverRegistrationForm,
   Image,
-  OrderDetails,
   OrderList,
   Footer,
 } from "../../Components";
@@ -26,16 +22,10 @@ import {
 export default function Driver() {
   const { addToast } = useToasts();
   const { path } = useRouteMatch();
-  const dispatch = useDispatch();
-  const orders = useSelector(selectOrders);
   const [redirect, setRedirect] = useState(null);
   const [userReady, setUserReady] = useState(null);
   const [user, setUser] = useState(undefined);
   const [approval_status, setApprovalStatus] = useState(null);
-
-  const setActiveIndex = (id) => {
-    dispatch(activeOrderChanged(id));
-  };
 
   useEffect(() => {
     const currentUser = AuthAPI.getCurrentUser();
@@ -87,17 +77,7 @@ export default function Driver() {
                 <Container>
                   <Navbar />
                   {approval_status === "A" ? (
-                    <Grid container spacing={8} justify="center">
-                      <Grid item xs={12} sm={8} md={6}>
-                        <OrderList
-                          setActiveIndex={setActiveIndex}
-                          user={user}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={8} md={6}>
-                        {orders.length && <OrderDetails user={user} />}
-                      </Grid>
-                    </Grid>
+                    <OrderList user={user} />
                   ) : approval_status === "P" ? (
                     <p>Registration successful pending approval</p>
                   ) : approval_status === "D" ? (
