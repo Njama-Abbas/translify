@@ -82,18 +82,19 @@ const OrderItem = ({ order, user }) => {
                   </Button>
                 </Grid>
               )
-            ) : order.status === "in-progress" ? (
+            ) : order.status === "in-progress" && user.role === "driver" ? (
               <Grid item>
-                <Button small onClick={handleOrderComplete}>
+                <Button warning small onClick={handleOrderComplete}>
                   complete
                 </Button>
               </Grid>
             ) : null}
+
             <Grid item>
               <ViewOrderDetailsDialog
                 user={user}
                 order={order}
-                constrols={{
+                controls={{
                   cancel: handleOrderCancel,
                   accept: handleOrderAccept,
                   complete: handleOrderComplete,
