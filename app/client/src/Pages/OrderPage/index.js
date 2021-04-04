@@ -60,6 +60,7 @@ export default function OrderTruck() {
           charges: calcPriceFromLatLng(pickup, destination, load),
         };
         const resultAction = await dispatch(addNewOrder(orderObj));
+        dispatch(getDrivers());
         unwrapResult(resultAction);
         dispatch(ordersFilterChanged("pending"));
         setIsLoading(false);
