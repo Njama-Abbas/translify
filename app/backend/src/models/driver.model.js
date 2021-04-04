@@ -16,6 +16,10 @@ const Driver = mongoose.model(
       type: Boolean,
       default: false,
     },
+    t_wallet: {
+      type: Number,
+      default: 0,
+    },
     truckno: String,
     dlno: String,
     approval_status: {
