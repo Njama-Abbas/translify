@@ -31,7 +31,7 @@ const DriversSlice = createSlice({
     },
     [getDrivers.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      state.drivers = state.drivers.concat(action.payload);
+      state.drivers = action.payload;
       state.designated = state.drivers[0];
     },
   },
