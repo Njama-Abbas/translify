@@ -54,11 +54,8 @@ module.exports = {
     await designatedDriver.save();
 
     const orders = [order];
-    const mappedOrders = MapOrders(orders);
-
-    res.status(200).json({
-      order: mappedOrders[0],
-    });
+    const mappedOrders = await MapOrders(orders);
+    res.status(200).json(mappedOrders[0]);
   },
 
   getAllOrdersByUserId: async (req, res) => {
@@ -107,7 +104,7 @@ module.exports = {
       return;
     }
     if (orders.length === 0) {
-      res.status(204).json(orders);
+      res.status(200).json(orders);
       return;
     }
     const mappedOrders = await MapOrders(orders);
