@@ -96,15 +96,19 @@ const OrderDetails = ({ user, close, order, controls }) => {
           )
         ))}
 
-      {order.status === "in-progress" && (
+      {order.status === "in-progress" && user.role === "driver" ? (
         <OrderColumn>
-          <Button small onClick={controls.complete}>
-            Complete Trip
+          <Button warning small onClick={controls.complete}>
+            Complete
           </Button>
           <Button small secondary onClick={close}>
             Exit
           </Button>
         </OrderColumn>
+      ) : (
+        <Button small secondary onClick={close}>
+          Exit
+        </Button>
       )}
     </OrderDetailsContainer>
   );
