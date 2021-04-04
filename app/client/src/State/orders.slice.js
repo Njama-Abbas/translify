@@ -8,9 +8,8 @@ const initialState = {
   filter: "in-progress",
 };
 
-const user = AuthAPI.getCurrentUser();
-
 export const fetchOrders = createAsyncThunk("orders/fetchOrders", async () => {
+  const user = AuthAPI.getCurrentUser();
   const response = await OrderAPI.getAllOrders(user.id);
   return response.data;
 });
@@ -19,7 +18,7 @@ export const addNewOrder = createAsyncThunk(
   "orders/create",
   async (order_details) => {
     const response = await OrderAPI.addNewOrder(order_details);
-    return response.data.order;
+    return response.data;
   }
 );
 
