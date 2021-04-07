@@ -2,14 +2,7 @@ import React, { useState } from "react";
 import { useRouteMatch } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Badge,
-  MenuItem,
-  Menu,
-} from "@material-ui/core";
+import { AppBar, Toolbar, IconButton, MenuItem, Menu } from "@material-ui/core";
 
 import {
   UserLogo,
@@ -19,12 +12,7 @@ import {
   AccountDropDown,
 } from "./UserNav.elements";
 
-import {
-  MdAccountCircle,
-  MdMail,
-  MdVerifiedUser,
-  MdLock,
-} from "react-icons/md";
+import { MdAccountCircle, MdVerifiedUser, MdLock } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
 const useStyles = makeStyles((theme) => ({
@@ -149,16 +137,7 @@ export default function UserNav({ user, logOutCallBack }) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
-        <NavLink primary={true} to={`${url}/notifications`}>
-          <IconButton aria-label="show 4 new mails" color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <MdMail />
-            </Badge>
-          </IconButton>
-          <p>Messages</p>
-        </NavLink>
-      </MenuItem>
+      <MenuItem></MenuItem>
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           aria-label="account of current user"
@@ -179,7 +158,7 @@ export default function UserNav({ user, logOutCallBack }) {
         <Toolbar>
           <UserLogo to={`/${user.role}`}>
             <AppTitle>translify</AppTitle> &nbsp;
-            <DashBoardIcon />
+            <DashBoardIcon size="40px" />
             {formatName(user.firstname)}&nbsp;{formatName(user.lastname)}
           </UserLogo>
           <br />
@@ -191,13 +170,6 @@ export default function UserNav({ user, logOutCallBack }) {
             )}
           </div>
           <div className={classes.sectionDesktop}>
-            <NavLink to={`${url}/notifications`}>
-              <IconButton aria-label="show 4 new mails" color="inherit">
-                <Badge badgeContent={4} color="secondary">
-                  <MdMail />
-                </Badge>
-              </IconButton>
-            </NavLink>
             <IconButton
               edge="end"
               aria-label="account of current user"
@@ -206,7 +178,7 @@ export default function UserNav({ user, logOutCallBack }) {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <MdAccountCircle />
+              <MdAccountCircle size="40px" />
             </IconButton>
           </div>
           <div className={classes.sectionMobile}>
@@ -217,7 +189,7 @@ export default function UserNav({ user, logOutCallBack }) {
               onClick={handleMobileMenuOpen}
               color="inherit"
             >
-              <BsThreeDotsVertical />
+              <BsThreeDotsVertical size="40px" />
             </IconButton>
           </div>
         </Toolbar>

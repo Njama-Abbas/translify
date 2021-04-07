@@ -1,6 +1,6 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { Grid } from "@material-ui/core";
-import { ServiceCard, Navbar } from "../../Components";
+import { ServiceCard } from "../../Components";
 import { services } from "../../Resources/Data/services";
 import { ImageBgContainer } from "../../Resources/Styles/global";
 
@@ -31,16 +31,9 @@ export default function Services({ withNav }) {
 
   return (
     <div>
-      {withNav ? (
-        <Fragment>
-          <Navbar />
-          <ImageBgContainer>
-            <ServiceContainer />
-          </ImageBgContainer>
-        </Fragment>
-      ) : (
+      <ImageBgContainer>
         <ServiceContainer />
-      )}
+      </ImageBgContainer>
     </div>
   );
 }
