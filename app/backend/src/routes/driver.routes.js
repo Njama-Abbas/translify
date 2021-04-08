@@ -1,18 +1,22 @@
-const controller = require("../controllers/driver.controller");
+const Router = require("express").Router();
+
+const driverController = require("../controllers/driver.controller");
 const { sift } = require("../middlewares");
 
-module.exports = function (app) {
-  app.get("/api/drivers/findone", controller.getById);
-  app.get("/api/drivers/drivers-on-call", controller.getOnCall);
-  app.get("/api/drivers/check-verification", controller.check_approval);
+Router.get("/findone", driverController.getById);
 
-  app.post(
-    "/api/drivers/complete-registration",
-    [
-      sift.checkDuplicateUserId,
-      sift.checkDuplicateDlno,
-      sift.checkDuplicateTruckNo,
-    ],
-    controller.complete_registration
-  );
-};
+Router.get("/drivers-on-call", driverController.getOnCall);
+
+Router.get("/check-verification", driverController.check_approval);
+
+Router.post(
+  "/complete-registration",
+  [
+    sift.checkDuplicateUserId,
+    sift.checkDuplicateDlno,
+    sift.checkDuplicateTruckNo,
+  ],
+  driverController.complete_registration
+);
+
+module.exports = Router;

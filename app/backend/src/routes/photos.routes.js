@@ -1,4 +1,6 @@
-const controller = require("../controllers/photos.controller"),
+const Router = require("express").Router();
+
+const photosController = require("../controllers/photos.controller"),
   multer = require("multer");
 
 const upload = multer({
@@ -13,21 +15,21 @@ const upload = multer({
   },
 });
 
-module.exports = function (app) {
-  app.get("/api/photos/:id", controller.getPhotoById);
+Router.get("/:id", photosController.getPhotoById);
 
-  app.get("/api/photos/img-id", controller.getUserProfilePhotoID);
+Router.get("/img", photosController.getUserProfilePhotoID);
 
-  app.post(
-    "/api/photos",
-    upload.single("photo"),
-    controller.uploadPhoto,
-    (err, req, res, next) => {
-      if (err) {
-        res.status(500).json({
-          upload_error: err.message,
-        });
-      }
+Router.post(
+  "/create",
+  upload.single("photo"),
+  photosController.uploadPhoto,
+  (err, req, res, next) => {
+    if (err) {
+      res.status(500).json({
+        upload_error: err.message,
+      });
     }
-  );
-};
+  }
+);
+
+module.exports = Router;

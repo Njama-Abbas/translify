@@ -1,9 +1,11 @@
-const controller = require("../controllers/order.controller");
+const Router = require("express").Router();
 
-module.exports = function (app) {
-  app.get("/api/orders/user", controller.getAllOrdersByUserId);
+const ordersController = require("../controllers/order.controller");
 
-  app.post("/api/orders/create", controller.creteOrder);
+Router.get("/user", ordersController.getAllOrdersByUserId);
 
-  app.post("/api/orders/update", controller.updateOrder);
-};
+Router.post("/create", ordersController.creteOrder);
+
+Router.post("/update", ordersController.updateOrder);
+
+module.exports = Router;
