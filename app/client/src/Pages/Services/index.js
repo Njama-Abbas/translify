@@ -31,6 +31,18 @@ export default function Services({ withNav }) {
 
   return (
     <ImageBgContainer>
+      <p
+        style={{
+          textAlign: "center",
+          fontSize: "3em",
+          textTransform: "capitalize",
+          textShadow: "1px 1px 1px white",
+          color: "#fff",
+          marginBottom: "10px",
+        }}
+      >
+        What we do
+      </p>
       <ServiceContainer />
     </ImageBgContainer>
   );
