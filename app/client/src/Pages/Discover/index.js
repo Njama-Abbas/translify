@@ -1,6 +1,10 @@
-import { Typography } from "@material-ui/core";
 import React from "react";
-import { Footer, Navbar } from "../../Components";
+import {
+  Footer,
+  Navbar,
+  HowItWorks,
+  TermsAndConditions,
+} from "../../Components";
 import { ImageBgContainer } from "../../Resources/Styles/global";
 
 const Discover = ({ withNav }) => {
@@ -8,9 +12,8 @@ const Discover = ({ withNav }) => {
     <div>
       <Navbar />
       <ImageBgContainer>
-        <Typography variant="h1" component="h1">
-          Comming Soon.........
-        </Typography>
+        <HowItWorks />
+        <TermsAndConditions />
       </ImageBgContainer>
       <Footer />
     </div>

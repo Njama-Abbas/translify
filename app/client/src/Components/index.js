@@ -17,3 +17,5 @@ export { default as LoadingComponent } from "./LoadingComponent";
 export { default as DriverList } from "./DriverList";
 export { default as OrderInfoDialog } from "./OrderInfoDialog";
 export { default as PersonalActions } from "./Profile/PersonalActions";
+export { default as HowItWorks } from "./HowItWorks";
+export { default as TermsAndConditions } from "./TermsAndConditions";
