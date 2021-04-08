@@ -5,12 +5,11 @@ export const Container = styled(C)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border-top: 1px solid blueviolet;
 `;
 
 export const PageWrapper = styled.div`
-  max-width: 960px;
   min-height: 100vh;
+  background-color: rgba(255, 255, 255, 0.8);
 `;
 
 export const Column = styled.div`
