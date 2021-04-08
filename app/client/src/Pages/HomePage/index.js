@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Footer, InfoSection, Navbar } from "../../Components";
+import { Footer, InfoSection, Navbar, HowItWorks } from "../../Components";
 import { HeroInfo } from "../../Resources/Data/heroInfo";
 import { Services } from "../index";
 
@@ -9,6 +9,7 @@ export default function Home() {
       <Navbar />
       <InfoSection {...HeroInfo} />
       <Services />
+      <HowItWorks />
       <Footer />
     </Fragment>
   );
