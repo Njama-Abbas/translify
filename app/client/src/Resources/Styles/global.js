@@ -1,6 +1,6 @@
 import styled, { createGlobalStyle } from "styled-components";
 import { Link } from "react-router-dom";
-import bgImage from "../Images/background-lg.svg";
+import bgImage from "../Images/keppel-port.jpg";
 
 const GlobalStyle = createGlobalStyle`
 * {

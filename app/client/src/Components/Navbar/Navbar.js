@@ -104,9 +104,6 @@ const Navbar = () => {
                   <NavLink to="/discover">Discover</NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink to="/services">Services</NavLink>
-                </NavItem>
-                <NavItem>
                   {button ? (
                     <DecisionDialog
                       actionText="Sign Up"

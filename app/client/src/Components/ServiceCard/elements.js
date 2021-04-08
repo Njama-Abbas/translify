@@ -11,6 +11,13 @@ export const CardContainer = styled(Paper)`
   width: 300px;
   height: 280px;
   border-top: 5px solid #f77f00;
+  cursor: pointer;
+  transition: transform ease 3s;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.1);
+  }
 `;
 
 export const CardHeader = styled.h3`
