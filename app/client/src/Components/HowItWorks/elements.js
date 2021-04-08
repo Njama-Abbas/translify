@@ -33,12 +33,12 @@ export const CardWrapper = styled.div`
     grid-template-rows: auto;
   }
 `;
+
 export const CardHeder = styled.p`
   text-align: center;
-  font-size: 4em;
+  font-size: 3em;
   text-transform: capitalize;
   text-shadow: 1px 1px 1px white;
-  color: navy;
-  border-bottom: 2px double black;
+  color: #fff;
   margin-bottom: 10px;
 `;
