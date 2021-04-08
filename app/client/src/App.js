@@ -8,7 +8,6 @@ import { ToastProvider } from "react-toast-notifications";
 import {
   Home,
   Discover,
-  Services,
   SignUp,
   SignIn,
   Client,
@@ -25,10 +24,6 @@ export default function App() {
         <Route exact path={["/", "/home"]} component={Home} />
         <Route exact path="/discover" component={Discover} />
         <Route exact path="/verify-account" component={Verification} />
-        <Route exact path="/services">
-          <Services withNav="true" />
-        </Route>
-
         <Route exact path="/driver/sign-up">
           <SignUp route="driver" />
         </Route>
