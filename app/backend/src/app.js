@@ -8,6 +8,8 @@ const dbConfig = require("./config/db.config"),
 
 const { initializeDB } = require("./utils/initializeDB");
 
+const { user, orders, mpesa, auth, driver, photos } = require("./routes");
+
 const URI = `mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`,
   app = express(),
   corsOptions = {
@@ -43,11 +45,11 @@ db.mongoose
     initializeDB();
   })
   .then(() => {
-    console.log("DB initialized");
+    console.log("DATABASE INITIALIZED");
   })
   .catch((err) => {
     console.error("Connection err", err);
-    process.exit;
+    process.exit(1);
   });
 
 app.use(function handleDatabaseError(error, request, response, next) {
@@ -60,15 +62,15 @@ app.use(function handleDatabaseError(error, request, response, next) {
   next(error);
 });
 
-require("./routes/auth.routes")(app);
-require("./routes/user.routes")(app);
-require("./routes/order.routes")(app);
-require("./routes/client.routes")(app);
-require("./routes/driver.routes")(app);
-require("./routes/photos.routes")(app);
+app.use("/api/user", user);
+app.use("/api/orders", orders);
+app.use("/api/mpesa", mpesa);
+app.use("/api/auth", auth);
+app.use("/api/driver", driver);
+app.use("/api/photos", photos);
 
 app.get("/", (_req, res) => res.send("Hello World!"));
 
-const PORT = process.env.PORT || 2312;
+const PORT = process.env.PORT || 801;
 
 app.listen(PORT, () => console.log(` ${PORT}! is Live`));
