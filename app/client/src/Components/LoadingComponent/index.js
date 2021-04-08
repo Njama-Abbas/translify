@@ -1,45 +1,28 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { ProgressContainer, ProgessWrappper, ProgressText } from "./elements";
+import {
+  LoaderContainer,
+  LoadingPage,
+  LoadingText,
+  SpinnerItem,
+} from "./elements";
 
-/**
- * material ui facebook loading template
- */
-
-const useStylesFacebook = makeStyles(() => ({
-  root: {
-    position: "relative",
-    backgroundColor: "#eeeeee",
-  },
-  top: {
-    color: "#1a90ff",
-    animationDuration: "1000ms",
-  },
-  circle: {
-    strokeLinecap: "round",
-  },
-}));
-
-export default function LoadingComponent(props) {
-  const classes = useStylesFacebook();
-
+const BouncingBalls = () => {
   return (
-    <ProgressContainer container justify="center" alignContent="center">
-      <ProgessWrappper item>
-        <CircularProgress
-          variant="indeterminate"
-          disableShrink
-          className={classes.top}
-          classes={{
-            circle: classes.circle,
-          }}
-          size={140}
-          thickness={4}
-          {...props}
-        />
-      </ProgessWrappper>
-      <ProgressText>Loading Please Wait&nbsp;.&nbsp;.&nbsp;.</ProgressText>
-    </ProgressContainer>
+    <LoadingPage>
+      <LoaderContainer>
+        <SpinnerItem></SpinnerItem>
+        <SpinnerItem index="two"></SpinnerItem>
+        <SpinnerItem index="three"></SpinnerItem>
+        <SpinnerItem index="four"></SpinnerItem>
+        <SpinnerItem index="five"></SpinnerItem>
+      </LoaderContainer>
+      <LoadingText>
+        Loading....
+        <br />
+        Please Wait
+      </LoadingText>
+    </LoadingPage>
   );
-}
+};
+
+export default BouncingBalls;
