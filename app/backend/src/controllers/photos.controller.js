@@ -2,25 +2,35 @@ const db = require("../models");
 const Photo = db.photo;
 
 exports.uploadPhoto = (req, res) => {
-  const { userId, photo_name } = req.body;
+  const { userId, photo } = req.body;
   const file = req.file.buffer;
 
-  const ProfilePhoto = new Photo({
+  console.log({
+    file,
+    photo,
     userId,
-    photo_name,
-    photo: file,
   });
 
-  ProfilePhoto.save((err, photo) => {
-    if (err) {
-      res.status(500).json({
-        message: err,
-      });
-      return;
-    }
-    res.status(200).json({
-      photo_id: photo._id,
-    });
+  // const ProfilePhoto = new Photo({
+  //   userId,
+  //   photo_name,
+  //   photo: file,
+  // });
+
+  // ProfilePhoto.save((err, photo) => {
+  //   if (err) {
+  //     console.log(err);
+  //     res.status(500).json({
+  //       message: err,
+  //     });
+  //     return;
+  //   }
+  //   res.status(200).json({
+  //     photo_id: photo._id,
+  //   });
+  // });
+  res.status(200).json({
+    ds: "dsau",
   });
 };
 

@@ -5,7 +5,7 @@ const API_URL = BASE_URL + "photos";
 
 class PhotoAPI {
   upload(formData) {
-    return axios.post(API_URL, formData, {
+    return axios.post(API_URL + "/create", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

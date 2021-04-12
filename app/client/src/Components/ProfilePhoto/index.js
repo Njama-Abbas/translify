@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { AuthAPI, PhotoAPI } from "../../Api";
+
 import {
   ProfileImage,
   Container,
@@ -20,24 +21,13 @@ import { FaEdit } from "react-icons/fa";
 import { profilePicSet, selectUser } from "../../State/user.slice";
 
 export default function FileUploadComponent() {
-  const user = useSelector(selectUser);
+  const user = AuthAPI.getCurrentUser();
 
   return (
     <Container>
       <Wrapper>
         <ProfileImage src={profile_img} />
         <EditImageDialog user={user} />
-        {/**
-      <div className="row">
-       
-      </div>
-
-      {imageId ? (
-        <div className="row">
-          <img src={`http://localhost:8080/api/photos/${imageId}`} alt="" />
-        </div>
-      ) : null}
-      */}
       </Wrapper>
     </Container>
   );
@@ -95,20 +85,24 @@ function EditImageForm({ user }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(profileImg);
 
-    //  const formData = new FormData();
-    //  formData.append("userId", user.id);
-    //  formData.append("photo", profileImg);
-    //  PhotoAPI.upload(formData).then(
-    //    (response) => {
-    //      console.log(response);
-    //     dispatch(profilePicSet(response.data.photo_id));
-    //    },
-    //    (error) => {
-    //      console.log(error);
-    //    }
-    //  );
+    const formData = new FormData();
+    formData.append("userId", user.ID);
+    formData.append("photo", profileImg.name);
+
+    console.log(profileImg);
+    PhotoAPI.upload({
+      userId: user.ID,
+      photo: profileImg.name,
+    }).then(
+      (response) => {
+        console.log(response);
+        dispatch(profilePicSet(response.data.photo_id));
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   };
 
   return (

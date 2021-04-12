@@ -16,9 +16,10 @@ const UserSlice = createSlice({
   initialState,
   reducers: {
     userSet(state, action) {
-      const { UID, phoneno } = action.payload;
+      const { UID, phoneno, verified } = action.payload;
       state.user.ID = UID;
       state.user.phoneno = phoneno;
+      state.user.verified = verified;
     },
     userVerified(state, action) {
       state.user.verified = action.payload;

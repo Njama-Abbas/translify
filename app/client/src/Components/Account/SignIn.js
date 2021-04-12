@@ -68,19 +68,28 @@ export default function SignUp({ route }) {
     setLoading(true);
 
     AuthAPI.login(email, password, role).then(
-      () => {
+      (response) => {
+        console.log(response);
+        dispatch(
+          userSet({
+            UID: response.id,
+            phoneno: response.phoneno,
+            verified: true,
+          })
+        );
         history.push(`/${route}`);
         setLoading(false);
       },
 
       (error) => {
-        if (error.response.status === 401) {
+        if (error.response.status && error.response.status === 401) {
           //unverified
           const { UID, phoneno, message } = error.response.data;
           dispatch(
             userSet({
               UID,
               phoneno,
+              verified: false,
             })
           );
           addToast(message, {
