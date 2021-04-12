@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
-import { PersonalDetails, PersonalActions } from "../../Components";
+import {
+  PersonalDetails,
+  PersonalActions,
+  ProfilePhoto,
+} from "../../Components";
 import { AuthAPI } from "../../Api";
 import { ImageBgContainer } from "../../Resources/Styles/global";
 import { Grid } from "@material-ui/core";
@@ -37,9 +41,7 @@ export default function Profile() {
             {/**to be determined by current time */}
             Greetings&nbsp;&nbsp;{currentUser.firstname}
           </GreetingLine>
-          <ProfileImageWrapper>
-            <ProfileImage src={DefaultProfileImage} />
-          </ProfileImageWrapper>
+          <ProfilePhoto />
           <Grid container spacing={2} justify="center">
             <PersonalDetails user={currentUser} />
             <PersonalActions user={currentUser} />
