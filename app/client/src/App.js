@@ -2,7 +2,7 @@ import React from "react";
 import { Switch, Route } from "react-router-dom";
 import ScrollToTop from "./Components/ScrollToTop";
 import GlobalStyle from "./Resources/Styles/global";
-import FileUploadComponent from "./Components/UploadPhoto";
+// import FileUploadComponent from "./Components/ProfilePhoto";
 import { ToastProvider } from "react-toast-notifications";
 
 import {
@@ -39,7 +39,7 @@ export default function App() {
           <SignIn route="client" />
         </Route>
 
-        <Route exact path="/test" component={FileUploadComponent} />
+        {/* <Route exact path="/test" component={FileUploadComponent} />**/}
         <Route path="/client" component={Client} />
         <Route path="/driver" component={Driver} />
       </Switch>
