@@ -1,7 +1,7 @@
 import axios from "axios";
 import { BASE_URL } from "./api.config";
 
-const API_URL = BASE_URL + "drivers/";
+const API_URL = BASE_URL + "driver/";
 
 class DriverAPI {
   getDriverById(driverid) {
@@ -30,7 +30,7 @@ class DriverAPI {
   }
 
   getOnCall() {
-    return axios.get(API_URL + "drivers-on-call");
+    return axios.get(API_URL + "on-call");
   }
 }
 

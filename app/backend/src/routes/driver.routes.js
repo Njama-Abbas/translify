@@ -5,7 +5,7 @@ const { sift } = require("../middlewares");
 
 Router.get("/findone", driverController.getById);
 
-Router.get("/drivers-on-call", driverController.getOnCall);
+Router.get("/on-call", driverController.getOnCall);
 
 Router.get("/check-verification", driverController.check_approval);
 
