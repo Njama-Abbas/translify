@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { AuthAPI, PhotoAPI } from "../../Api";
 
@@ -13,12 +13,12 @@ import {
   ProfileControls,
 } from "./elements";
 
-import profile_img from "../../Resources/Images/undraw_profile_pic.svg";
+import imagePlaceHolder from "../../Resources/Images/undraw_profile_pic.svg";
 import { IconContext } from "react-icons/lib";
 import { Dialog, DialogContent, Slide } from "@material-ui/core";
 import { Button } from "../../Resources/Styles/global";
 import { FaEdit } from "react-icons/fa";
-import { profilePicSet, selectUser } from "../../State/user.slice";
+import { profilePicSet } from "../../State/user.slice";
 
 export default function FileUploadComponent() {
   const user = AuthAPI.getCurrentUser();
@@ -26,7 +26,13 @@ export default function FileUploadComponent() {
   return (
     <Container>
       <Wrapper>
-        <ProfileImage src={profile_img} />
+        <ProfileImage
+          src={
+            user.profilePhotoId
+              ? `http://localhost:801/api/photos/${user.profilePhotoId}`
+              : imagePlaceHolder
+          }
+        />
         <EditImageDialog user={user} />
       </Wrapper>
     </Container>
@@ -87,14 +93,11 @@ function EditImageForm({ user }) {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("userId", user.ID);
-    formData.append("photo", profileImg.name);
+    formData.append("userId", user.id);
+    formData.append("photo_name", profileImg.name);
+    formData.append("photo", profileImg);
 
-    console.log(profileImg);
-    PhotoAPI.upload({
-      userId: user.ID,
-      photo: profileImg.name,
-    }).then(
+    PhotoAPI.upload(formData).then(
       (response) => {
         console.log(response);
         dispatch(profilePicSet(response.data.photo_id));
