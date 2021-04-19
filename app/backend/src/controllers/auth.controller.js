@@ -5,9 +5,10 @@ const config = require("../config/auth.config"),
   jwt = require("jsonwebtoken"),
   bcrypt = require("bcrypt");
 
-const User = db.user,
-  Role = db.role,
-  sms = new twilio(config.TWILLIO_ACCOUNT_SID, config.TWILLIO_AUTH_TOKEN);
+const USER = db.user,
+  ROLE = db.role,
+  PHOTO = db.photo,
+  SMS = new twilio(config.TWILLIO_ACCOUNT_SID, config.TWILLIO_AUTH_TOKEN);
 
 module.exports = {
   signup: async (req, res) => {
@@ -20,7 +21,7 @@ module.exports = {
       role,
     } = req.body;
 
-    const $role = await Role.findOne({
+    const $role = await ROLE.findOne({
       name: role,
     });
 
@@ -32,7 +33,7 @@ module.exports = {
     //create a new user
     let new_user;
     try {
-      new_user = await User.create({
+      new_user = await USER.create({
         firstname,
         lastname,
         phoneno,
@@ -77,7 +78,7 @@ module.exports = {
   verify: async (req, res) => {
     const { ID, v_code } = req.body;
 
-    const user = await User.findOne({
+    const user = await USER.findOne({
       _id: ID,
     });
 
@@ -108,7 +109,7 @@ module.exports = {
      * change verification status to true
      */
 
-    const updatedUser = await User.findByIdAndUpdate(user._id, {
+    const updatedUser = await USER.findByIdAndUpdate(user._id, {
       verification: {
         status: true,
         code: user.verification.code,
@@ -119,7 +120,7 @@ module.exports = {
      * get the users role
      */
 
-    const $role = await Role.findOne({
+    const $role = await ROLE.findOne({
       _id: updatedUser.role,
     });
 
@@ -132,6 +133,10 @@ module.exports = {
       expiresIn: 86400,
     });
 
+    let photo_id = await PHOTO.findOne({
+      userId: updatedUser._id,
+    });
+
     res.status(200).json({
       id: updatedUser._id,
       firstname: updatedUser.firstname,
@@ -140,17 +145,18 @@ module.exports = {
       phoneno: updatedUser.phoneno,
       role: $role.name,
       accessToken: token,
+      profilePhotoId: photo_id._id,
     });
   },
 
   signin: async (req, res) => {
     const { email, password, role } = req.body;
 
-    const $role = await Role.findOne({
+    const $role = await ROLE.findOne({
       name: role,
     });
 
-    const user = await User.findOne({
+    const user = await USER.findOne({
       email,
       role: $role._id,
     });
@@ -189,6 +195,11 @@ module.exports = {
       expiresIn: 86400,
     });
 
+    //get the profile photo ID
+    let photo_id = await PHOTO.findOne({
+      userId: user._id,
+    });
+
     res.status(200).json({
       id: user._id,
       firstname: user.firstname,
@@ -197,6 +208,7 @@ module.exports = {
       phoneno: user.phoneno,
       role: $role.name,
       accessToken: token,
+      profilePhotoId: photo_id._id,
     });
   },
 
@@ -209,7 +221,7 @@ module.exports = {
     //change the existing token in the database;
     let updatedUser;
     try {
-      updatedUser = await User.findByIdAndUpdate(req.body.userID, {
+      updatedUser = await USER.findByIdAndUpdate(req.body.userID, {
         verification: {
           code: generated_code,
         },
@@ -224,7 +236,7 @@ module.exports = {
     //Send the text
     let sendText;
     try {
-      sendText = await sms.messages.create({
+      sendText = await SMS.messages.create({
         body: `Tans-Code: ${updatedUser.verification.code} `,
         to: "+254" + updatedUser.phoneno.slice(-9),
         from: "+12027598622",
