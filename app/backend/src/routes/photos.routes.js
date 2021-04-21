@@ -15,9 +15,9 @@ const upload = multer({
   },
 });
 
-Router.get("/:id", photosController.getPhotoById);
-
 Router.get("/img", photosController.getUserProfilePhotoID);
+
+Router.get("/:id", photosController.getPhotoById);
 
 Router.post(
   "/create",
