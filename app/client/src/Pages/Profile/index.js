@@ -8,12 +8,8 @@ import {
 import { AuthAPI } from "../../Api";
 import { ImageBgContainer } from "../../Resources/Styles/global";
 import { Grid } from "@material-ui/core";
-import {
-  GreetingLine,
-  ProfileImage,
-  ProfileImageWrapper,
-} from "./profile.elements";
-import DefaultProfileImage from "../../Resources/Images/undraw_profile_pic.svg";
+import { GreetingLine } from "./profile.elements";
+
 export default function Profile() {
   const [redirect, setRedirect] = useState(null);
   const [userReady, setUserReady] = useState(null);

@@ -8,21 +8,3 @@ export const GreetingLine = styled.h3`
   color: #810101;
   padding: 8px;
 `;
-
-export const ProfileImage = styled.img`
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-
-  @media (max-width: 600px) {
-    width: 150px;
-    height: 150px;
-  }
-`;
-
-export const ProfileImageWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: auto;
-`;
