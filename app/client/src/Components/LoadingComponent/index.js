@@ -6,7 +6,7 @@ import {
   SpinnerItem,
 } from "./elements";
 
-const BouncingBalls = () => {
+const BouncingBalls = ({ message }) => {
   return (
     <LoadingPage>
       <LoaderContainer>
@@ -17,7 +17,7 @@ const BouncingBalls = () => {
         <SpinnerItem index="five"></SpinnerItem>
       </LoaderContainer>
       <LoadingText>
-        Loading....
+        {message || " Loading...."}
         <br />
         Please Wait
       </LoadingText>
