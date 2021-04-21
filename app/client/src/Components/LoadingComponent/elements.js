@@ -1,8 +1,8 @@
 import styled, { keyframes } from "styled-components";
 
 export const LoadingPage = styled.div`
-  width: 100vw;
-  height: 100vh;
+  width: ${({ small }) => (small ? "100%" : "100vw")};
+  height: ${({ small }) => (small ? "100%" : "100vh")};
   display: flex;
   flex-direction: column;
   justify-content: center;
