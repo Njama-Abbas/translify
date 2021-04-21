@@ -8,8 +8,10 @@ const dbConfig = require("./config/db.config"),
 
 const { initializeDB } = require("./utils/initializeDB");
 
+//require routes
 const { user, orders, mpesa, auth, driver, photos } = require("./routes");
 
+//mongodb connection
 const URI = `mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`,
   app = express(),
   corsOptions = {
@@ -34,6 +36,7 @@ app.use(function (_req, res, next) {
   next();
 });
 
+//conect to db
 db.mongoose
   .connect(URI, {
     useNewUrlParser: true,
@@ -51,7 +54,9 @@ db.mongoose
     console.error("Connection err", err);
     process.exit(1);
   });
-
+/**
+ * Handle unknown database errors
+ */
 app.use(function handleDatabaseError(error, request, response, next) {
   if (error instanceof db.mongoose.Error) {
     return response.status(500).json({
@@ -62,6 +67,9 @@ app.use(function handleDatabaseError(error, request, response, next) {
   next(error);
 });
 
+/**
+ * Routes
+ */
 app.use("/api/user", user);
 app.use("/api/orders", orders);
 app.use("/api/mpesa", mpesa);
