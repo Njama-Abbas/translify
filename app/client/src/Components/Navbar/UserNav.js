@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useRouteMatch } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 
 import { AppBar, Toolbar, IconButton, MenuItem, Menu } from "@material-ui/core";
@@ -62,7 +61,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function UserNav({ user, logOutCallBack }) {
   const classes = useStyles();
-  const { url } = useRouteMatch();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
@@ -104,7 +102,7 @@ export default function UserNav({ user, logOutCallBack }) {
       className={classes.profmenu}
     >
       <MenuItem onClick={handleMenuClose}>
-        <NavLink primary to={`${url}/profile`}>
+        <NavLink primary to={`/client/profile`}>
           <IconButton color="inherit">
             <MdVerifiedUser />
           </IconButton>
@@ -166,7 +164,7 @@ export default function UserNav({ user, logOutCallBack }) {
           <div className={classes.grow} />
           <div>
             {user.role === "client" && (
-              <NavLink to={`${url}/order-truck`}>Order</NavLink>
+              <NavLink to={`/client/order-truck`}>Order</NavLink>
             )}
           </div>
           <div className={classes.sectionDesktop}>
