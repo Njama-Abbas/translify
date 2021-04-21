@@ -12,7 +12,7 @@ class PhotoAPI {
     });
   }
   getProfileID(userid) {
-    axios.get(API_URL + "/img-id", {
+    return axios.get(API_URL + "/img", {
       headers: {
         userid,
       },
