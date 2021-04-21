@@ -66,12 +66,18 @@ export default function Client() {
         </div>
       </Route>
       <Route path={`${path}/order-truck`}>
+        <Container>
+          <Navbar />
+        </Container>
         <OrderTruck />
       </Route>
       <Route path={`${path}/notifications`}>
         <div>Comming soon</div>
       </Route>
       <Route path={`${path}/profile`}>
+        <Container>
+          <Navbar />
+        </Container>
         <Profile />
       </Route>
     </Switch>

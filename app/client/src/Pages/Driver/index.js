@@ -111,10 +111,10 @@ export default function Driver() {
           ) : null}
         </div>
       </Route>
-      <Route path={`${path}/notifications`}>
-        <div>Comming soon</div>
-      </Route>
       <Route path={`${path}/profile`}>
+        <Container>
+          <Navbar />
+        </Container>
         <Profile />
       </Route>
     </Switch>
