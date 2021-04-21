@@ -133,10 +133,6 @@ module.exports = {
       expiresIn: 86400,
     });
 
-    let photo_id = await PHOTO.findOne({
-      userId: updatedUser._id,
-    });
-
     res.status(200).json({
       id: updatedUser._id,
       firstname: updatedUser.firstname,
@@ -145,7 +141,6 @@ module.exports = {
       phoneno: updatedUser.phoneno,
       role: $role.name,
       accessToken: token,
-      profilePhotoId: photo_id._id,
     });
   },
 
@@ -195,11 +190,6 @@ module.exports = {
       expiresIn: 86400,
     });
 
-    //get the profile photo ID
-    let photo_id = await PHOTO.findOne({
-      userId: user._id,
-    });
-
     res.status(200).json({
       id: user._id,
       firstname: user.firstname,
@@ -208,7 +198,6 @@ module.exports = {
       phoneno: user.phoneno,
       role: $role.name,
       accessToken: token,
-      profilePhotoId: photo_id._id,
     });
   },
 
