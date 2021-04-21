@@ -16,7 +16,11 @@ export const FormPaper = styled(Paper)`
 export const Wrapper = styled.div`
   position: relative;
 `;
-
+export const ProfileLoaderContainer = styled.div`
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+`;
 export const ProfileImage = styled.img`
   width: 300px;
   height: 300px;
