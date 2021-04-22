@@ -1,13 +1,24 @@
-const controller = require("../controllers/driver.controller");
+const driverController = require("../controllers/driver.controller");
+const {
+  driver_sift,
+  user_sift
+} = require("../middlewares");
 
-module.exports = function (app) {
-  app.post("/drivers", controller.create);
+const Router = require("express").Router();
 
-  app.get("/drivers", controller.fetch);
+Router.post("/create", [
+  user_sift.checkDuplicateEmail, user_sift.checkDuplicatePhoneNo, user_sift.checkRolesExisted,
+  driver_sift.checkDuplicateUserId,
+  driver_sift.checkDuplicateDlno,
+  driver_sift.checkDuplicateTruckNo,
+], driverController.create);
 
-  app.get("/drivers/:id", controller.get);
+Router.get("/", driverController.fetch);
 
-  app.put("/drivers/:id", controller.update);
+Router.get("/:id", driverController.get);
 
-  app.delete("/drivers/:id", controller.delete);
-};
+Router.put("/:id", driverController.update);
+
+Router.delete("/:id", driverController.delete);
+
+module.exports = Router;

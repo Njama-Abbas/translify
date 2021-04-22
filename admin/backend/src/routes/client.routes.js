@@ -1,11 +1,18 @@
-const controller = require("../controllers/client.controller");
+const clientController = require("../controllers/client.controller");
+const {
+  user_sift
+} = require("../middlewares")
+const Router = require("express").Router();
 
-module.exports = function (app) {
-  app.post("/clients", controller.create);
+Router.post("/create", [
+    user_sift.checkDuplicateEmail, user_sift.checkDuplicatePhoneNo, user_sift.checkRolesExisted
+  ],
+  clientController.create);
 
-  app.get("/clients", controller.fetch);
+Router.get("/", clientController.fetch);
 
-  app.get("/clients/:id", controller.get);
+Router.get("/:id", clientController.get);
 
-  app.delete("/clients/:id", controller.delete);
-};
+Router.delete("/:id", clientController.delete);
+
+module.exports = Router;
