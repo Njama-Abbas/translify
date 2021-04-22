@@ -1,11 +1,13 @@
 const Router = require("express").Router();
 
-const { verifySignUp } = require("../middlewares");
+const {
+  user_sift
+} = require("../middlewares");
 const AuthController = require("../controllers/auth.controller");
 
 Router.post(
   "/signup",
-  [verifySignUp.checkDuplicateEmail, verifySignUp.checkRolesExisted],
+  [user_sift.checkDuplicateEmail, user_sift.checkDuplicatePhoneNo, user_sift.checkRolesExisted],
   AuthController.signup
 );
 
