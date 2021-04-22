@@ -2,24 +2,25 @@ const mongoose = require("mongoose");
 
 const Transaction = mongoose.model(
   "Transaction",
+
   new mongoose.Schema({
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: "UserId is required",
-    },
-    type: {
+    MerchantRequestID: {
       type: String,
-      enum: ["payment", "deposit", "withdraw"],
     },
-    amount: {
+    CheckoutRequestID: {
+      type: String,
+    },
+    Amount: {
       type: Number,
     },
-    dateTime: {
+    TrasactionType: {
+      type: String,
+      enum: ["C2B", "B2C"],
+      required: "Whats the transaction type",
+    },
+    TransactionDate: {
       type: Date,
       default: new Date(),
     },
   })
 );
-
-module.exports = Transaction;
