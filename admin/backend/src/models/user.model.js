@@ -8,6 +8,15 @@ const User = mongoose.model(
     phoneno: String,
     email: String,
     password: String,
+    verification: {
+      status: {
+        type: Boolean,
+        default: false,
+      },
+      code: {
+        type: Number,
+      },
+    },
     rating: {
       type: Number,
       default: 0,
