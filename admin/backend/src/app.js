@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { client, driver } = require("./routes");
 
 const express = require("express"),
   bodyParser = require("body-parser"),
@@ -9,7 +10,7 @@ const dbConfig = require("./config/db.config"),
 const URI = `mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`,
   app = express(),
   corsOptions = {
-    origin: ["http://localhost:9092"],
+    origin: ["http://localhost:903"],
   };
 
 app.use(cors(corsOptions));
@@ -44,12 +45,29 @@ db.mongoose
     process.exit;
   });
 
-require("./routes/client.routes")(app);
-require("./routes/driver.routes")(app);
+/**
+ * Handle database errors
+ */
+app.use(function handleDatabaseError(error, request, response, next) {
+  if (error instanceof db.mongoose.Error) {
+    return response.status(500).json({
+      type: "MongoError",
+      message: error.message,
+    });
+  }
+  next(error);
+});
+
+/**
+ * Routes
+ */
+
+app.use("/api/drivers", driver);
+app.use("/api/clients", client);
 
 app.get("/", (_req, res) => res.send("Hello World!"));
 
-const PORT = process.env.PORT || 8787;
+const PORT = process.env.PORT || 901;
 
 app.listen(PORT, () => {
   console.log(` ${PORT}! is Live`);
