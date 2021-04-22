@@ -1,13 +1,73 @@
 const bcrypt = require("bcrypt");
 const db = require("../models");
-const User = db.user;
-const Role = db.role;
-const Driver = db.driver;
+const USER = db.user;
+const ROLE = db.role;
+const DRIVER = db.driver;
 
 module.exports = {
-  create: (req, res) => {},
+  create: async (req, res) => {
+    const {
+      firstname,
+      lastname,
+      phoneno,
+      email,
+      password: userPassword,
+      address,
+      dlno,
+      truckno,
+    } = req.body;
+
+    const $role = await ROLE.findOne({
+      name: "driver",
+    });
+
+    if (!$role) {
+      res.status(404).json({
+        message: "Role not found",
+      });
+      return;
+    }
+
+    let user;
+    try {
+      user = await USER.create({
+        firstname,
+        lastname,
+        phoneno,
+        email,
+        password: bcrypt.hashSync(userPassword, 10),
+        role: $role._id,
+      });
+      await user.save();
+    } catch (error) {
+      res.status(500).json({
+        message: "Process to create 'USER' for role 'DRIVER' failed",
+        error,
+      });
+      return;
+    }
+
+    let driver;
+
+    try {
+      driver = await DRIVER.create({
+        userId: user._id,
+        dlno,
+        truckno,
+        address,
+      });
+      await driver.save();
+    } catch (error) {
+      res.status(500).json({
+        message: "Process to register 'DRIVER' failed",
+        error,
+      });
+      return;
+    }
+    res.status(200).json(driverResponseObject(driver, user));
+  },
   fetch: async (req, res) => {
-    const driver_role = await Role.findOne({
+    const driver_role = await ROLE.findOne({
       name: "driver",
     });
 
@@ -18,7 +78,7 @@ module.exports = {
       return;
     }
 
-    const users = await User.find({
+    const users = await USER.find({
       role: driver_role.id,
     });
 
@@ -30,35 +90,11 @@ module.exports = {
     }
     const drivers = await Promise.all(
       users.map(async (user) => {
-        const exists = await Driver.findOne({
+        const exists = await DRIVER.findOne({
           userId: user._id,
         });
-        function format_approval(value) {
-          switch (value) {
-            case "A":
-              return "Approved";
-            case "D":
-              return "Declined";
-            case "P":
-            default:
-              return "Pending";
-          }
-        }
         if (exists) {
-          return {
-            id: exists._id,
-            userid: user._id,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            phoneno: user.phoneno,
-            email: user.email,
-            rating: user.rating,
-            truckno: exists.truckno,
-            dlno: exists.dlno,
-            address: exists.address.place_name,
-            approval_status: format_approval(exists.approval_status),
-            created_at: new Date(exists.dateOfReg),
-          };
+          return driverResponseObject(exists, user);
         }
       })
     );
@@ -69,7 +105,7 @@ module.exports = {
   get: async (req, res) => {
     const driver_id = req.params.id;
 
-    const driver = await Driver.findOne({
+    const driver = await DRIVER.findOne({
       _id: driver_id,
     });
 
@@ -80,8 +116,8 @@ module.exports = {
       return;
     }
 
-    const user = await User.findOne({
-      userId: driver.userId,
+    const user = await USER.findOne({
+      _id: driver.userId,
     });
 
     if (!user) {
@@ -91,22 +127,37 @@ module.exports = {
       return;
     }
 
-    res.status(200).json({
-      id: driver._id,
-      userid: user._id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      phoneno: user.phoneno,
-      email: user.email,
-      rating: user.rating,
-      truckno: driver.truckno,
-      dlno: driver.dlno,
-      address: driver.address.place_name,
-      approval_status: format_approval(driver.approval_status),
-      created_at: new Date(driver.dateOfReg),
-    });
+    res.status(200).json(driverResponseObject(driver, user));
   },
   update: (req, res) => {},
 
   delete: (req, res) => {},
 };
+
+const format_approval = (value) => {
+  switch (value) {
+    case "A":
+      return "Approved";
+    case "D":
+      return "Declined";
+    case "P":
+    default:
+      return "Pending";
+  }
+};
+
+const driverResponseObject = (driver, user) => ({
+  id: driver._id,
+  userId: user._id,
+  firstname: user.firstname,
+  lastname: user.lastname,
+  phoneno: user.phoneno,
+  email: user.email,
+  rating: user.rating,
+  v_status: user.verification.status,
+  truckno: driver.truckno,
+  dlno: driver.dlno,
+  address: driver.address.place_name,
+  approval_status: format_approval(driver.approval_status),
+  created_at: new Date(driver.dateOfReg),
+});

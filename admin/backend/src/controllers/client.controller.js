@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const db = require("../models");
-const User = db.user;
-const Role = db.role;
+const USER = db.user;
+const ROLE = db.role;
 
 module.exports = {
   create: async (req, res) => {
@@ -13,48 +13,54 @@ module.exports = {
       password: userPassword,
     } = req.body;
 
-    const client_role = await Role.findOne({
+    const $role = await ROLE.findOne({
       name: "client",
     });
 
-    if (!client_role) {
+    if (!$role) {
       res.status(404).json({
         message: "Role not found",
       });
       return;
     }
 
-    const user = await User.create({
-      firstname,
-      lastname,
-      phoneno,
-      email,
-      password: bcrypt.hashSync(userPassword, 10),
-      role: role._id,
-    });
+    let user;
 
-    const is_saved = await user.save();
-    if (!is_saved) {
-      res.status(500).json({ message: is_saved.errors });
+    try {
+      user = await USER.create({
+        firstname,
+        lastname,
+        phoneno,
+        email,
+        password: bcrypt.hashSync(userPassword, 10),
+        role: $role._id,
+      });
+      await user.save();
+    } catch (error) {
+      res.status(500).json({
+        message: "Process to create 'USER' for role 'CLIENT' failed",
+        error,
+      });
       return;
     }
-    res.status(201).json(user);
+
+    res.status(201).json(clientResponseObject(user));
   },
 
   fetch: async (req, res) => {
-    const client_role = await Role.findOne({
+    const $role = await ROLE.findOne({
       name: "client",
     });
 
-    if (!client_role) {
+    if (!$role) {
       res.status(404).json({
         message: "Role Not Found",
       });
       return;
     }
 
-    const users = await User.find({
-      role: client_role.id,
+    const users = await USER.find({
+      role: $role.id,
     });
 
     if (!users) {
@@ -63,26 +69,14 @@ module.exports = {
       });
       return;
     }
-
-    const clients = users.map((client) => {
-      const { rating, _id: id, firstname, lastname, phoneno, email } = client;
-      return {
-        id,
-        firstname,
-        lastname,
-        phoneno,
-        email,
-        rating,
-      };
-    });
-
+    const clients = users.map((client) => clientResponseObject(client));
     res.set("content-range", clients.length);
     res.status(200).json(clients);
   },
 
   get: async (req, res) => {
     const id = req.params.id;
-    const user = await User.findOne({
+    const user = await USER.findOne({
       _id: id,
     });
 
@@ -92,21 +86,53 @@ module.exports = {
       });
       return;
     }
-    res.status(200).json(user);
+
+    const {
+      rating,
+      _id,
+      firstname,
+      lastname,
+      phoneno,
+      email,
+      verification,
+    } = user;
+
+    const client = {
+      id: _id,
+      firstname,
+      lastname,
+      phoneno,
+      email,
+      rating,
+      v_status: verification.status,
+    };
+
+    res.status(200).json(client);
   },
+
   delete: async (req, res) => {
     const clientId = req.params.id;
-    const user = await User.findById(clientId);
+    const user = await USER.findById(clientId);
     if (!user) {
       res.status(404).json({
         message: "Client Not Found",
       });
       return;
     }
-    const deleted_user = await User.findByIdAndDelete(clientId);
+    await USER.findByIdAndDelete(clientId);
 
     res.status(204).json({
-      data: { ...deleted_user, id: deleted_user._id },
+      message: "DELETE == SUCCESS",
     });
   },
 };
+
+const clientResponseObject = (user) => ({
+  rating: user.rating,
+  id: user._id,
+  firstname: user.firstname,
+  lastname: user.lastname,
+  phoneno: user.phoneno,
+  email: user.email,
+  v_status: user.verification.status,
+});
