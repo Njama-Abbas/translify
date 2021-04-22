@@ -1,75 +1,61 @@
 const db = require("../models");
-const Driver = db.driver;
-
-const checkDuplicateUserId = (req, res, next) => {
-  const { userId } = req.body;
-
-  Driver.findOne(
-    {
-      userId,
-    },
-    (err, driver) => {
-      if (err) {
-        res.status(500).json({ message: err });
-        return;
-      }
-      if (driver) {
-        res.status(400).json({
-          message: "driver has already been registered",
-        });
-        return;
-      }
-      next();
-    }
-  );
-};
-
-const checkDuplicateTruckNo = (req, res, next) => {
-  const { truckno } = req.body;
-  Driver.findOne(
-    {
-      truckno,
-    },
-    (err, driver) => {
-      if (err) {
-        res.status(500).json({ message: err });
-        return;
-      }
-      if (driver) {
-        res.status(400).json({
-          message: "truck " + truckno + " is already registered",
-        });
-        return;
-      }
-      next();
-    }
-  );
-};
-
-const checkDuplicateDlno = (req, res, next) => {
-  const { dlno } = req.body;
-  Driver.findOne(
-    {
-      dlno,
-    },
-    (err, driver) => {
-      if (err) {
-        res.status(500).json({ message: err });
-        return;
-      }
-      if (driver) {
-        res.status(400).json({
-          message: "the licence no " + dlno + " is already registered ",
-        });
-        return;
-      }
-      next();
-    }
-  );
-};
+const DRIVER = db.driver;
 
 module.exports = {
-  checkDuplicateDlno,
-  checkDuplicateTruckNo,
-  checkDuplicateUserId,
-};
+  checkDuplicateUserId: async (req, res, next) => {
+    const {
+      userId
+    } = req.body;
+
+    const driver = DRIVER.findOne({
+      userId
+    });
+
+    if (driver) {
+      res.status(409).json({
+        message: `FAILED!
+        Driver Has already been registered
+        `,
+      });
+      return;
+    }
+    next();
+  },
+  checkDuplicateTruckNo: async (req, res, next) => {
+    const {
+      truckno
+    } = req.body;
+
+    const driver = DRIVER.findOne({
+      truckno
+    });
+
+    if (driver) {
+      res.status(409).json({
+        message: `FAILED! 
+        Truck ${truckno} + " is already registered"
+        `,
+      });
+      return;
+    }
+    next();
+  },
+  checkDuplicateDlno: async (req, res, next) => {
+    const {
+      dlno
+    } = req.body;
+
+    const driver = DRIVER.findOne({
+      dlno
+    });
+
+    if (driver) {
+      res.status(409).json({
+        message: `FAILED!
+        LICENCE  ${dlno} is already registered `,
+      });
+      return;
+    }
+    next();
+  }
+}
