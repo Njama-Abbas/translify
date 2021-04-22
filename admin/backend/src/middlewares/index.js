@@ -1,9 +1,9 @@
 const authJwt = require("./authJwt");
-const verifySignUp = require("./verifySignUp");
-const sift = require("./driver-sift");
+const user_sift = require("./user-sift");
+const driver_sift = require("./driver-sift");
 
 module.exports = {
   authJwt,
-  verifySignUp,
-  sift,
+  user_sift,
+  driver_sift,
 };
