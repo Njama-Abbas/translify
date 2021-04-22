@@ -1,20 +1,24 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/auth.config");
 const db = require("../models");
-const User = db.user;
-const Role = db.role;
+const USER = db.user;
+const ROLE = db.role;
 
 module.exports = {
   verifyToken: async (req, res, next) => {
     let token = req.headers["x-access-token"];
 
     if (!token) {
-      return res.status(403).json({ message: "No token provided!" });
+      return res.status(403).json({
+        message: "No token provided!"
+      });
     }
 
     jwt.verify(token, config.secret, (err, decoded) => {
       if (err) {
-        return res.status(401).json({ message: "Unauthourized" });
+        return res.status(401).json({
+          message: "Unauthourized"
+        });
       }
       req.userId = decoded.id;
       next();
@@ -22,7 +26,7 @@ module.exports = {
   },
 
   verifyStatus: async (req, res, next) => {
-    const user = await User.findOne({
+    const user = await USER.findOne({
       _id: req.userId,
     });
 
@@ -35,8 +39,7 @@ module.exports = {
 
     if (!user.verification.status) {
       res.status(403).json({
-        message:
-          "You are Not authorized to view this page. Please Verify your account",
+        message: "You are Not authorized to view this page. Please Verify your account",
       });
       return;
     }
@@ -44,7 +47,7 @@ module.exports = {
   },
 
   isClient: async (req, res, next) => {
-    const user = await User.findOne({
+    const user = await USER.findOne({
       _id: req.userId,
     });
 
@@ -55,7 +58,7 @@ module.exports = {
       return;
     }
 
-    const client_role = await Role.findOne({
+    const client_role = await ROLE.findOne({
       _id: user.role,
     });
 
@@ -76,7 +79,7 @@ module.exports = {
   },
 
   isDriver: async (req, res, next) => {
-    const user = await User.findOne({
+    const user = await USER.findOne({
       _id: req.userId,
     });
 
@@ -87,7 +90,7 @@ module.exports = {
       return;
     }
 
-    const driver_role = await Role.findOne({
+    const driver_role = await ROLE.findOne({
       _id: user.role,
     });
 
