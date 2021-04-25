@@ -41,7 +41,8 @@ module.exports = {
       await user.save();
     } catch (error) {
       res.status(500).json({
-        message: "Process to create 'USER' for role 'DRIVER' failed",
+        message: `FAILED!
+        Process to create 'USER' for role 'DRIVER' UNSUCCESSFUL`,
         error,
       });
       return;
@@ -59,7 +60,8 @@ module.exports = {
       await driver.save();
     } catch (error) {
       res.status(500).json({
-        message: "Process to register 'DRIVER' failed",
+        message: `FAILED!
+        Process to register 'DRIVER' UNSUCCESSFUL`,
         error,
       });
       return;
@@ -84,7 +86,8 @@ module.exports = {
 
     if (!users) {
       res.status(404).json({
-        message: "Drivers Not Found",
+        message: `FAILED!
+        Drivers Not Found`,
       });
       return;
     }
@@ -111,7 +114,8 @@ module.exports = {
 
     if (!driver) {
       res.status(404).json({
-        message: "Driver Not Found",
+        message: `FAILED!
+        Driver Not Found`,
       });
       return;
     }
@@ -122,16 +126,72 @@ module.exports = {
 
     if (!user) {
       res.status(404).json({
-        message: "User Not Found",
+        message: `FAILED!
+        User Not Found`,
       });
       return;
     }
 
     res.status(200).json(driverResponseObject(driver, user));
   },
-  update: (req, res) => {},
 
-  delete: (req, res) => {},
+  approve: async (req, res) => {
+    const { driverId, status } = req.body;
+
+    let approvedDriver;
+    try {
+      approvedDriver = await DRIVER.findByIdAndUpdate(driverId, {
+        approval_status: status,
+      });
+      await approvedDriver.save();
+    } catch (error) {
+      res.status(500).json({
+        message: `FAILED!
+         Driver Approval Unsuccessful
+         `,
+      });
+    }
+  },
+  delete: async (req, res) => {
+    const driverId = req.params.id;
+
+    const driver = await DRIVER.findById(driverId);
+
+    if (!driver) {
+      res.status(404).json({
+        message: `FAILED!
+        Driver Not Found`,
+      });
+      return;
+    }
+
+    let deletedUser;
+    try {
+      deletedUser = await USER.findByIdAndDelete(driver.userId);
+    } catch (error) {
+      res.status(500).json({
+        message: `FAILED!
+        Deletion process unsuccessful`,
+        error,
+      });
+      return;
+    }
+
+    let deletedDriver;
+    try {
+      deletedDriver = await DRIVER.findByIdAndDelete(driver._id);
+    } catch (error) {
+      res.status(500).json({
+        message: `FAILED!
+        Could not delete driver`,
+        error,
+      });
+      return;
+    }
+    res.status(204).json({
+      message: "DELETE == SUCCESS",
+    });
+  },
 };
 
 const format_approval = (value) => {
