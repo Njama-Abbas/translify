@@ -115,11 +115,22 @@ module.exports = {
     const user = await USER.findById(clientId);
     if (!user) {
       res.status(404).json({
-        message: "Client Not Found",
+        message: `FAILED!
+        Client Not Found`,
       });
       return;
     }
-    await USER.findByIdAndDelete(clientId);
+    let deletedUser;
+    try {
+      deletedUser = await USER.findByIdAndDelete(clientId);
+    } catch (error) {
+      res.status(500).json({
+        message: `FAILED!
+        Deletion process unsuccessful`,
+        error,
+      });
+      return;
+    }
 
     res.status(204).json({
       message: "DELETE == SUCCESS",
