@@ -107,14 +107,21 @@ module.exports = {
      *  if code entered by user
      * is equal to code in the database
      * change verification status to true
+     * generate a new verifictaion code
      */
+
+    const new_generated_code = phoneToken(8, {
+      type: "number",
+    });
 
     const updatedUser = await USER.findByIdAndUpdate(user._id, {
       verification: {
         status: true,
-        code: user.verification.code,
+        code: new_generated_code,
       },
     });
+
+    await updatedUser.save();
 
     /**
      * get the users role
@@ -215,6 +222,7 @@ module.exports = {
           code: generated_code,
         },
       });
+      await updatedUser.save();
     } catch (error) {
       res.status(500).json({
         message: `An Error Occured Cannot update details ${e}`,
