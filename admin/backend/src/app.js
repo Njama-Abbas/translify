@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { client, driver } = require("./routes");
+const { client, driver, order } = require("./routes");
 
 const express = require("express"),
   bodyParser = require("body-parser"),
@@ -64,7 +64,7 @@ app.use(function handleDatabaseError(error, request, response, next) {
 
 app.use("/api/drivers", driver);
 app.use("/api/clients", client);
-
+app.use("/api/orders", order);
 app.get("/", (_req, res) => res.send("Hello World!"));
 
 const PORT = process.env.PORT || 901;
