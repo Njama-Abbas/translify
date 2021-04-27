@@ -64,7 +64,7 @@ export default function ChangePasswordDialog({ user }) {
 
 const EditForm = ({ currentUser, handleClose }) => {
   const { register, handleSubmit, errors } = useForm({
-    reValidateMode: "onChange",
+    reValidateMode: "onBlur",
     mode: "onBlur",
   });
 
