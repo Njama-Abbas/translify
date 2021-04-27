@@ -9,7 +9,7 @@ import {
   selectAllOrders,
 } from "../../State/orders.slice";
 
-import { LinkButton } from "../../Resources/Styles/global";
+import { LinkButton, Button } from "../../Resources/Styles/global";
 import OrderItem from "./OrderItem";
 
 import {
@@ -30,6 +30,8 @@ import {
   FilterText,
   Notification,
   Message,
+  SortControlsContainer,
+  SortText,
 } from "./elements";
 
 const Orders = ({ user }) => {
@@ -144,7 +146,42 @@ const Orders = ({ user }) => {
                   </OrdersNav>
                 </Grid>
                 <Grid item md={9} sm={12}>
-                  {content}
+                  <Grid container direction="column">
+                    <SortControlsContainer>
+                      <Grid item xs={12}>
+                        <Grid
+                          container
+                          justify="space-evenly"
+                          alignItems="center"
+                        >
+                          <Grid item>
+                            <SortText>Filter By:</SortText>
+                          </Grid>
+                          <Grid item>
+                            <Button primary small>
+                              Date
+                            </Button>
+                          </Grid>
+                          <Grid item>
+                            <Button primary small>
+                              Destination
+                            </Button>
+                          </Grid>
+                          <Grid item>
+                            <Button primary small>
+                              Pickup
+                            </Button>
+                          </Grid>
+                          <Grid item>
+                            <Button primary small>
+                              Cost
+                            </Button>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </SortControlsContainer>
+                    <Grid item>{content}</Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </OrderCardContainer>

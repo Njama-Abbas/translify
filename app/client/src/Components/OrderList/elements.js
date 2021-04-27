@@ -33,6 +33,15 @@ export const OrdersNav = styled(Paper)`
   }
 `;
 
+export const SortControlsContainer = styled.div`
+  background-color: rgba(251, 251, 251, 0.7);
+  margin: 0 5px;
+`;
+
+export const SortText = styled.p`
+  font-size: 2em;
+  font-weight: bold;
+`;
 export const FilterControlItem = styled.div`
   background-color: ${({ selected }) =>
     selected ? "rgba(0, 0,0, 0.7)" : "#3f51b5"};
@@ -76,7 +85,7 @@ export const FilterCount = styled.p`
   background-color: #fff;
   height: 40px;
   color: #3f51b5;
-  border-radius: 50%;
+  border-radius: 25%;
   width: 40px;
   display: flex;
   justify-content: center;
