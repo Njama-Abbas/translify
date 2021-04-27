@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, Redirect, useHistory } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
-
+import Glitch from "../../Resources/Utils/error";
 import { AuthAPI } from "../../Api";
 import { useDispatch } from "react-redux";
 import { userSet } from "../../State/user.slice";
@@ -69,7 +69,6 @@ export default function SignUp({ route }) {
 
     AuthAPI.login(email, password, role).then(
       (response) => {
-        console.log(response);
         dispatch(
           userSet({
             UID: response.id,
@@ -98,12 +97,7 @@ export default function SignUp({ route }) {
           // redirect to verification page
           setRedirect("/verify-account");
         } else {
-          const ErrorMessage =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString();
+          const ErrorMessage = Glitch.message(error);
           addToast(ErrorMessage, {
             appearance: "error",
           });
