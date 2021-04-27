@@ -57,6 +57,28 @@ class AuthAPI {
       userID,
     });
   }
+
+  updateInfo(userId, data) {
+    return axios.put(API_URL + "update-info", {
+      userId,
+      data,
+    });
+  }
+
+  getPasswordChangeVerificationCode(userId, currentPassword) {
+    return axios.post(API_URL + "change-password-code", {
+      userId,
+      currentPassword,
+    });
+  }
+
+  changePassword(userId, newPassword, v_code) {
+    return axios.post(API_URL + "change-password", {
+      userId,
+      newPassword,
+      v_code,
+    });
+  }
 }
 
 export default new AuthAPI();
