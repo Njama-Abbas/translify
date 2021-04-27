@@ -44,9 +44,11 @@ module.exports = {
           code: generated_code,
         },
       });
-    } catch (e) {
+    } catch (error) {
       res.status(500).json({
-        message: `Create User Error: ${e}`,
+        message: `FAILED! 
+        Could not create User
+        `,
       });
       return;
     }
@@ -84,21 +86,27 @@ module.exports = {
 
     if (!user) {
       res.status(404).json({
-        message: "User nor found",
+        message: `FAILED!
+        Sorry! We cant seem to find your details
+        Please Sign Up
+        `,
       });
       return;
     }
 
     if (user.verification.status) {
       res.status(200).json({
-        message: "User Already verified",
+        message: `AHEM!
+        You are Already verified
+        `,
       });
       return;
     }
 
     if (user.verification.code !== Number(v_code)) {
       res.status(401).json({
-        message: "Wrong verification code",
+        message: `FAILED!
+        You Entered a Wrong verification code`,
       });
       return;
     }
@@ -166,7 +174,10 @@ module.exports = {
     //user is not in the database
     if (!user) {
       res.status(404).json({
-        message: "User Not Found",
+        message: `FAILED!
+        Sorry! We cant seem to locate you in our system
+        Please Sign Up
+        `,
       });
       return;
     }
@@ -177,7 +188,8 @@ module.exports = {
     if (!valid) {
       res.status(403).json({
         accessToken: null,
-        message: "Invalid Password",
+        message: `FAILED!
+        Invalid Login Credentials`,
       });
       return;
     }
@@ -185,7 +197,8 @@ module.exports = {
     //Take care of a user signing in and is not verified
     if (!user.verification.status) {
       res.status(401).json({
-        message: "Not Authaurized",
+        message: `FAILED!
+        You are Not Authaurized`,
         UID: user._id,
         phoneno: user.phoneno,
       });
@@ -225,7 +238,9 @@ module.exports = {
       await updatedUser.save();
     } catch (error) {
       res.status(500).json({
-        message: `An Error Occured Cannot update details ${e}`,
+        message: `FAILED!
+        An Error Occured Cannot update details`,
+        errror,
       });
       return;
     }
@@ -240,7 +255,9 @@ module.exports = {
       });
     } catch (e) {
       res.status(500).json({
-        message: `Twillio Send Text Error ${e}`,
+        message: `FAILED!
+        Twillio Send Text Error
+        Please Try again Later`,
       });
       return;
     }
@@ -248,6 +265,137 @@ module.exports = {
     res.status(201).json({
       UID: updatedUser._id,
       phoneno: updatedUser.phoneno,
+    });
+  },
+
+  updateInfo: async (req, res) => {
+    const { data, userId } = req.body;
+    let user;
+    try {
+      user = await USER.findByIdAndUpdate(userId, data);
+      await user.save();
+    } catch (error) {
+      res.status(500);
+      return;
+    }
+    const role = await ROLE.findOne({
+      _id: user.role,
+    });
+
+    res.status(204);
+  },
+
+  sendChangePasswordVerificationCode: async (req, res) => {
+    const { userId, currentPassword } = req.body;
+    const user = await USER.findById(userId);
+
+    if (!user) {
+      res.status(404).json({
+        message: `FAILED!
+        Sorry! We cant seem to locate you in our system
+        `,
+      });
+      return;
+    }
+
+    //validate current password
+    const valid = bcrypt.compareSync(currentPassword, user.password);
+
+    if (!valid) {
+      res.status(403).json({
+        message: `FAILED! 
+        Your current password is Incorrect
+        `,
+      });
+      return;
+    }
+
+    //valid generate sms verification code
+    const generated_code = phoneToken(8, {
+      type: "number",
+    });
+
+    //change the existing verification code in the database;
+    let $user;
+    try {
+      $user = await USER.findByIdAndUpdate(user._id, {
+        verification: {
+          code: generated_code,
+        },
+      });
+      await $user.save();
+    } catch (error) {
+      res.status(500).json({
+        message: `FAILED!
+        An Error Occured Cannot update details`,
+        error,
+      });
+      return;
+    }
+
+    //Send the text
+    // let sendText;
+    // try {
+    //   sendText = await SMS.messages.create({
+    //     body: `Tans-Code: ${$user.verification.code} `,
+    //     to: "+254" + $user.phoneno.slice(-9),
+    //     from: "+12027598622",
+    //   });
+    // } catch (error) {
+    //   res.status(500).json({
+    //     message: `FAILED!
+    //     Twillio Send Text Error`,
+    //     error,
+    //   });
+    //   return;
+    // }
+
+    res.status(201).json({
+      v_code: $user.verification.code,
+    });
+  },
+
+  changePassword: async (req, res) => {
+    const { newPassword, userId, v_code } = req.body;
+
+    const user = await USER.findById(userId);
+
+    if (!user) {
+      res.status(404).json({
+        message: `FAILED!
+        Sorry! We cant seem to locate you in our system`,
+      });
+      return;
+    }
+
+    //validate verification code
+    if (user.verification.code !== Number(v_code)) {
+      res.status(401).json({
+        message: `FAILED!
+        You entered the Wrong verification code`,
+      });
+      return;
+    }
+
+    //valid change password
+    let updatedUser;
+    try {
+      updatedUser = await USER.findByIdAndUpdate(user._id, {
+        password: bcrypt.hashSync(newPassword, 10),
+      });
+      await updatedUser.save();
+    } catch (error) {
+      res.status(500).json({
+        message: `FAILED!
+        An Error Occured Cannot update password`,
+        error,
+      });
+      return;
+    }
+
+    res.status(204).json({
+      message: `SUCCESSS! 
+      Password updated successfully`,
     });
   },
 };
