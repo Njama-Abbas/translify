@@ -3,7 +3,7 @@ import { Grid } from "@material-ui/core";
 import { ProfileSection, PersonalDetailsItem } from "./Profile.elements";
 import EditInfoDialog from "./EditInfo";
 
-export default function PersonalInfo({ user }) {
+export default function PersonalInfo({ user, setLoading }) {
   return (
     <Grid item md={6} sm={8} xs={12}>
       <ProfileSection>
@@ -37,7 +37,7 @@ export default function PersonalInfo({ user }) {
             flexDirection: "column",
           }}
         >
-          <EditInfoDialog user={user} />
+          <EditInfoDialog user={user} setLoading={setLoading} />
         </div>
       </ProfileSection>
     </Grid>
