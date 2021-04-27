@@ -17,7 +17,7 @@ import {
 
 export default function App() {
   return (
-    <ToastProvider autoDismiss autoDismissTimeout={7000}>
+    <ToastProvider autoDismiss autoDismissTimeout={10000}>
       <GlobalStyle />
       <ScrollToTop />
       <Switch>
