@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useToasts } from "react-toast-notifications";
+import Glitch from "../../Resources/Utils/error";
+
 import {
   Dialog,
   DialogContent,
@@ -17,12 +20,13 @@ import ValidationError from "../Error/Validation";
 import ValidationPatterns from "../../Resources/Patterns/validation";
 import { Form, FormAvatar, FormPaper } from "./Profile.elements";
 import { IoPencil, IoMail, IoPerson } from "react-icons/io5";
+import { AuthAPI } from "../../Api";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function EditInfoDialog({ user }) {
+export default function EditInfoDialog({ user, setLoading }) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -48,21 +52,25 @@ export default function EditInfoDialog({ user }) {
         aria-describedby="edit-info-dialog-slide-description"
       >
         <DialogContent>
-          <EditForm currentUser={user} handleClose={handleClose} />
+          <EditForm
+            currentUser={user}
+            handleClose={handleClose}
+            setLoading={setLoading}
+          />
         </DialogContent>
       </Dialog>
     </div>
   );
 }
 
-const EditForm = ({ currentUser, handleClose }) => {
+const EditForm = ({ currentUser, handleClose, setLoading }) => {
   const { register, handleSubmit, errors } = useForm({
-    reValidateMode: "onChange",
+    reValidateMode: "onBlur",
     mode: "onChange",
   });
+  const { addToast } = useToasts();
 
   // const [message, showMessage] = useState("");
-  // const [loading, setLoading] = useState(false);
 
   const { firstname, lastname, email } = currentUser;
 
@@ -71,11 +79,29 @@ const EditForm = ({ currentUser, handleClose }) => {
   const [new_mail, setEmail] = useState(email);
 
   const onSubmit = (user) => {
-    // const { email, firstname, lastname } = user;
-    handleClose();
-    // setLoading(true);
-    console.log(user);
+    setLoading(true);
+    AuthAPI.updateInfo(currentUser.id, user).then(
+      (response) => {
+        addToast(
+          `SUCCESS!
+          Details will be updated next time you log in
+          `,
+          {
+            appearance: "success",
+          }
+        );
+        handleClose();
+      },
+      (error) => {
+        let message = Glitch.message(error);
+        addToast(message, {
+          appearance: "error",
+        });
+      }
+    );
+    setLoading(false);
   };
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
