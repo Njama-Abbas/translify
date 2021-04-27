@@ -60,7 +60,7 @@ const OrderItem = ({ order, user }) => {
           </Grid>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Grid container spacing={1} justify="center" alignContent="center">
+          <Grid container spacing={1} justify="center" alignItems="center">
             {order.status === "pending" ? (
               user.role === "driver" ? (
                 <React.Fragment>
