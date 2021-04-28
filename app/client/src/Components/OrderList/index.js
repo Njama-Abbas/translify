@@ -7,8 +7,8 @@ import {
   ordersFilterChanged,
   selectFilter,
   selectAllOrders,
+  ordersSortOrderChanged,
 } from "../../State/orders.slice";
-
 import { LinkButton, Button } from "../../Resources/Styles/global";
 import OrderItem from "./OrderItem";
 
@@ -43,6 +43,9 @@ const Orders = ({ user }) => {
   const allOrders = useSelector(selectAllOrders);
 
   const handleFilterChange = (filter) => dispatch(ordersFilterChanged(filter));
+
+  const handleSortOrderChange = (order) =>
+    dispatch(ordersSortOrderChanged(order));
 
   const active_filter = (current_filter) => current_filter === filter;
 
@@ -158,23 +161,41 @@ const Orders = ({ user }) => {
                             <SortText>Filter By:</SortText>
                           </Grid>
                           <Grid item>
-                            <Button primary small>
+                            <Button
+                              onClick={() => handleSortOrderChange("date")}
+                              primary
+                              small
+                            >
                               Date
                             </Button>
                           </Grid>
                           <Grid item>
-                            <Button primary small>
+                            <Button
+                              primary
+                              small
+                              onClick={() =>
+                                handleSortOrderChange("destination")
+                              }
+                            >
                               Destination
                             </Button>
                           </Grid>
                           <Grid item>
-                            <Button primary small>
+                            <Button
+                              primary
+                              small
+                              onClick={() => handleSortOrderChange("pickup")}
+                            >
                               Pickup
                             </Button>
                           </Grid>
                           <Grid item>
-                            <Button primary small>
-                              Cost
+                            <Button
+                              primary
+                              small
+                              onClick={() => handleSortOrderChange("charges")}
+                            >
+                              Charges
                             </Button>
                           </Grid>
                         </Grid>

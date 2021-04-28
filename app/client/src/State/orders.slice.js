@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { AuthAPI, OrderAPI } from "../Api";
+import SORT from "../Resources/Utils/sort";
 
 const initialState = {
   orders: [],
   status: "idle",
   error: null,
   filter: "in-progress",
+  sortOrder: "date",
 };
 
 export const fetchOrders = createAsyncThunk("orders/fetchOrders", async () => {
@@ -34,6 +36,10 @@ const OrdersSlice = createSlice({
     ordersFilterChanged(state, action) {
       state.filter = action.payload;
     },
+    ordersSortOrderChanged(state, action) {
+      state.sortOrder = action.payload;
+      state.orders = SORT(state.orders, state.sortOrder);
+    },
   },
   extraReducers: {
     [fetchOrders.pending]: (state, action) => {
@@ -58,7 +64,11 @@ const OrdersSlice = createSlice({
   },
 });
 
-export const { ordersFilterChanged, activeOrderChanged } = OrdersSlice.actions;
+export const {
+  ordersFilterChanged,
+  activeOrderChanged,
+  ordersSortOrderChanged,
+} = OrdersSlice.actions;
 
 export const selectAllOrders = (state) => state.orders.orders;
 
@@ -72,4 +82,7 @@ export const selectOrderById = (state, orderId) =>
   state.orders.orders.find((order) => order._id === orderId);
 
 export const selectFilter = (state) => state.orders.filter;
+
+export const selectSortOrder = (state) => state.orders.sortOrder;
+
 export default OrdersSlice.reducer;
