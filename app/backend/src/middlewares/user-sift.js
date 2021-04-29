@@ -4,9 +4,7 @@ const USER = db.user;
 
 module.exports = {
   checkDuplicateEmail: async (req, res, next) => {
-    const {
-      email
-    } = req.body;
+    const { email } = req.body;
 
     const user = await USER.findOne({
       email,
@@ -15,7 +13,7 @@ module.exports = {
     if (user) {
       res.status(409).json({
         message: `FAILED!
-         Email is already in use`
+         Email is already in use`,
       });
       return;
     }
@@ -23,18 +21,16 @@ module.exports = {
     next();
   },
   checkDuplicatePhoneNo: async (req, res, next) => {
-    const {
-      phoneno
-    } = req.body;
+    const { phoneno: user_phoneno } = req.body;
 
     const user = await USER.findOne({
-      phoneno,
+      phoneno: user_phoneno.slice(-9),
     });
 
     if (user) {
       res.status(409).json({
         message: `FAILED!
-        Phone No is already Registered`
+        Phone No is already Registered`,
       });
       return;
     }
@@ -43,9 +39,7 @@ module.exports = {
   },
 
   checkRolesExisted: async (req, res, next) => {
-    const {
-      role
-    } = req.body;
+    const { role } = req.body;
 
     if (role) {
       if (!ROLES.includes(role)) {
@@ -57,5 +51,5 @@ module.exports = {
       }
     }
     next();
-  }
-}
+  },
+};
