@@ -17,7 +17,6 @@ module.exports = {
     } = req.body;
 
     const CheckoutRequestID = req.CheckoutRequestID;
-    //add order to database
 
     if (!CheckoutRequestID) {
       res.status(500).json({
@@ -26,6 +25,7 @@ module.exports = {
       return;
     }
 
+    //add order to database
     let new_order;
     try {
       new_order = await ORDER.create({
@@ -56,10 +56,10 @@ module.exports = {
       role: admin_role._id,
     });
 
-    const account_balance = admin.account_balance + charges;
+    const system_account_balance = admin.account_balance + charges;
 
     const updated_admin = await USER.findByIdAndUpdate(admin._id, {
-      account_balance,
+      account_balance: system_account_balance,
     });
 
     await updated_admin.save();
@@ -105,7 +105,8 @@ module.exports = {
 
     if (!role) {
       res.status(404).json({
-        message: "We could not locate the supplied role",
+        message: `FAILED!
+        We could not locate the supplied role`,
       });
     }
 
@@ -121,7 +122,8 @@ module.exports = {
       });
       if (!driver) {
         res.status(404).json({
-          message: "Driver not found",
+          message: `FAILED!
+          Designated Driver not found`,
         });
         return;
       }
@@ -131,7 +133,8 @@ module.exports = {
     }
     if (!orders) {
       res.status(404).json({
-        message: "orders not found",
+        message: `FAILED! 
+        No orders`,
       });
       return;
     }
@@ -173,7 +176,8 @@ module.exports = {
 
     if (!user) {
       res.status(404).json({
-        message: "User not found",
+        message: `FAILED!
+        User not found`,
       });
       return;
     }
@@ -182,7 +186,7 @@ module.exports = {
 
     if (!role) {
       res.status(404).json({
-        message: "We could not locate the supplied role",
+        message: `FAILED! We could not locate the supplied role`,
       });
     }
 
@@ -192,14 +196,11 @@ module.exports = {
 
     if (!driver) {
       res.status(404).json({
-        message: "Driver not found",
+        message: `FAILED!
+        Designated Driver not found`,
       });
       return;
     }
-    /**
-     * @todo
-     * pay the driver with
-     */
 
     if (status === "successfull") {
       const admin_role = await ROLE.findOne({
@@ -210,21 +211,47 @@ module.exports = {
         role: admin_role._id,
       });
       const payment = order.charges * 0.9;
+
+      //deduct the system account balance
       const system_account_balance = admin.account_balance - payment;
 
-      const updated_admin = await USER.findByIdAndUpdate(admin._id, {
-        account_balance: system_account_balance,
-      });
+      let updated_admin;
+      try {
+        updated_admin = await USER.findByIdAndUpdate(admin._id, {
+          account_balance: system_account_balance,
+        });
+        await updated_admin.save();
+      } catch (error) {
+        res.status(500).json({
+          message: `FAILED! 
+           Transaction 001 Update unsuccessful
+           `,
+          error,
+        });
+        return;
+      }
 
-      await updated_admin.save();
-      const designated_Driver = await USER.findById(driver.userId);
+      const designated_driver = await USER.findById(driver.userId);
 
+      //pay the driver
       const driver_account_balance =
-        designated_Driver.account_balance + payment;
-      const $driver = await USER.findByIdAndUpdate(driver.userId, {
-        account_balance: driver_account_balance,
-      });
-      await $driver.save();
+        designated_driver.account_balance + payment;
+
+      let updated_driver;
+      try {
+        updated_driver = await USER.findByIdAndUpdate(driver.userId, {
+          account_balance: driver_account_balance,
+        });
+        await updated_driver.save();
+      } catch (error) {
+        res.status(500).json({
+          message: `FAILED! 
+           Transaction 002 Update unsuccessful
+           `,
+          error,
+        });
+        return;
+      }
     }
 
     //unreserve driver
@@ -234,9 +261,10 @@ module.exports = {
         designatedDriver = await DRIVER.findByIdAndUpdate(driver._id, {
           reserved: false,
         });
-      } catch (err) {
+      } catch (error) {
         res.status(500).json({
-          message: err,
+          message: "FAILED! Order Update unsuccessful",
+          error,
         });
         return;
       }
