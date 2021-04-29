@@ -6,7 +6,7 @@ const drivers = {
       personal_details: {
         firstname: "Salman",
         lastname: "Khan",
-        phoneno: "0712345678",
+        phoneno: "712345678",
         email: "salmankhan@gmail.com",
         rating: 5.0,
       },
@@ -23,7 +23,7 @@ const drivers = {
       personal_details: {
         firstname: "Alisha",
         lastname: "Keys",
-        phoneno: "0712345679",
+        phoneno: "712345679",
         email: "alisha@gmail.com",
         rating: 4.3,
       },
@@ -40,7 +40,7 @@ const drivers = {
       personal_details: {
         firstname: "Dwayne",
         lastname: "Johnson",
-        phoneno: "0712345680",
+        phoneno: "712345680",
         email: "johnson@gmail.com",
         rating: 4.2,
       },
@@ -57,7 +57,7 @@ const drivers = {
       personal_details: {
         firstname: "Paul",
         lastname: "Walker",
-        phoneno: "07123456781",
+        phoneno: "7123456781",
         email: "salmankhan@gmail.com",
         rating: 4.0,
       },
@@ -74,7 +74,7 @@ const drivers = {
       personal_details: {
         firstname: "Michelle",
         lastname: "Rodriguez",
-        phoneno: "07123456782",
+        phoneno: "7123456782",
         email: "rodriguez@gmail.com",
         rating: 4.5,
       },
@@ -93,7 +93,7 @@ const drivers = {
       personal_details: {
         firstname: "Megan",
         lastname: "Boone",
-        phoneno: "0712345698",
+        phoneno: "712345698",
         email: "megan@gmail.com",
       },
       driving_details: {
@@ -109,7 +109,7 @@ const drivers = {
       personal_details: {
         firstname: "Laura",
         lastname: "Sohn",
-        phoneno: "0712345699",
+        phoneno: "712345699",
         email: "laura@gmail.com",
       },
       driving_details: {
@@ -141,7 +141,7 @@ const drivers = {
       personal_details: {
         firstname: "David",
         lastname: "Strathairn",
-        phoneno: "07123456795",
+        phoneno: "7123456795",
         email: "david@gmail.com",
       },
       driving_details: {
@@ -157,7 +157,7 @@ const drivers = {
       personal_details: {
         firstname: "Adriane",
         lastname: "Lenox",
-        phoneno: "0712345687",
+        phoneno: "712345687",
         email: "adriane@gmail.com",
       },
       driving_details: {
@@ -175,7 +175,7 @@ const drivers = {
       personal_details: {
         firstname: "Valarie",
         lastname: "Pettford",
-        phoneno: "0722345678",
+        phoneno: "722345678",
         email: "valarie@gmail.com",
       },
       driving_details: {
@@ -191,7 +191,7 @@ const drivers = {
       personal_details: {
         firstname: "Ulrich",
         lastname: "Thomsen",
-        phoneno: "072645679",
+        phoneno: "72645679",
         email: "ulrich@gmail.com",
       },
       driving_details: {
@@ -207,7 +207,7 @@ const drivers = {
       personal_details: {
         firstname: "Rachael",
         lastname: "Brosnahan",
-        phoneno: "0743845680",
+        phoneno: "743845680",
         email: "rachael@gmail.com",
       },
       driving_details: {
@@ -227,6 +227,7 @@ const set_password = (driver) => {
     personal_details: {
       ...driver.personal_details,
       password: bcrypt.hashSync("123Asd", 10),
+      phoneno: "254" + driver.personal_details.phoneno,
       verification: {
         status: true,
         code: 10801080,
