@@ -1,14 +1,13 @@
-const mongoose = require("mongoose");
 const db = require("../models");
-const User = db.user;
-const Driver = db.driver;
-const Role = db.role;
+const USER = db.user,
+  DRIVER = db.driver,
+  ROLE = db.role;
 
 module.exports = {
   complete_registration: async (req, res, next) => {
     const { userId, truckno, dlno, address } = req.body;
 
-    const newDriver = await Driver.create({
+    const newDriver = await DRIVER.create({
       userId,
       truckno,
       dlno,
@@ -32,7 +31,7 @@ module.exports = {
   check_approval: async (req, res) => {
     const { userid: userId } = req.headers;
 
-    const driver = await Driver.findOne({
+    const driver = await DRIVER.findOne({
       userId,
     });
 
@@ -49,7 +48,7 @@ module.exports = {
   getById: async (req, res) => {
     const id = req.headers.driverid;
 
-    const driver = await Driver.findById(id);
+    const driver = await DRIVER.findById(id);
 
     if (!driver) {
       res.status(404).json({
@@ -58,7 +57,7 @@ module.exports = {
       return;
     }
 
-    const user = await User.findOne({
+    const user = await USER.findOne({
       _id: driver.userId,
     });
 
@@ -80,7 +79,7 @@ module.exports = {
   },
 
   getOnCall: async (req, res) => {
-    const driver_role = await Role.findOne({
+    const driver_role = await ROLE.findOne({
       name: "driver",
     });
     if (!driver_role) {
@@ -91,7 +90,7 @@ module.exports = {
     }
 
     //get all users who have a role of driver
-    const users = await User.find({
+    const users = await USER.find({
       role: driver_role._id,
     });
 
@@ -105,7 +104,7 @@ module.exports = {
     //map the driving details and personal details
     const drivers = await Promise.all(
       users.map(async (user) => {
-        const driver = await Driver.findOne({
+        const driver = await DRIVER.findOne({
           userId: user._id,
         });
         if (driver) {
@@ -135,7 +134,62 @@ module.exports = {
     );
     res.status(200).json(availableDrivers);
   },
-  getTest: async (req, res) => {
-    res.send("Test");
+
+  checkDutyStatus: async (req, res) => {
+    const { userid: userId } = req.headers;
+
+    const driver = await DRIVER.findOne({
+      userId,
+    });
+
+    if (!driver) {
+      res.status(404).json({
+        message: `FAILED!
+        Driver Not Found
+        `,
+      });
+      return;
+    }
+
+    res.status(200).json({
+      duty_status: driver.oncall,
+    });
+  },
+
+  changeDutyStatus: async (req, res) => {
+    const { userId, duty_status } = req.body;
+
+    const driver = await DRIVER.findOne({
+      userId,
+    });
+
+    if (!driver) {
+      res.status(404).json({
+        message: `FAILED!
+        Driver Not Found
+        `,
+      });
+      return;
+    }
+
+    let updatedDriver;
+
+    try {
+      updatedDriver = await DRIVER.findByIdAndUpdate(driver._id, {
+        oncall: duty_status,
+      });
+      await updatedDriver.save();
+    } catch (error) {
+      res.status(404).json({
+        message: `FAILED!
+        Changing duty status UNSUCCESSFULL
+        `,
+      });
+      return;
+    }
+    res.status(200).json({
+      message: `SUCCESS! Duty status updated`,
+      duty_status: updatedDriver.oncall,
+    });
   },
 };
