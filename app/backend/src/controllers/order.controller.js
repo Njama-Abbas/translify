@@ -47,13 +47,31 @@ module.exports = {
 
     const order = await new_order.save();
 
-    /**
-     * @todo
-     * deposit money into admins account
-     */
+    //Send money to the company account
+    const admin_role = await ROLE.findOne({
+      name: "admin",
+    });
+
+    const admin = await USER.findOne({
+      role: admin_role._id,
+    });
+
+    const account_balance = admin.account_balance + charges;
+
+    const updated_admin = await USER.findByIdAndUpdate(admin._id, {
+      account_balance,
+    });
+
+    await updated_admin.save();
 
     //Reserve driver until the order is completed
     let designatedDriver;
+
+    /**
+     * @todo
+     * send text message to designated driver
+     */
+
     try {
       designatedDriver = await DRIVER.findByIdAndUpdate(driverId, {
         reserved: true,
@@ -177,6 +195,36 @@ module.exports = {
         message: "Driver not found",
       });
       return;
+    }
+    /**
+     * @todo
+     * pay the driver with
+     */
+
+    if (status === "successfull") {
+      const admin_role = await ROLE.findOne({
+        name: "admin",
+      });
+
+      const admin = await USER.findOne({
+        role: admin_role._id,
+      });
+      const payment = order.charges * 0.9;
+      const system_account_balance = admin.account_balance - payment;
+
+      const updated_admin = await USER.findByIdAndUpdate(admin._id, {
+        account_balance: system_account_balance,
+      });
+
+      await updated_admin.save();
+      const designated_Driver = await USER.findById(driver.userId);
+
+      const driver_account_balance =
+        designated_Driver.account_balance + payment;
+      const $driver = await USER.findByIdAndUpdate(driver.userId, {
+        account_balance: driver_account_balance,
+      });
+      await $driver.save();
     }
 
     //unreserve driver
