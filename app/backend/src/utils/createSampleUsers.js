@@ -1,22 +1,22 @@
 const db = require("../models");
-const Role = db.role;
-const User = db.user;
-const Driver = db.driver;
+const ROLE = db.role;
+const USER = db.user;
+const DRIVER = db.driver;
 const bcrypt = require("bcrypt");
 
 const sample_drivers = require("./drivers");
 const sample_clients = require("./clients");
 
 exports.createSampleUsers = function () {
-  User.estimatedDocumentCount(async (err, count) => {
+  USER.estimatedDocumentCount(async (err, count) => {
     if (!err && count === 0) {
-      const client_role = await Role.findOne({
+      const client_role = await ROLE.findOne({
         name: "client",
       });
 
       const $sample_clients = await Promise.all(
         sample_clients.map(async (client) => {
-          const c1 = await User.create({
+          const c1 = await USER.create({
             ...client,
             role: client_role._id,
           });
@@ -29,19 +29,19 @@ exports.createSampleUsers = function () {
         console.log("SAMPLE 'CLIENTS' CREATED");
       }
 
-      const driver_role = await Role.findOne({
+      const driver_role = await ROLE.findOne({
         name: "driver",
       });
 
       const approved_drivers = await Promise.all(
         sample_drivers.approved.map(async (driver) => {
-          const d1 = await User.create({
+          const d1 = await USER.create({
             ...driver.personal_details,
             role: driver_role._id,
           });
           const d2 = await d1.save();
 
-          const d3 = await Driver.create({
+          const d3 = await DRIVER.create({
             userId: d2._id,
             ...driver.driving_details,
             approval_status: "A",
@@ -52,31 +52,31 @@ exports.createSampleUsers = function () {
       );
       const declined_drivers = await Promise.all(
         sample_drivers.declined.map(async (driver) => {
-          const d1 = await User.create({
+          const d1 = await USER.create({
             ...driver.personal_details,
             role: driver_role._id,
           });
           const d2 = await d1.save();
 
-          const d3 = await Driver.create({
+          const d3 = await DRIVER.create({
             userId: d2._id,
             ...driver.driving_details,
             approval_status: "D",
           });
-          const d4 = await d3.save();
+          await d3.save();
           return true;
         })
       );
 
       const pending_drivers = await Promise.all(
         sample_drivers.pending.map(async (driver) => {
-          const d1 = await User.create({
+          const d1 = await USER.create({
             ...driver.personal_details,
             role: driver_role._id,
           });
           const d2 = await d1.save();
 
-          const d3 = await Driver.create({
+          const d3 = await DRIVER.create({
             userId: d2._id,
             ...driver.driving_details,
             approval_status: "P",
@@ -96,17 +96,18 @@ exports.createSampleUsers = function () {
         console.log("SAMPLE 'DRIVERS' CREATED");
       }
 
-      const admin_role = await Role.findOne({
+      const admin_role = await ROLE.findOne({
         name: "admin",
       });
 
-      const sample_admin = await User.create({
+      const sample_admin = await USER.create({
         firstname: "Priyanka",
         lastname: "Chopra",
         phoneno: "0712345678",
         email: "priyanka@gmail.com",
         password: bcrypt.hashSync("123Asd", 10),
         role: admin_role._id,
+        account_balance: 100000,
       });
       await sample_admin.save();
       console.log("Default 'ADMIN' created");
