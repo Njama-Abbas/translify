@@ -1,4 +1,3 @@
-const { role } = require("../models");
 const db = require("../models");
 const ORDER = db.order;
 const DRIVER = db.driver;
@@ -17,7 +16,16 @@ module.exports = {
       charges,
     } = req.body;
 
+    const CheckoutRequestID = req.CheckoutRequestID;
     //add order to database
+
+    if (!CheckoutRequestID) {
+      res.status(500).json({
+        message: "FAILED! Payment process failed please try again",
+      });
+      return;
+    }
+
     let new_order;
     try {
       new_order = await ORDER.create({
@@ -36,7 +44,13 @@ module.exports = {
       });
       return;
     }
+
     const order = await new_order.save();
+
+    /**
+     * @todo
+     * deposit money into admins account
+     */
 
     //Reserve driver until the order is completed
     let designatedDriver;

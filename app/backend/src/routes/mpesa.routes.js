@@ -1,8 +1,19 @@
 const Router = require("express").Router();
 
-const mpesaController = require("../controllers/mpesa.controller");
-const { reqMpesaToken } = require("../middlewares/mpesa_token");
+const { Mpesa } = require("../middlewares");
 
-Router.post("/stk-push", reqMpesaToken, mpesaController.stkPush);
+Router.post(
+  "/stk-push",
+  [Mpesa.reqMpesaToken, Mpesa.stkPush],
+  Mpesa.sampleResponse
+);
+
+Router.post("/", (req, res) => {
+  console.log("--------------STK-------------");
+  console.log(req.body);
+  /**save transaction to db */
+});
+
+Router.get("/", Mpesa.mpesaPassword);
 
 module.exports = Router;
