@@ -7,6 +7,10 @@ const User = mongoose.model(
     lastname: String,
     phoneno: String,
     email: String,
+    account_balance: {
+      type: Number,
+      default: 0,
+    },
     password: String,
     verification: {
       status: {
