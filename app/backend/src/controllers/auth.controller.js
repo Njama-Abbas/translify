@@ -1,21 +1,19 @@
 const config = require("../config/auth.config"),
   db = require("../models"),
   phoneToken = require("generate-sms-verification-code"),
-  twilio = require("twilio"),
+  sms = require("../utils/sms.utils"),
   jwt = require("jsonwebtoken"),
   bcrypt = require("bcrypt");
 
 const USER = db.user,
-  ROLE = db.role,
-  PHOTO = db.photo,
-  SMS = new twilio(config.TWILLIO_ACCOUNT_SID, config.TWILLIO_AUTH_TOKEN);
+  ROLE = db.role;
 
 module.exports = {
   signup: async (req, res) => {
     const {
       firstname,
       lastname,
-      phoneno,
+      phoneno: user_phoneno,
       email,
       password: userPassword,
       role,
@@ -36,7 +34,7 @@ module.exports = {
       new_user = await USER.create({
         firstname,
         lastname,
-        phoneno,
+        phoneno: "254" + user_phoneno.slice(-9),
         email,
         password: bcrypt.hashSync(userPassword, 10),
         role: $role._id,
@@ -61,7 +59,7 @@ module.exports = {
     // try {
     //   sendText = await sms.messages.create({
     //     body: `Tans-Code: ${user.verification.code} `,
-    //     to: "+254" + user.phoneno.slice(-9),
+    //     to: user.phoneno,
     //     from: "+12027598622",
     //   });
     // } catch (e) {
@@ -248,7 +246,7 @@ module.exports = {
     //Send the text
     let sendText;
     try {
-      sendText = await SMS.messages.create({
+      sendText = await sms.messages.create({
         body: `Tans-Code: ${updatedUser.verification.code} `,
         to: "+254" + updatedUser.phoneno.slice(-9),
         from: "+12027598622",
@@ -336,7 +334,7 @@ module.exports = {
     //Send the text
     // let sendText;
     // try {
-    //   sendText = await SMS.messages.create({
+    //   sendText = await sms.messages.create({
     //     body: `Tans-Code: ${$user.verification.code} `,
     //     to: "+254" + $user.phoneno.slice(-9),
     //     from: "+12027598622",
