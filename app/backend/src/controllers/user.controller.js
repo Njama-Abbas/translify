@@ -1,8 +1,7 @@
 const db = require("../models");
-const config = require("../config/auth.config");
 const USER = db.user;
 const ROLE = db.role;
-const { userResponseObject } = require("../utils/response");
+const { userResponseObject } = require("../utils/response.utils");
 
 module.exports = {
   allAccess: async (_req, res) => {
