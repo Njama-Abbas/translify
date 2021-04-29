@@ -1,3 +1,4 @@
+require("dotenv").config();
 module.exports = {
   secret: process.env.SECRET_KEY,
   TWILLIO_ACCOUNT_SID: process.env.TWILLIO_ACCOUNT_SID,
