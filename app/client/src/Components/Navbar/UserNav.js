@@ -13,7 +13,7 @@ import {
 
 import { MdAccountCircle, MdVerifiedUser, MdLock } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
-
+import DutySwitch from "../DutySwitch";
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -167,6 +167,7 @@ export default function UserNav({ user, logOutCallBack }) {
               <NavLink to={`/client/order-truck`}>Order</NavLink>
             )}
           </div>
+          <div>{user.role === "driver" && <DutySwitch user={user} />}</div>
           <div className={classes.sectionDesktop}>
             <IconButton
               edge="end"
