@@ -1,6 +1,5 @@
 const Router = require("express").Router();
 const { Mpesa } = require("../middlewares");
-const mpesaController = require("../controllers/mpesa.controller");
 const ordersController = require("../controllers/order.controller");
 
 Router.get("/user", ordersController.getAllOrdersByUserId);
