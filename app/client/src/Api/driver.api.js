@@ -32,6 +32,21 @@ class DriverAPI {
   getOnCall() {
     return axios.get(API_URL + "on-call");
   }
+
+  checkDutyStatus(userid) {
+    return axios.get(API_URL + "duty-status", {
+      headers: {
+        userid,
+      },
+    });
+  }
+
+  changeDutyStaus(userId, duty_status) {
+    return axios.post(API_URL + "duty-status", {
+      userId,
+      duty_status,
+    });
+  }
 }
 
 export default new DriverAPI();
