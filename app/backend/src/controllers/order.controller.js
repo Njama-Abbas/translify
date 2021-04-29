@@ -1,8 +1,10 @@
-const db = require("../models");
-const ORDER = db.order;
-const DRIVER = db.driver;
-const ROLE = db.role;
-const USER = db.user;
+const db = require("../models"),
+  sms = require("../utils/sms.utils");
+
+const ORDER = db.order,
+  DRIVER = db.driver,
+  ROLE = db.role,
+  USER = db.user;
 
 module.exports = {
   creteOrder: async (req, res) => {
@@ -65,17 +67,14 @@ module.exports = {
     await updated_admin.save();
 
     //Reserve driver until the order is completed
-    let designatedDriver;
 
-    /**
-     * @todo
-     * send text message to designated driver
-     */
+    let designatedDriver;
 
     try {
       designatedDriver = await DRIVER.findByIdAndUpdate(driverId, {
         reserved: true,
       });
+      await designatedDriver.save();
     } catch (err) {
       res.status(500).json({
         message: err,
@@ -83,7 +82,27 @@ module.exports = {
       return;
     }
 
-    await designatedDriver.save();
+    let driver = await USER.findById(designatedDriver.userId);
+
+    /**
+     * send text message to designated driver
+     */
+    // let sendText;
+    // try {
+    //   sendText = await sms.messages.create({
+    //     body: `You have received a translify transit request
+    //     please login to the app and proceed accordingly
+    //     `,
+    //     to: driver.phoneno,
+    //     from: "+12027598622",
+    //   });
+    // } catch (error) {
+    //   res.status(500).json({
+    //     message: `Twillio Send Text Error ${e}`,
+    //     error,
+    //   });
+    //   return;
+    // }
 
     const orders = [order];
     const mappedOrders = await MapOrders(orders);
