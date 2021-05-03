@@ -58,3 +58,9 @@ export const AccountDropDown = styled.p`
   justify-content: center;
   margin-right: 10px;
 `;
+
+export const NameTag = styled.span`
+  @media screen and (max-width: 600px) {
+    display: none;
+  }
+`;

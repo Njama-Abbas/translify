@@ -9,6 +9,7 @@ import {
   NavLink,
   AppTitle,
   AccountDropDown,
+  NameTag,
 } from "./UserNav.elements";
 
 import { MdAccountCircle, MdVerifiedUser, MdLock } from "react-icons/md";
@@ -157,7 +158,9 @@ export default function UserNav({ user, logOutCallBack }) {
           <UserLogo to={`/${user.role}`}>
             <AppTitle>translify</AppTitle> &nbsp;
             <DashBoardIcon size="40px" />
-            {formatName(user.firstname)}&nbsp;{formatName(user.lastname)}
+            <NameTag>
+              {formatName(user.firstname)}&nbsp;{formatName(user.lastname)}
+            </NameTag>
           </UserLogo>
           <br />
           <div>{user.role === "driver" && <DutySwitch user={user} />}</div>
