@@ -1,19 +1,13 @@
 import React from "react";
-import {
-  Footer,
-  Navbar,
-  HowItWorks,
-  TermsAndConditions,
-} from "../../Components";
+import { Footer, Navbar, HowItWorks } from "../../Components";
 import { ImageBgContainer } from "../../Resources/Styles/global";
 
-const Discover = ({ withNav }) => {
+const Discover = () => {
   return (
     <div>
       <Navbar />
       <ImageBgContainer>
         <HowItWorks />
-        <TermsAndConditions />
       </ImageBgContainer>
       <Footer />
     </div>
