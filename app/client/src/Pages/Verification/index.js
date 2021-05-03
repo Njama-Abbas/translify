@@ -10,6 +10,7 @@ import {
 } from "./elements";
 import { useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
+import Glitch from "../../Resources/Utils/error";
 
 import { IconContext } from "react-icons";
 import Grid from "@material-ui/core/Grid";
@@ -23,7 +24,6 @@ const Verification = () => {
   const user = useSelector(selectUser);
   const [redirect, setRedirect] = useState(null);
   const [shortCode, setShortCode] = useState("");
-  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleShortCodeChange = (event) => {
@@ -38,16 +38,9 @@ const Verification = () => {
         addToast("Code sent");
       },
       (error) => {
-        addToast(
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-            error.message ||
-            error.toString(),
-          {
-            appearance: "error",
-          }
-        );
+        addToast(Glitch.message(error), {
+          appearance: "error",
+        });
         setIsLoading(false);
       }
     );
@@ -64,14 +57,10 @@ const Verification = () => {
           setRedirect(`${user.role}`);
         },
         (error) => {
-          setMessage(
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-              error.message ||
-              error.toString()
-          );
-          console.log(message);
+          addToast(Glitch.message(error), {
+            appearance: "error",
+          });
+          setIsLoading(false);
         }
       );
       setIsLoading(false);
