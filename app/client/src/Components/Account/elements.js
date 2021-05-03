@@ -1,14 +1,10 @@
 import { Paper, Avatar, Grid } from "@material-ui/core";
 import styled from "styled-components";
 import { Button } from "../../Resources/Styles/global";
-import PORT_IMAGE from "../../Resources/Images/production-center.jpg";
 
 export const FormContainer = styled(Grid)`
-  background-image: url(${PORT_IMAGE});
-  background-repeat: no-repeat;
   height: 100vh;
-  background-position: center;
-  background-size: cover;
+  background-color: #ddd;
 `;
 
 export const FormPaper = styled(Paper)`

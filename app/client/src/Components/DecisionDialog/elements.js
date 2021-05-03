@@ -18,7 +18,7 @@ export const DialogCard = styled.div`
   position: relative;
   width: 270px;
   height: 300px;
-  background: rgba(2, 49, 167, 0.623);
+  background: #ddd;
   margin: 10px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   border-radius: 15px;
@@ -42,7 +42,7 @@ export const DialogMediaWrapper = styled.div`
   width: 150px;
   height: 150px;
   position: relative;
-  border: 5px solid #021a69;
+  border: 5px solid #ddd;
   border-radius: 50%;
   overflow: hidden;
 
@@ -62,11 +62,11 @@ export const DialogMedia = styled.img`
 `;
 
 export const DialogTextContent = styled.div`
-  color: #fff;
+  color: #000308;
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: 2px;
-  font-weight: 500;
+  font-weight: 900;
   text-align: center;
   margin: 20px 0 10px;
   line-height: 1.1em;

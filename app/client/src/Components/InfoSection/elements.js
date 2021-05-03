@@ -4,7 +4,7 @@ export const InfoSec = styled.div`
   color: #101522;
   padding: 160px 0;
   background-color: ${({ dark }) =>
-    dark ? "rgba(235, 235, 235, 0.7)" : "#fff"};
+    dark ? "rgba(235, 235, 235, 0.7)" : "#ddd"};
   margin-top: ${({ topMargin }) => (topMargin ? "30px" : "none")};
   /* background-image: url("https://i.postimg.cc/nhkFjLrr/kepple-port.jpg");
   background-repeat: no-repeat;

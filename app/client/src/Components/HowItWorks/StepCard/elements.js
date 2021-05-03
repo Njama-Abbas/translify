@@ -1,23 +1,27 @@
 import styled from "styled-components";
 
 export const StepCardContainer = styled.div`
-  width: 250px;
-  height: 250px;
-  background-color: #fff;
+  width: 300px;
+  height: 280px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05), 0 6px 6px rgba(0, 0, 0, 0.1);
+  background-color: #ddd;
   border-radius: 8px;
   padding: 8px;
+  margin: 20px auto;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
 
   &:hover {
-    background-color: rgba(13, 17, 23, 0.746);
-  }
-  &:hover > p {
-    color: #fff;
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.1);
   }
 `;
 
 export const CardNumber = styled.p`
-  font-size: 6em;
+  font-size: 4em;
   color: navy;
   text-align: center;
 `;
@@ -25,7 +29,6 @@ export const CardNumber = styled.p`
 export const CardContent = styled.p`
   font-size: 1.5em;
   text-align: center;
-  color: #0d1117;
-  font-weight: 500;
-  text-shadow: 1px 1px 0.5px #2e2e2e;
+  color: #000916;
+  font-weight: 600;
 `;

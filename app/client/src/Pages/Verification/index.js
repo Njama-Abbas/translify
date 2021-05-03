@@ -89,7 +89,7 @@ const Verification = () => {
     content = (
       <IconContext.Provider
         value={{
-          color: "#fff",
+          color: "#f00",
         }}
       >
         <PageContainer container alignContent="center" justify="center">
@@ -161,7 +161,7 @@ const Verification = () => {
                   <br />
                   <Grid item>
                     <LinkButton primary to="/home">
-                      Get Started
+                      Get Started With Translify
                     </LinkButton>
                   </Grid>
                 </Grid>
