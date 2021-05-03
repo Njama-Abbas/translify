@@ -8,7 +8,7 @@ export const FormContainer = styled(Grid)`
 `;
 
 export const FormPaper = styled(Paper)`
-  margin-top: 64px;
+  margin-top: 48px;
   padding: 8px;
   display: flex;
   flex-direction: column;
