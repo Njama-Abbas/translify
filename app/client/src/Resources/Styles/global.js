@@ -68,6 +68,7 @@ export const Button = styled.button`
 
   &:hover {
     opacity: 0.9;
+    font-weight: bold;
   }
 
   &:disabled {
@@ -112,6 +113,7 @@ export const LinkButton = styled(Link)`
 
   &:hover {
     opacity: 0.9;
+    font-weight: bold;
   }
 
   @media screen and (max-width: 960px) {
