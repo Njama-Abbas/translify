@@ -160,14 +160,19 @@ export default function UserNav({ user, logOutCallBack }) {
             {formatName(user.firstname)}&nbsp;{formatName(user.lastname)}
           </UserLogo>
           <br />
-
+          <div>{user.role === "driver" && <DutySwitch user={user} />}</div>
           <div className={classes.grow} />
           <div>
             {user.role === "client" && (
               <NavLink to={`/client/order-truck`}>Order</NavLink>
             )}
           </div>
-          <div>{user.role === "driver" && <DutySwitch user={user} />}</div>
+          <div>
+            {user.role === "driver" && (
+              <NavLink to={`/driver/orders-list`}>Transits</NavLink>
+            )}
+          </div>
+
           <div className={classes.sectionDesktop}>
             <IconButton
               edge="end"
