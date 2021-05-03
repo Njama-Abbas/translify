@@ -61,6 +61,7 @@ const DecisionDialog = ({ btnText, actionText, primary, small, big }) => {
             <DialogActions>
               <LinkButton
                 onClick={handleClose}
+                secondary
                 to={`driver/${toRoute(actionText)}`}
               >
                 {actionText} to Drive
@@ -77,6 +78,7 @@ const DecisionDialog = ({ btnText, actionText, primary, small, big }) => {
             <DialogActions>
               <LinkButton
                 onClick={handleClose}
+                primary
                 to={`/client/${toRoute(actionText)}`}
               >
                 {actionText} to Ship
