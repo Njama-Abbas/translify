@@ -5,7 +5,7 @@ import { FaMeteor } from "react-icons/fa";
 
 export const Nav = styled.nav`
   background: #0231a7;
-  height: 70px;
+  height: 9vh;
   display: flex;
   justify-content: center;
   font-size: 1.2rem;
