@@ -14,6 +14,7 @@ import {
   Driver,
   Verification,
 } from "./Pages";
+import { ForgotPassword } from "./Components";
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
           <SignIn route="client" />
         </Route>
 
+        <Route exact path="/forgot-password" component={ForgotPassword} />
         {/* <Route exact path="/test" component={FileUploadComponent} />**/}
         <Route path="/client" component={Client} />
         <Route path="/driver" component={Driver} />

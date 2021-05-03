@@ -19,3 +19,4 @@ export { default as OrderInfoDialog } from "./OrderInfoDialog";
 export { default as PersonalActions } from "./Profile/PersonalActions";
 export { default as HowItWorks } from "./HowItWorks";
 export { default as ProfilePhoto } from "./ProfilePhoto";
+export { default as ForgotPassword } from "./Forgot-Password";
