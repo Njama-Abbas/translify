@@ -1,20 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
+import {
+  Redirect,
+  Route,
+  Switch,
+  useHistory,
+  useRouteMatch,
+} from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 
 import { Grid } from "@material-ui/core";
 import { DriverAPI, UserAPI, AuthAPI } from "../../Api";
 
-import destination from "../../Resources/Images/Destination.svg";
-import { Container } from "../../Resources/Styles/global";
-import { Box } from "./driver.elements";
+import { Container, LinkButton } from "../../Resources/Styles/global";
+import {
+  AlertIcon,
+  Box,
+  Message,
+  MessageWrapper,
+  PageContainer,
+} from "./driver.elements";
 
 import Profile from "../Profile";
 
 import {
   Navbar,
   DriverRegistrationForm,
-  Image,
   OrderList,
   Footer,
 } from "../../Components";
@@ -26,6 +36,7 @@ export default function Driver() {
   const [userReady, setUserReady] = useState(null);
   const [user, setUser] = useState(undefined);
   const [approval_status, setApprovalStatus] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
     const currentUser = AuthAPI.getCurrentUser();
@@ -67,56 +78,126 @@ export default function Driver() {
     return <Redirect to={redirect} />;
   }
 
+  const logOutCallBack = () => {
+    AuthAPI.logout();
+    setUserReady(false);
+    history.push("/");
+  };
+
   return (
-    <Switch>
-      <Route path={path} exact>
-        <div>
-          {userReady ? (
-            <div>
+    <div>
+      <Switch>
+        {userReady ? (
+          <div>
+            <Route path={`${path}`} exact>
+              <Box container justify="space-between">
+                {approval_status === "A" ? (
+                  <div>
+                    <Container>
+                      <Navbar />
+                    </Container>
+                    <p>Comming soon</p>
+                  </div>
+                ) : approval_status === "P" ? (
+                  <MessageDisplay
+                    message="Registration successful pending approval please wait ..."
+                    logOutCallBack={logOutCallBack}
+                  />
+                ) : approval_status === "D" ? (
+                  <MessageDisplay
+                    message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
+                    logOutCallBack={logOutCallBack}
+                  />
+                ) : (
+                  <PageContainer
+                    container
+                    justify="center"
+                    alignContent="center"
+                  >
+                    <Grid item xs={12} sm={6} md={6}>
+                      <DriverRegistrationForm USER_ID={user.userId} />
+                    </Grid>
+                  </PageContainer>
+                )}
+              </Box>
+            </Route>
+
+            <Route path={`${path}/orders-list`} exact>
               <Box container justify="space-between">
                 <Container>
-                  <Navbar />
                   {approval_status === "A" ? (
-                    <OrderList user={user} />
+                    <div>
+                      <Navbar />
+                      <OrderList user={user} />
+                    </div>
                   ) : approval_status === "P" ? (
-                    <p>Registration successful pending approval</p>
+                    <MessageDisplay
+                      message="Registration successful pending approval please wait ..."
+                      logOutCallBack={logOutCallBack}
+                    />
                   ) : approval_status === "D" ? (
-                    <p>
-                      We are Sorry that your approval request has been declined
-                    </p>
+                    <MessageDisplay
+                      message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
+                      logOutCallBack={logOutCallBack}
+                    />
                   ) : (
-                    <Grid
+                    <PageContainer
                       container
-                      spacing={2}
                       justify="center"
                       alignContent="center"
                     >
                       <Grid item xs={12} sm={6} md={6}>
                         <DriverRegistrationForm USER_ID={user.userId} />
                       </Grid>
-
-                      <Grid item xs={12} sm={6} md={6}>
-                        <Image
-                          start="true"
-                          alt="my current location"
-                          src={destination}
-                        />
-                      </Grid>
-                    </Grid>
+                    </PageContainer>
                   )}
                 </Container>
               </Box>
-              <Footer />
-            </div>
-          ) : null}
-        </div>
-      </Route>
-      <Route path={`${path}/profile`}>
-        <Container>
-          <Navbar />
-        </Container>
-        <Profile />
-      </Route>
-    </Switch>
+            </Route>
+
+            <Route path={`${path}/profile`} exact>
+              <Container>
+                <Navbar />
+              </Container>
+              <Profile />
+            </Route>
+          </div>
+        ) : null}
+      </Switch>
+
+      <Footer />
+    </div>
   );
 }
+
+const MessageDisplay = ({ message, logOutCallBack }) => (
+  <PageContainer
+    container
+    alignContent="center"
+    justify="center"
+    direction="column"
+  >
+    <MessageWrapper item>
+      <Grid container alignItems="center" justify="center" direction="column">
+        <Grid item>
+          <AlertIcon />
+        </Grid>
+        <Grid item>
+          <Message>{message}</Message>
+        </Grid>
+        <Grid item>
+          <LinkButton
+            primary="true"
+            to="/goodbye"
+            onClick={(e) => {
+              e.preventDefault();
+              logOutCallBack();
+            }}
+          >
+            Exit
+          </LinkButton>
+        </Grid>
+      </Grid>
+    </MessageWrapper>
+  </PageContainer>
+);
