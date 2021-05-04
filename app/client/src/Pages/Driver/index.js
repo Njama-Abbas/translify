@@ -21,6 +21,7 @@ import {
 } from "./driver.elements";
 
 import Profile from "../Profile";
+import Glitch from "../../Resources/Utils/error";
 
 import {
   Navbar,
@@ -36,6 +37,8 @@ export default function Driver() {
   const [userReady, setUserReady] = useState(null);
   const [user, setUser] = useState(undefined);
   const [approval_status, setApprovalStatus] = useState(null);
+  const [account_status, setAccountStatus] = useState(null);
+
   const history = useHistory();
 
   useEffect(() => {
@@ -45,33 +48,32 @@ export default function Driver() {
       setRedirect("/home");
     }
 
-    UserAPI.getDriverBoard().then(
-      (response) => {
+    UserAPI.getDriverBoard()
+      .then((response) => {
         const { id } = response.data;
         setUser(response.data);
         setUserReady(true);
-        DriverAPI.check_approval(id).then(
-          (response) => {
-            setApprovalStatus(response.data.approval_status);
-          },
-          (error) => {
-            const { status } = error.response;
-            if (status === 404) {
-              setApprovalStatus(null);
-              addToast(error.response.data.message, {
-                appearance: "error",
-              });
-            }
-          }
-        );
-      },
-      (error) => {
+        return id;
+      })
+      .then((id) => {
+        DriverAPI.check_account_status(id).then((response) => {
+          setAccountStatus(response.data.account_status);
+        });
+        return id;
+      })
+      .then((id) => {
+        DriverAPI.check_approval(id).then((response) => {
+          setApprovalStatus(response.data.approval_status);
+        });
+      })
+      .catch((error) => {
         setUser(undefined);
-        addToast(`An error occured ${error} `, {
+        setApprovalStatus(null);
+        setAccountStatus(null);
+        addToast(Glitch.message(error), {
           appearance: "error",
         });
-      }
-    );
+      });
   }, [addToast]);
 
   if (redirect) {
@@ -98,14 +100,19 @@ export default function Driver() {
                     </Container>
                     <p>Comming soon</p>
                   </div>
-                ) : approval_status === "P" ? (
+                ) : account_status === "SUSPENDED" ? (
                   <MessageDisplay
-                    message="Registration successful pending approval please wait ..."
+                    message="We regret to notify you that your Account has been suspended please contact the adminstration for more information"
                     logOutCallBack={logOutCallBack}
                   />
                 ) : approval_status === "D" ? (
                   <MessageDisplay
                     message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
+                    logOutCallBack={logOutCallBack}
+                  />
+                ) : approval_status === "P" ? (
+                  <MessageDisplay
+                    message="Registration successful pending approval please wait ..."
                     logOutCallBack={logOutCallBack}
                   />
                 ) : (
@@ -138,6 +145,11 @@ export default function Driver() {
                   ) : approval_status === "D" ? (
                     <MessageDisplay
                       message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
+                      logOutCallBack={logOutCallBack}
+                    />
+                  ) : approval_status === "S" ? (
+                    <MessageDisplay
+                      message="We regret to notify you that your Account has been suspended please contact the adminstration for more information"
                       logOutCallBack={logOutCallBack}
                     />
                   ) : (

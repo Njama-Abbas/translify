@@ -22,7 +22,15 @@ class DriverAPI {
   }
 
   check_approval(userid) {
-    return axios.get(API_URL + "check-verification", {
+    return axios.get(API_URL + "check-approval", {
+      headers: {
+        userid,
+      },
+    });
+  }
+
+  check_account_status(userid) {
+    return axios.get(API_URL + "check-account-status", {
       headers: {
         userid,
       },

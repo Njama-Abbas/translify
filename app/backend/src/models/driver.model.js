@@ -23,6 +23,11 @@ const Driver = mongoose.model(
       enum: ["P", "D", "A"],
       default: "P",
     },
+    account_status: {
+      type: String,
+      enum: ["ACTIVE", "SUSPENDED"],
+      default: "ACTIVE",
+    },
     current_location_id: {
       type: String,
     },
