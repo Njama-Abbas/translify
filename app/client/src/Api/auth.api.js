@@ -65,8 +65,8 @@ class AuthAPI {
     });
   }
 
-  getPasswordChangeVerificationCode(userId, currentPassword) {
-    return axios.post(API_URL + "change-password-code", {
+  getPasswordChangeAuthCode(userId, currentPassword) {
+    return axios.post(API_URL + "change-password-auth", {
       userId,
       currentPassword,
     });
@@ -77,6 +77,19 @@ class AuthAPI {
       userId,
       newPassword,
       v_code,
+    });
+  }
+  getPasswordResetAuthCode(phoneno) {
+    return axios.post(API_URL + "reset-password-auth", {
+      phoneno,
+    });
+  }
+
+  resetPassword(userId, auth_code, newPassword) {
+    return axios.post(API_URL + "reset-password", {
+      userId,
+      auth_code,
+      newPassword,
     });
   }
 }

@@ -21,10 +21,12 @@ Router.post("/resend-vcode", AuthController.resendVerificationCode);
 
 Router.put("/update-info", AuthController.updateInfo);
 
-Router.post("/change-password-auth", AuthController.sendChangePasswordAuthCode);
+Router.post("/change-password-auth", AuthController.sendPasswordChangeAuthCode);
 
-Router.post("/reset-password-auth", AuthController.sendResetPasswordAuthCode);
+Router.post("/reset-password-auth", AuthController.sendPasswordResetAuthCode);
 
 Router.post("/change-password", AuthController.changePassword);
+
+Router.post("/reset-password", AuthController.resetPassword);
 
 module.exports = Router;

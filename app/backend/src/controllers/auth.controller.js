@@ -283,7 +283,7 @@ module.exports = {
     res.status(204);
   },
 
-  sendChangePasswordAuthCode: async (req, res) => {
+  sendPasswordChangeAuthCode: async (req, res) => {
     const { userId, currentPassword } = req.body;
     const user = await USER.findById(userId);
 
@@ -396,7 +396,108 @@ module.exports = {
       Password updated successfully`,
     });
   },
-  sendResetPasswordAuthCode: async (req, res) => {
-    const { userId, auth_code, newpassword } = req.body;
+  sendPasswordResetAuthCode: async (req, res) => {
+    const { phoneno } = req.body;
+    const user = await USER.findOne({
+      phoneno,
+    });
+
+    if (!user) {
+      res.status(404).json({
+        message: `Failed 
+         Sorry! We cant seem to locate you in our system
+        `,
+      });
+      return;
+    }
+
+    //genereate auth_code
+    const generated_code = phoneToken(8, {
+      type: "number",
+    });
+
+    //change the existing verification code in the database;
+    let $user;
+    try {
+      $user = await USER.findByIdAndUpdate(user._id, {
+        verification: {
+          code: generated_code,
+        },
+      });
+      await $user.save();
+    } catch (error) {
+      res.status(500).json({
+        message: `FAILED!
+        An Error Occured Cannot update details`,
+        error,
+      });
+      return;
+    }
+
+    //Send the text
+    // let sendText;
+    // try {
+    //   sendText = await sms.messages.create({
+    //     body: `Tans-Code: ${$user.verification.code} `,
+    //     to: "+254" + $user.phoneno.slice(-9),
+    //     from: "+12027598622",
+    //   });
+    // } catch (error) {
+    //   res.status(500).json({
+    //     message: `FAILED!
+    //     Twillio Send Text Error`,
+    //     error,
+    //   });
+    //   return;
+    // }
+
+    res.status(201).json({
+      v_code: $user.verification.code,
+    });
+  },
+  resetPassword: async (req, res) => {
+    const { userId, auth_code, newPassword } = req.body;
+    const user = await USER.findById(userId);
+
+    if (!user) {
+      res.status(404).json({
+        message: `Failed 
+         Sorry! We cant seem to locate you in our system
+        `,
+      });
+      return;
+    }
+
+    if (auth_code !== user.verification.code) {
+      res.status(403).json({
+        message: `Failed 
+         Invalid Authentication Code
+        `,
+      });
+      return;
+    }
+    let $user;
+
+    try {
+      $user = await USER.findByIdAndUpdate(user._id, {
+        password: bcrypt.hashSync(newPassword),
+      });
+      await $user.save();
+    } catch (error) {
+      res.status(500).json({
+        message: `FAILED!
+        An Error Occured Cannot update details`,
+        error,
+      });
+      return;
+    }
+
+    const role = await ROLE.findById($user.role);
+
+    res.status(201).json({
+      message: `SUCCESS!
+      Password changed - Login to continue`,
+      role: role.name,
+    });
   },
 };
