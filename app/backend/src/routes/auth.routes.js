@@ -21,10 +21,9 @@ Router.post("/resend-vcode", AuthController.resendVerificationCode);
 
 Router.put("/update-info", AuthController.updateInfo);
 
-Router.post(
-  "/change-password-code",
-  AuthController.sendChangePasswordVerificationCode
-);
+Router.post("/change-password-auth", AuthController.sendChangePasswordAuthCode);
+
+Router.post("/reset-password-auth", AuthController.sendResetPasswordAuthCode);
 
 Router.post("/change-password", AuthController.changePassword);
 

@@ -283,7 +283,7 @@ module.exports = {
     res.status(204);
   },
 
-  sendChangePasswordVerificationCode: async (req, res) => {
+  sendChangePasswordAuthCode: async (req, res) => {
     const { userId, currentPassword } = req.body;
     const user = await USER.findById(userId);
 
@@ -395,5 +395,8 @@ module.exports = {
       message: `SUCCESSS! 
       Password updated successfully`,
     });
+  },
+  sendResetPasswordAuthCode: async (req, res) => {
+    const { userId, auth_code, newpassword } = req.body;
   },
 };
