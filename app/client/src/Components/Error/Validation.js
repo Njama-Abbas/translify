@@ -21,6 +21,8 @@ export default function ValidationError({
         <RenderErrorMessage msg={patternErrorMsg} />
       ) : errors[fieldName]?.type === "minLength" ? (
         <RenderErrorMessage msg={lengthErrorMsg} />
+      ) : errors[fieldName]?.type === "maxLength" ? (
+        <RenderErrorMessage msg={lengthErrorMsg} />
       ) : (
         ""
       )}
