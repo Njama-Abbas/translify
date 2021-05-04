@@ -93,24 +93,24 @@ export default function Driver() {
           <div>
             <Route path={`${path}`} exact>
               <Box container justify="space-between">
-                {approval_status === "A" ? (
+                {account_status === "SUSPENDED" ? (
+                  <MessageDisplay
+                    message="We regret to notify you that your Account has been suspended please contact the adminstration for more information"
+                    logOutCallBack={logOutCallBack}
+                  />
+                ) : approval_status === "A" && account_status === "ACTIVE" ? (
                   <div>
                     <Container>
                       <Navbar />
                     </Container>
                     <p>Comming soon</p>
                   </div>
-                ) : account_status === "SUSPENDED" ? (
-                  <MessageDisplay
-                    message="We regret to notify you that your Account has been suspended please contact the adminstration for more information"
-                    logOutCallBack={logOutCallBack}
-                  />
-                ) : approval_status === "D" ? (
+                ) : approval_status === "D" && account_status === "ACTIVE" ? (
                   <MessageDisplay
                     message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
                     logOutCallBack={logOutCallBack}
                   />
-                ) : approval_status === "P" ? (
+                ) : approval_status === "P" && account_status === "ACTIVE" ? (
                   <MessageDisplay
                     message="Registration successful pending approval please wait ..."
                     logOutCallBack={logOutCallBack}
