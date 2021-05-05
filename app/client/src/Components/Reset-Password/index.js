@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Redirect } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { useToasts } from "react-toast-notifications";
 import { AuthAPI } from "../../Api";
-import { useDispatch } from "react-redux";
 
 import {
   MdLockOutline,
@@ -34,12 +34,14 @@ import {
 import ValidationError from "../Error/Validation";
 import ValidationPatterns from "../../Resources/Patterns/validation";
 import { ErrorMessage } from "../Error/validation.elements";
-
+import { selectUser, userSet } from "../../State/user.slice";
+import Glitch from "../../Resources/Utils/error";
 import LoadingComponent from "../LoadingComponent";
 
 export default function ResetPassword() {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const user = useSelector(selectUser);
+  const [redirect, setRedirect] = useState(null);
   const { addToast } = useToasts();
   const [message, setMessage] = useState("");
 
@@ -62,17 +64,33 @@ export default function ResetPassword() {
 
   const onSubmit = (formData) => {
     const { auth_code, password_y, password_x } = formData;
-    setIsLoading(true);
     let newPassword = null;
     if (password_y !== password_x) {
       setMessage("Passwords Did not match");
     } else {
+      setIsLoading(true);
       newPassword = password_y;
-      console.log({
-        auth_code,
-        newPassword,
-      });
-      setMessage("");
+      AuthAPI.resetPassword(user.ID, auth_code, newPassword)
+        .then((response) => {
+          const { data: user } = response;
+          dispatch(
+            userSet({
+              UID: user.id,
+              phoneno: user.phoneno,
+              verified: user.verification.status,
+            })
+          );
+          setRedirect(`/${user.role}/sign-in`);
+        })
+        .catch((error) => {
+          addToast(Glitch.message(error), {
+            appearance: "error",
+          });
+        })
+        .finally(() => {
+          setIsLoading(false);
+          setMessage("");
+        });
     }
     setIsLoading(false);
   };
@@ -81,6 +99,8 @@ export default function ResetPassword() {
 
   if (isLoading) {
     content = <LoadingComponent />;
+  } else if (redirect) {
+    content = <Redirect to={redirect} />;
   } else {
     content = (
       <FormContainer container>
@@ -132,6 +152,7 @@ export default function ResetPassword() {
                       required: true,
                       pattern: ValidationPatterns.password,
                     })}
+                    placeholder=" e.g 123Asd"
                     variant="outlined"
                     required
                     fullWidth
