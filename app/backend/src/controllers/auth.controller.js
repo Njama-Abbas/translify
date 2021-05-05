@@ -7,7 +7,7 @@ const config = require("../config/auth.config"),
 
 const USER = db.user,
   ROLE = db.role;
-
+const { userResponseObject } = require("../utils/response.utils");
 module.exports = {
   signup: async (req, res) => {
     const {
@@ -231,6 +231,7 @@ module.exports = {
       updatedUser = await USER.findByIdAndUpdate(req.body.userID, {
         verification: {
           code: generated_code,
+          status: false,
         },
       });
       await updatedUser.save();
@@ -319,6 +320,7 @@ module.exports = {
       $user = await USER.findByIdAndUpdate(user._id, {
         verification: {
           code: generated_code,
+          status: true,
         },
       });
       await $user.save();
@@ -375,11 +377,19 @@ module.exports = {
       return;
     }
 
+    const generated_code = phoneToken(8, {
+      type: "number",
+    });
+
     //valid change password
     let updatedUser;
     try {
       updatedUser = await USER.findByIdAndUpdate(user._id, {
         password: bcrypt.hashSync(newPassword, 10),
+        verification: {
+          code: generated_code,
+          status: true,
+        },
       });
       await updatedUser.save();
     } catch (error) {
@@ -422,6 +432,7 @@ module.exports = {
       $user = await USER.findByIdAndUpdate(user._id, {
         verification: {
           code: generated_code,
+          status: false,
         },
       });
       await $user.save();
@@ -450,10 +461,9 @@ module.exports = {
     //   });
     //   return;
     // }
+    const role = await ROLE.findById($user.role);
 
-    res.status(201).json({
-      v_code: $user.verification.code,
-    });
+    res.status(201).json(userResponseObject($user, role));
   },
   resetPassword: async (req, res) => {
     const { userId, auth_code, newPassword } = req.body;
@@ -468,7 +478,7 @@ module.exports = {
       return;
     }
 
-    if (auth_code !== user.verification.code) {
+    if (Number(auth_code) !== user.verification.code) {
       res.status(403).json({
         message: `Failed 
          Invalid Authentication Code
@@ -476,11 +486,19 @@ module.exports = {
       });
       return;
     }
-    let $user;
+    const generated_code = phoneToken(8, {
+      type: "number",
+    });
 
+    let $user;
+    //change the existing verification code in the database;
     try {
       $user = await USER.findByIdAndUpdate(user._id, {
-        password: bcrypt.hashSync(newPassword),
+        password: bcrypt.hashSync(newPassword, 10),
+        verification: {
+          code: generated_code,
+          status: true,
+        },
       });
       await $user.save();
     } catch (error) {
@@ -494,10 +512,6 @@ module.exports = {
 
     const role = await ROLE.findById($user.role);
 
-    res.status(201).json({
-      message: `SUCCESS!
-      Password changed - Login to continue`,
-      role: role.name,
-    });
+    res.status(201).json(userResponseObject($user, role));
   },
 };
