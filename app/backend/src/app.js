@@ -57,12 +57,23 @@ db.mongoose
 /**
  * Handle unknown database errors
  */
+
 app.use(function handleDatabaseError(error, request, response, next) {
-  if (error instanceof db.mongoose.Error) {
-    return response.status(500).json({
-      type: "MongoError",
-      message: error.message,
-    });
+  if (error instanceof MongoError) {
+    console.log(error.message);
+    if (error.code === 11000) {
+      return response.status(409).json({
+        httpStatus: 409,
+        type: "MongoError",
+        message: error.message,
+      });
+    } else {
+      return response.status(503).json({
+        httpStatus: 503,
+        type: "MongoError",
+        message: error.message,
+      });
+    }
   }
   next(error);
 });
