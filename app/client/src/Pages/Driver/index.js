@@ -52,13 +52,8 @@ export default function Driver() {
       .then((response) => {
         const { id } = response.data;
         setUser(response.data);
+        setAccountStatus(response.data.account_status);
         setUserReady(true);
-        return id;
-      })
-      .then((id) => {
-        DriverAPI.check_account_status(id).then((response) => {
-          setAccountStatus(response.data.account_status);
-        });
         return id;
       })
       .then((id) => {
@@ -131,58 +126,74 @@ export default function Driver() {
 
             <Route path={`${path}/orders-list`} exact>
               <Box container justify="space-between">
-                <Container>
-                  {approval_status === "A" ? (
-                    <div>
-                      <Navbar />
-                      <OrderList user={user} />
-                    </div>
-                  ) : approval_status === "P" ? (
-                    <MessageDisplay
-                      message="Registration successful pending approval please wait ..."
-                      logOutCallBack={logOutCallBack}
-                    />
-                  ) : approval_status === "D" ? (
-                    <MessageDisplay
-                      message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
-                      logOutCallBack={logOutCallBack}
-                    />
-                  ) : approval_status === "S" ? (
-                    <MessageDisplay
-                      message="We regret to notify you that your Account has been suspended please contact the adminstration for more information"
-                      logOutCallBack={logOutCallBack}
-                    />
-                  ) : (
-                    <PageContainer
-                      container
-                      justify="center"
-                      alignContent="center"
-                    >
-                      <Grid item xs={12} sm={6} md={6}>
-                        <DriverRegistrationForm USER_ID={user.userId} />
-                      </Grid>
-                    </PageContainer>
-                  )}
-                </Container>
+                {account_status === "SUSPENDED" ? (
+                  <MessageDisplay
+                    message="We regret to notify you that your Account has been suspended please contact the adminstration for more information"
+                    logOutCallBack={logOutCallBack}
+                  />
+                ) : approval_status === "A" && account_status === "ACTIVE" ? (
+                  <Container>
+                    <Navbar />
+                    <OrderList user={user} />
+                  </Container>
+                ) : approval_status === "P" && account_status === "ACTIVE" ? (
+                  <MessageDisplay
+                    message="Registration successful pending approval please wait ..."
+                    logOutCallBack={logOutCallBack}
+                  />
+                ) : approval_status === "D" && account_status === "ACTIVE" ? (
+                  <MessageDisplay
+                    message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
+                    logOutCallBack={logOutCallBack}
+                  />
+                ) : (
+                  <PageContainer
+                    container
+                    justify="center"
+                    alignContent="center"
+                  >
+                    <Grid item xs={12} sm={6} md={6}>
+                      <DriverRegistrationForm USER_ID={user.userId} />
+                    </Grid>
+                  </PageContainer>
+                )}
               </Box>
             </Route>
 
             <Route path={`${path}/profile`} exact>
-              <Container>
-                <Navbar />
-              </Container>
-              <Profile />
+              {account_status === "SUSPENDED" ? (
+                <MessageDisplay
+                  message="We regret to notify you that your Account has been suspended please contact the adminstration for more information"
+                  logOutCallBack={logOutCallBack}
+                />
+              ) : approval_status === "A" && account_status === "ACTIVE" ? (
+                <div>
+                  <Container>
+                    <Navbar />
+                  </Container>
+                  <Profile />
+                </div>
+              ) : approval_status === "P" && account_status === "ACTIVE" ? (
+                <MessageDisplay
+                  message="Registration successful pending approval please wait ..."
+                  logOutCallBack={logOutCallBack}
+                />
+              ) : approval_status === "D" && account_status === "ACTIVE" ? (
+                <MessageDisplay
+                  message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
+                  logOutCallBack={logOutCallBack}
+                />
+              ) : null}
             </Route>
           </div>
         ) : null}
       </Switch>
-
       <Footer />
     </div>
   );
 }
 
-const MessageDisplay = ({ message, logOutCallBack }) => (
+export const MessageDisplay = ({ message, logOutCallBack }) => (
   <PageContainer
     container
     alignContent="center"
