@@ -1,15 +1,22 @@
 const config = require("../config/auth.config"),
   db = require("../models"),
   phoneToken = require("generate-sms-verification-code"),
-  sms = require("../utils/sms.utils"),
   jwt = require("jsonwebtoken"),
   bcrypt = require("bcrypt");
 
 const USER = db.user,
   ROLE = db.role;
+
+const { sendText } = require("../utils/sms.utils");
 const { composeUserResponseObj } = require("../utils/response.utils");
+const IN_ERR = require("../utils/error.utils");
+
 module.exports = {
-  signup: async (req, res) => {
+  /**
+   *
+   * @returns {{}} creation response
+   */
+  async signup(req, res) {
     const {
       firstname,
       lastname,
@@ -43,10 +50,10 @@ module.exports = {
         },
       });
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED! 
-        Could not create User
-        `,
+      let e = IN_ERR.CREATION_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
+        error,
       });
       return;
     }
@@ -54,20 +61,19 @@ module.exports = {
     const user = await new_user.save();
 
     //send verification text message
-    // let sendText;
+    let sms = await sendText(
+      user.phoneno,
+      `Auth-Code: ${user.verification.code}`
+    );
 
-    // try {
-    //   sendText = await sms.messages.create({
-    //     body: `Tans-Code: ${user.verification.code} `,
-    //     to: user.phoneno,
-    //     from: "+12027598622",
-    //   });
-    // } catch (e) {
-    //   res.status(500).json({
-    //     message: `Twillio Send Text Error ${e}`,
-    //   });
-    //   return;
-    // }
+    if (!sms.message || sms.error) {
+      let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
+      res.status(e.status).json({
+        message: e.message,
+        error: sms.error,
+      });
+      return;
+    }
 
     res.status(201).json({
       UID: user._id,
@@ -75,19 +81,20 @@ module.exports = {
     });
   },
 
+  /**
+   *
+   * Verify a user by comparing the code in the database and the code input by te user captured in the request object
+   * @returns {{}} verifys and signs in a user
+   */
+
   verify: async (req, res) => {
     const { ID, v_code } = req.body;
-
-    const user = await USER.findOne({
-      _id: ID,
-    });
+    const user = await USER.findById(ID);
 
     if (!user) {
-      res.status(404).json({
-        message: `FAILED!
-        Sorry! We cant seem to find your details
-        Please Sign Up
-        `,
+      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
@@ -102,15 +109,15 @@ module.exports = {
     }
 
     if (user.verification.code !== Number(v_code)) {
-      res.status(401).json({
-        message: `FAILED!
-        You Entered a Wrong verification code`,
+      let e = IN_ERR.CONFLICT_ERROR("verifcation code");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
 
     /**
-     *  if code entered by user
+     * if code entered by user
      * is equal to code in the database
      * change verification status to true
      * generate a new verifictaion code
@@ -120,14 +127,16 @@ module.exports = {
       type: "number",
     });
 
-    const updatedUser = await USER.findByIdAndUpdate(user._id, {
-      verification: {
-        status: true,
-        code: new_generated_code,
+    const updatedUser = await USER.findByIdAndUpdate(
+      user._id,
+      {
+        verification: {
+          status: true,
+          code: new_generated_code,
+        },
       },
-    });
-
-    await updatedUser.save();
+      { new: true }
+    );
 
     /**
      * get the users role
@@ -146,15 +155,7 @@ module.exports = {
       expiresIn: 86400,
     });
 
-    res.status(200).json({
-      id: updatedUser._id,
-      firstname: updatedUser.firstname,
-      lastname: updatedUser.lastname,
-      email: updatedUser.email,
-      phoneno: updatedUser.phoneno,
-      role: $role.name,
-      accessToken: token,
-    });
+    res.status(201).json(composeUserResponseObj(updatedUser, $role, token));
   },
 
   signin: async (req, res) => {
@@ -166,37 +167,42 @@ module.exports = {
 
     const user = await USER.findOne({
       email,
-      role: $role._id,
     });
 
     //user is not in the database
     if (!user) {
-      res.status(404).json({
-        message: `FAILED!
-        Sorry! We cant seem to locate you in our system
-        Please Sign Up
-        `,
+      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
+    }
+
+    const isCorrectRole = String(user.role) === String($role._id);
+    if (!isCorrectRole) {
+      let e = IN_ERR.FORBIDDEN_ERROR($role.name);
+      res.status(e.status).json({
+        message: e.message,
+      });
     }
 
     //decrypt and validate password
     let valid = bcrypt.compareSync(password, user.password);
 
     if (!valid) {
-      res.status(403).json({
+      let e = IN_ERR.UNAUTHORIZED_ERROR();
+      res.status(e.status).json({
         accessToken: null,
-        message: `FAILED!
-        Invalid Login Credentials`,
+        message: e.message,
       });
       return;
     }
 
     //Take care of a user signing in and is not verified
     if (!user.verification.status) {
-      res.status(401).json({
-        message: `FAILED!
-        You are Not Authaurized`,
+      let e = IN_ERR.UNAUTHORIZED_ERROR();
+      res.status(e.status).json({
+        message: `FAILED!\n You are not Verified`,
         UID: user._id,
         phoneno: user.phoneno,
       });
@@ -208,15 +214,7 @@ module.exports = {
       expiresIn: 86400,
     });
 
-    res.status(200).json({
-      id: user._id,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      email: user.email,
-      phoneno: user.phoneno,
-      role: $role.name,
-      accessToken: token,
-    });
+    res.status(200).json(composeUserResponseObj(user, $role, token));
   },
 
   resendVerificationCode: async (req, res) => {
@@ -228,35 +226,35 @@ module.exports = {
     //change the existing token in the database;
     let updatedUser;
     try {
-      updatedUser = await USER.findByIdAndUpdate(req.body.userID, {
-        verification: {
-          code: generated_code,
-          status: false,
+      updatedUser = await USER.findByIdAndUpdate(
+        req.body.userID,
+        {
+          verification: {
+            code: generated_code,
+            status: false,
+          },
         },
-      });
-      await updatedUser.save();
+        { new: true }
+      );
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED!
-        An Error Occured Cannot update details`,
+      let e = IN_ERR.UPDATE_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
         errror,
       });
       return;
     }
+    //send verification text message
+    let sms = await sendText(
+      updatedUser.phoneno,
+      `Auth-Code: ${updatedUser.verification.code}`
+    );
 
-    //Send the text
-    let sendText;
-    try {
-      sendText = await sms.messages.create({
-        body: `Tans-Code: ${updatedUser.verification.code} `,
-        to: "+254" + updatedUser.phoneno.slice(-9),
-        from: "+12027598622",
-      });
-    } catch (e) {
-      res.status(500).json({
-        message: `FAILED!
-        Twillio Send Text Error
-        Please Try again Later`,
+    if (!sms.message || sms.error) {
+      let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
+      res.status(e.status).json({
+        message: e.message,
+        error: sms.error,
       });
       return;
     }
@@ -271,15 +269,22 @@ module.exports = {
     const { data, userId } = req.body;
     let user;
     try {
-      user = await USER.findByIdAndUpdate(userId, data);
-      await user.save();
+      user = await USER.findByIdAndUpdate(userId, data, { new: true });
     } catch (error) {
-      res.status(500);
+      let e = IN_ERR.UPDATE_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
+      });
       return;
     }
-    const role = await ROLE.findOne({
-      _id: user.role,
-    });
+
+    if (!user) {
+      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
+      });
+      return;
+    }
 
     res.status(204);
   },
@@ -289,10 +294,9 @@ module.exports = {
     const user = await USER.findById(userId);
 
     if (!user) {
-      res.status(404).json({
-        message: `FAILED!
-        Sorry! We cant seem to locate you in our system
-        `,
+      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
@@ -301,7 +305,8 @@ module.exports = {
     const valid = bcrypt.compareSync(currentPassword, user.password);
 
     if (!valid) {
-      res.status(403).json({
+      let e = IN_ERR.UNAUTHORIZED_ERROR();
+      res.status(e.status).json({
         message: `FAILED! 
         Your current password is Incorrect
         `,
@@ -317,42 +322,40 @@ module.exports = {
     //change the existing verification code in the database;
     let $user;
     try {
-      $user = await USER.findByIdAndUpdate(user._id, {
-        verification: {
-          code: generated_code,
-          status: true,
+      $user = await USER.findByIdAndUpdate(
+        user._id,
+        {
+          verification: {
+            code: generated_code,
+            status: true,
+          },
         },
-      });
-      await $user.save();
+        { new: true }
+      );
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED!
-        An Error Occured Cannot update details`,
+      let e = IN_ERR.UPDATE_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
         error,
       });
       return;
     }
 
-    //Send the text
-    // let sendText;
-    // try {
-    //   sendText = await sms.messages.create({
-    //     body: `Tans-Code: ${$user.verification.code} `,
-    //     to: "+254" + $user.phoneno.slice(-9),
-    //     from: "+12027598622",
-    //   });
-    // } catch (error) {
-    //   res.status(500).json({
-    //     message: `FAILED!
-    //     Twillio Send Text Error`,
-    //     error,
-    //   });
-    //   return;
-    // }
+    //send verification text message
+    let sms = await sendText(
+      $user.phoneno,
+      `Auth-Code: ${$user.verification.code}`
+    );
 
-    res.status(201).json({
-      v_code: $user.verification.code,
-    });
+    if (!sms.message || sms.error) {
+      let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
+      res.status(e.status).json({
+        message: e.message,
+        error: sms.error,
+      });
+      return;
+    }
+    res.status(204);
   },
 
   changePassword: async (req, res) => {
@@ -361,16 +364,16 @@ module.exports = {
     const user = await USER.findById(userId);
 
     if (!user) {
-      res.status(404).json({
-        message: `FAILED!
-        Sorry! We cant seem to locate you in our system`,
+      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
 
     //validate verification code
     if (user.verification.code !== Number(v_code)) {
-      res.status(401).json({
+      let e = res.status(401).json({
         message: `FAILED!
         You entered the Wrong verification code`,
       });
@@ -401,10 +404,7 @@ module.exports = {
       return;
     }
 
-    res.status(204).json({
-      message: `SUCCESSS! 
-      Password updated successfully`,
-    });
+    res.status(204);
   },
   sendPasswordResetAuthCode: async (req, res) => {
     const { phoneno } = req.body;
@@ -444,41 +444,22 @@ module.exports = {
       });
       return;
     }
-
-    //Send the text
-    // let sendText;
-    // try {
-    //   sendText = await sms.messages.create({
-    //     body: `Tans-Code: ${$user.verification.code} `,
-    //     to: "+254" + $user.phoneno.slice(-9),
-    //     from: "+12027598622",
-    //   });
-    // } catch (error) {
-    //   res.status(500).json({
-    //     message: `FAILED!
-    //     Twillio Send Text Error`,
-    //     error,
-    //   });
-    //   return;
-    // }
-    const role = await ROLE.findById($user.role);
-
-    res.status(201).json(composeUserResponseObj($user, role));
+    res.status(204);
   },
   resetPassword: async (req, res) => {
     const { userId, auth_code, newPassword } = req.body;
     const user = await USER.findById(userId);
 
     if (!user) {
-      res.status(404).json({
-        message: `Failed 
-         Sorry! We cant seem to locate you in our system
-        `,
+      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
 
     if (Number(auth_code) !== user.verification.code) {
+      let e = IN_ERR.CONFLICT_ERROR("verifcation code");
       res.status(403).json({
         message: `Failed 
          Invalid Authentication Code
@@ -502,16 +483,13 @@ module.exports = {
       });
       await $user.save();
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED!
-        An Error Occured Cannot update details`,
+      let e = IN_ERR.UPDATE_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
         error,
       });
       return;
     }
-
-    const role = await ROLE.findById($user.role);
-
-    res.status(201).json(composeUserResponseObj($user, role));
+    res.status(204);
   },
 };
