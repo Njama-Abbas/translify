@@ -6,7 +6,7 @@ const USER = db.user,
   ORDER = db.order;
 
 module.exports = {
-  composeUserResponseObj(user, role) {
+  composeUserResponseObj(user, role, accesstoken = null) {
     return {
       email: user.email,
       firstname: user.firstname,
@@ -16,6 +16,8 @@ module.exports = {
       role: role.name,
       verification: user.verification,
       id: user.id,
+      accessToken: accesstoken ? accesstoken : "xxx-xxx-xxx",
+      account_status: user.account_status,
     };
   },
 
