@@ -32,6 +32,11 @@ const User = mongoose.model(
       ref: "Role",
       required: "Role is required",
     },
+    account_status: {
+      type: String,
+      enum: ["ACTIVE", "SUSPENDED"],
+      default: "ACTIVE",
+    },
   })
 );
 
