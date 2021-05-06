@@ -4,10 +4,10 @@ import { BASE_URL } from "./api.config";
 const API_URL = BASE_URL + "auth/";
 
 class AuthAPI {
-  login(email, password, role) {
+  login(username, password, role) {
     return axios
       .post(API_URL + "signin", {
-        email,
+        username,
         password,
         role,
       })
@@ -23,11 +23,11 @@ class AuthAPI {
     localStorage.removeItem("user");
   }
 
-  register(firstname, lastname, email, phoneno, password, role) {
+  register(firstname, lastname, username, phoneno, password, role) {
     return axios.post(API_URL + "signup", {
       firstname,
       lastname,
-      email,
+      username,
       phoneno,
       password,
       role,

@@ -6,7 +6,7 @@ const User = mongoose.model(
     firstname: String,
     lastname: String,
     phoneno: String,
-    email: String,
+    username: String,
     account_balance: {
       type: Number,
       default: 0,

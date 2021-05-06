@@ -8,7 +8,7 @@ const USER = db.user,
 module.exports = {
   composeUserResponseObj(user, role, accesstoken = null) {
     return {
-      email: user.email,
+      username: user.username,
       firstname: user.firstname,
       lastname: user.lastname,
       phoneno: user.phoneno,

@@ -10,7 +10,7 @@ import {
   MdLockOutline,
   MdVisibility,
   MdVisibilityOff,
-  MdMailOutline,
+  MdAssignmentInd,
   MdEnhancedEncryption,
 } from "react-icons/md";
 
@@ -35,7 +35,6 @@ import {
 } from "./elements";
 
 import ValidationError from "../Error/Validation";
-import ValidationPatterns from "../../Resources/Patterns/validation";
 import LoadingComponent from "../LoadingComponent";
 
 export default function SignUp({ route }) {
@@ -64,10 +63,10 @@ export default function SignUp({ route }) {
   const role = route;
 
   const onSubmit = (user) => {
-    const { email, password } = user;
+    const { username, password } = user;
     setLoading(true);
 
-    AuthAPI.login(email, password, role).then(
+    AuthAPI.login(username, password, role).then(
       (response) => {
         dispatch(
           userSet({
@@ -131,29 +130,29 @@ export default function SignUp({ route }) {
                   <TextField
                     inputRef={register({
                       required: true,
-                      pattern: ValidationPatterns.email,
                     })}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <MdMailOutline />
+                          <MdAssignmentInd />
                         </InputAdornment>
                       ),
                     }}
                     variant="outlined"
                     required
                     fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
+                    id="username"
+                    label="Username / Phone-No"
+                    name="username"
+                    autoComplete="username"
+                    placeholder="Username or Phoneno"
                   />
                   <ValidationError
                     errors={errors}
-                    fieldName="email"
-                    requiredErrorMsg="Email is Required"
-                    patternErrorMsg="Wrong Email Adress Format"
+                    fieldName="username"
+                    requiredErrorMsg="Username is required"
                   />
+                  {/**exists */}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField

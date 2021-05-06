@@ -7,7 +7,7 @@ const drivers = {
         firstname: "Salman",
         lastname: "Khan",
         phoneno: "712345678",
-        email: "salmankhan@gmail.com",
+        username: "salmankhan",
         rating: 5.0,
       },
       driving_details: {
@@ -24,7 +24,7 @@ const drivers = {
         firstname: "Alisha",
         lastname: "Keys",
         phoneno: "712345679",
-        email: "alisha@gmail.com",
+        username: "alisha",
         rating: 4.3,
       },
       driving_details: {
@@ -41,7 +41,7 @@ const drivers = {
         firstname: "Dwayne",
         lastname: "Johnson",
         phoneno: "712345680",
-        email: "johnson@gmail.com",
+        username: "dwayneJ",
         rating: 4.2,
       },
       driving_details: {
@@ -58,7 +58,7 @@ const drivers = {
         firstname: "Paul",
         lastname: "Walker",
         phoneno: "7123456781",
-        email: "salmankhan@gmail.com",
+        username: "paulwalker",
         rating: 4.0,
       },
       driving_details: {
@@ -75,7 +75,7 @@ const drivers = {
         firstname: "Michelle",
         lastname: "Rodriguez",
         phoneno: "7123456782",
-        email: "rodriguez@gmail.com",
+        username: "rodriguez",
         rating: 4.5,
       },
       driving_details: {
@@ -94,7 +94,7 @@ const drivers = {
         firstname: "Megan",
         lastname: "Boone",
         phoneno: "712345698",
-        email: "megan@gmail.com",
+        username: "megan",
       },
       driving_details: {
         truckno: "KCZ 335 A",
@@ -110,7 +110,7 @@ const drivers = {
         firstname: "Laura",
         lastname: "Sohn",
         phoneno: "712345699",
-        email: "laura@gmail.com",
+        username: "laura",
       },
       driving_details: {
         truckno: "KDM 226 R",
@@ -126,7 +126,7 @@ const drivers = {
         firstname: "Eddy",
         lastname: "Gathengi",
         phoneno: "0712345691",
-        email: "eddy@gmail.com",
+        username: "eddy",
       },
       driving_details: {
         truckno: "KBE 227 S",
@@ -142,7 +142,7 @@ const drivers = {
         firstname: "David",
         lastname: "Strathairn",
         phoneno: "7123456795",
-        email: "david@gmail.com",
+        username: "david",
       },
       driving_details: {
         truckno: "KAG 215 U",
@@ -158,7 +158,7 @@ const drivers = {
         firstname: "Adriane",
         lastname: "Lenox",
         phoneno: "712345687",
-        email: "adriane@gmail.com",
+        username: "adriane",
       },
       driving_details: {
         truckno: "KMD 512 J",
@@ -176,7 +176,7 @@ const drivers = {
         firstname: "Valarie",
         lastname: "Pettford",
         phoneno: "722345678",
-        email: "valarie@gmail.com",
+        username: "valarie",
       },
       driving_details: {
         truckno: "KMX 125 S",
@@ -192,7 +192,7 @@ const drivers = {
         firstname: "Ulrich",
         lastname: "Thomsen",
         phoneno: "72645679",
-        email: "ulrich@gmail.com",
+        username: "ulrich",
       },
       driving_details: {
         truckno: "KDC 876 W",
@@ -208,7 +208,7 @@ const drivers = {
         firstname: "Rachael",
         lastname: "Brosnahan",
         phoneno: "743845680",
-        email: "rachael@gmail.com",
+        username: "rachael",
       },
       driving_details: {
         truckno: "KED 721 K",

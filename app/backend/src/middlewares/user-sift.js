@@ -3,11 +3,11 @@ const ROLES = db.ROLES;
 const USER = db.user;
 
 module.exports = {
-  checkDuplicateEmail: async (req, res, next) => {
-    const { email } = req.body;
+  checkDuplicateUserName: async (req, res, next) => {
+    const { username } = req.body;
 
     const user = await USER.findOne({
-      email,
+      username,
     });
 
     if (user) {

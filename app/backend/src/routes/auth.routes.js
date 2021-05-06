@@ -6,7 +6,7 @@ const AuthController = require("../controllers/auth.controller");
 Router.post(
   "/signup",
   [
-    user_sift.checkDuplicateEmail,
+    user_sift.checkDuplicateUserName,
     user_sift.checkDuplicatePhoneNo,
     user_sift.checkRolesExisted,
   ],

@@ -4,31 +4,31 @@ const clients = [
     firstname: "Jayson",
     lastname: "Bourne",
     phoneno: "723664497",
-    email: "jason@gmail.com",
+    username: "jayson",
   },
   {
     firstname: "Iano",
     lastname: "Somerhalder",
     phoneno: "741235678",
-    email: "iano@gmail.com",
+    username: "iano_some",
   },
   {
     firstname: "Nina",
     lastname: "Dobrev",
     phoneno: "742134567",
-    email: "nina@gmail.com",
+    username: "nina-dobrev",
   },
   {
     firstname: "Katty",
     lastname: "Graham",
     phoneno: "743125678",
-    email: "katty@gmail.com",
+    username: "katty_graham",
   },
   {
     firstname: "Kayla",
     lastname: "Ewell",
     phoneno: "744789765",
-    email: "ewell@gmail.com",
+    username: "ewellKylla",
   },
 ];
 

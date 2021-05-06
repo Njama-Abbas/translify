@@ -21,7 +21,7 @@ module.exports = {
       firstname,
       lastname,
       phoneno: user_phoneno,
-      email,
+      username,
       password: userPassword,
       role,
     } = req.body;
@@ -42,7 +42,7 @@ module.exports = {
         firstname,
         lastname,
         phoneno: "254" + user_phoneno.slice(-9),
-        email,
+        username,
         password: bcrypt.hashSync(userPassword, 10),
         role: $role._id,
         verification: {
@@ -61,19 +61,19 @@ module.exports = {
     const user = await new_user.save();
 
     //send verification text message
-    let sms = await sendText(
-      user.phoneno,
-      `Auth-Code: ${user.verification.code}`
-    );
+    // let sms = await sendText(
+    //   user.phoneno,
+    //   `Auth-Code: ${user.verification.code}`
+    // );
 
-    if (!sms.message || sms.error) {
-      let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
-      res.status(e.status).json({
-        message: e.message,
-        error: sms.error,
-      });
-      return;
-    }
+    // if (!sms.message || sms.error) {
+    //   let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
+    //   res.status(e.status).json({
+    //     message: e.message,
+    //     error: sms.error,
+    //   });
+    //   return;
+    // }
 
     res.status(201).json({
       UID: user._id,
@@ -159,15 +159,21 @@ module.exports = {
   },
 
   signin: async (req, res) => {
-    const { email, password, role } = req.body;
+    const { username, password, role } = req.body;
 
     const $role = await ROLE.findOne({
       name: role,
     });
 
-    const user = await USER.findOne({
-      email,
+    const user_v1 = await USER.findOne({
+      username,
     });
+
+    const user_v2 = await USER.findOne({
+      phoneno: `254${username.slice(-9)}`,
+    });
+
+    const user = user_v1 || user_v2;
 
     //user is not in the database
     if (!user) {

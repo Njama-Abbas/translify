@@ -9,9 +9,9 @@ export default function PersonalInfo({ user, setLoading }) {
       <ProfileSection>
         <PersonalDetailsItem>
           <p>
-            <strong>Email:</strong>
+            <strong>UserName:</strong>
           </p>
-          <p>{user.email}</p>
+          <p>{user.username}</p>
         </PersonalDetailsItem>
         <PersonalDetailsItem>
           <p>

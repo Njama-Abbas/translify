@@ -10,7 +10,7 @@ import {
   MdLockOutline,
   MdVisibility,
   MdVisibilityOff,
-  MdMailOutline,
+  MdAssignmentInd,
   MdPhone,
   MdEnhancedEncryption,
 } from "react-icons/md";
@@ -61,10 +61,16 @@ export default function SignUp({ route }) {
 
   const role = route;
   const onSubmit = (user) => {
-    const { firstname, lastname, phoneno, email, password } = user;
+    const { firstname, lastname, phoneno, username, password } = user;
     setIsLoading(true);
-
-    AuthAPI.register(firstname, lastname, email, phoneno, password, role).then(
+    AuthAPI.register(
+      firstname,
+      lastname,
+      username,
+      phoneno,
+      password,
+      role
+    ).then(
       (response) => {
         const { UID, phoneno } = response.data;
         dispatch(
@@ -156,31 +162,30 @@ export default function SignUp({ route }) {
                   <TextField
                     inputRef={register({
                       required: true,
-                      pattern: ValidationPatterns.email,
+                      pattern: /^[a-z0-9_-]{3,16}$/gi,
                     })}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <MdMailOutline />
+                          <MdAssignmentInd />
                         </InputAdornment>
                       ),
                     }}
                     variant="outlined"
                     required
                     fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
-                    placeholder="e.g johdoe@gmail.com"
+                    id="username"
+                    label="Username"
+                    name="username"
+                    autoComplete="username"
+                    placeholder=" e.g johdoe"
                   />
                   <ValidationError
                     errors={errors}
-                    fieldName="email"
-                    patternErrorMsg="Wrong Email Adress!"
-                    requiredErrorMsg="Email Required"
+                    fieldName="username"
+                    patternErrorMsg="Username must be 3 to 16 characters and should not contain spaces or special symbols"
+                    requiredErrorMsg="Username Is Required"
                   />
-                  {/**exists */}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField

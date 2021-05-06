@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import ValidationError from "../Error/Validation";
 import ValidationPatterns from "../../Resources/Patterns/validation";
 import { Form, FormAvatar, FormPaper } from "./Profile.elements";
-import { IoPencil, IoMail, IoPerson } from "react-icons/io5";
+import { IoPencil, IoPerson } from "react-icons/io5";
 import { AuthAPI } from "../../Api";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -72,15 +72,15 @@ const EditForm = ({ currentUser, handleClose, setLoading }) => {
 
   // const [message, showMessage] = useState("");
 
-  const { firstname, lastname, email } = currentUser;
+  const { firstname, lastname, username } = currentUser;
 
   const [new_fname, setFname] = useState(firstname);
   const [new_lname, setLname] = useState(lastname);
-  const [new_mail, setEmail] = useState(email);
+  const [new_username, setUserName] = useState(username);
 
-  const onSubmit = (user) => {
+  const onSubmit = (data) => {
     setLoading(true);
-    AuthAPI.updateInfo(currentUser.id, user).then(
+    AuthAPI.updateInfo(currentUser.id, data).then(
       (response) => {
         addToast(
           `SUCCESS!
@@ -118,30 +118,30 @@ const EditForm = ({ currentUser, handleClose, setLoading }) => {
               <TextField
                 inputRef={register({
                   required: true,
-                  pattern: ValidationPatterns.email,
+                  pattern: /^[a-z0-9_-]{3,16}$/gi,
                 })}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <IoMail />
+                      <IoPerson />
                     </InputAdornment>
                   ),
                 }}
                 variant="outlined"
                 required
-                value={new_mail}
-                onChange={(e) => setEmail(e.target.value)}
+                value={new_username}
+                onChange={(e) => setUserName(e.target.value)}
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                id="username"
+                label="User Name"
+                name="username"
+                autoComplete="username"
               />
               <ValidationError
                 errors={errors}
-                fieldName="email"
-                requiredErrorMsg="Email is Required"
-                patternErrorMsg="Wrong Email Adress Format"
+                fieldName="username"
+                requiredErrorMsg="Username Is Required"
+                patternErrorMsg="Username must be 3 to 16 characters and should not contain spaces or special symbols"
               />
             </Grid>
             <Grid item xs={12}>
