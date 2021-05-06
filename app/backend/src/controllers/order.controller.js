@@ -1,6 +1,11 @@
 const db = require("../models"),
   sms = require("../utils/sms.utils");
 
+const {
+  composeOrderResponseObj,
+  averageRating,
+} = require("../utils/response.utils");
+
 const ORDER = db.order,
   DRIVER = db.driver,
   ROLE = db.role,
@@ -105,11 +110,11 @@ module.exports = {
     // }
 
     const orders = [order];
-    const mappedOrders = await MapOrders(orders);
+    const mappedOrders = await composeOrderResponseObj(orders);
     res.status(200).json(mappedOrders[0]);
   },
 
-  getAllOrdersByUserId: async (req, res) => {
+  async getAllOrdersByUserId(req, res) {
     const { userid } = req.headers;
 
     const user = await USER.findById(userid);
@@ -161,7 +166,7 @@ module.exports = {
       res.status(200).json(orders);
       return;
     }
-    const mappedOrders = await MapOrders(orders);
+    const mappedOrders = await composeOrderResponseObj(orders);
     res.status(200).json(mappedOrders);
   },
 
@@ -174,9 +179,10 @@ module.exports = {
       order = await ORDER.findByIdAndUpdate(OID, {
         status,
       });
-    } catch (err) {
+    } catch (error) {
       res.status(500).json({
-        message: err,
+        message: `FAILED! Updating order unsuccessfull`,
+        error,
       });
       return;
     }
@@ -184,7 +190,8 @@ module.exports = {
     //if null result
     if (!order) {
       res.status(404).json({
-        message: "order not found",
+        message: `FAILED!
+        order not found`,
       });
       return;
     }
@@ -290,7 +297,7 @@ module.exports = {
       await designatedDriver.save();
     }
 
-    let orders = [];
+    let orders = null;
 
     if (role.name === "client") {
       orders = await ORDER.find({
@@ -316,61 +323,111 @@ module.exports = {
       return;
     }
 
-    const mappedOrders = await MapOrders(orders);
+    const mappedOrders = await composeOrderResponseObj(orders);
 
     res.status(200).json(mappedOrders);
   },
+
+  async reviewOrder(req, res) {
+    const { userId, grade, orderId } = req.body;
+    const user = await USER.findById(userId);
+
+    if (!user) {
+      res.status(404).json({
+        message: `FAILED!
+        User not found`,
+      });
+      return;
+    }
+
+    const role = await ROLE.findById(user.role);
+
+    if (!role) {
+      res.status(404).json({
+        message: `FAILED! We could not locate the supplied role`,
+      });
+    }
+
+    let order = await ORDER.findOne({
+      _id: orderId,
+    });
+
+    if (!order) {
+      res.status(404).json({
+        message: `FAILED! 
+        Order Not Found`,
+      });
+      return;
+    }
+
+    let other = role.name === "client" ? "driver" : "client";
+
+    const reviewedOrder = await ORDER.findByIdAndUpdate(
+      order._id,
+      {
+        review: {
+          [role.name]: {
+            status: true,
+            grade: Number(grade),
+          },
+          [other]: {
+            status: order.review[other].status,
+            grade: order.review[other].grade,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (!reviewedOrder) {
+      res.status(404).json({
+        message: "FAILED! Order Update unsuccessful",
+      });
+      return;
+    }
+
+    let allOrders, reviewedUser;
+    try {
+      if (role.name === "driver") {
+        reviewedUser = await USER.findById(order.clientId);
+        allOrders = await ORDER.find({
+          clientId: order.clientId,
+        });
+      } else if (role.name === "client") {
+        let driver = await DRIVER.findById(order.driverId);
+        reviewedUser = await USER.findById(driver.userId);
+        allOrders = await ORDER.find({
+          driverId: driver._id,
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: "FAILED! USER Update unsuccessful",
+        error,
+      });
+      return;
+    }
+
+    //update the rating of a reviewed user;
+    let ratedUser = await USER.findByIdAndUpdate(
+      reviewedUser._id,
+      {
+        rating: averageRating(allOrders, role.name),
+      },
+      { new: true }
+    );
+
+    if (!ratedUser) {
+      res.status(404).json({
+        message: "FAILED! USER not found",
+      });
+      return;
+    }
+
+    const structuredOrders = await composeOrderResponseObj([reviewedOrder]);
+    res.status(200).json({
+      order: structuredOrders[0],
+      ratedUser,
+    });
+  },
 };
-/**
- *
- * @param {[]} orders
- * @returns {[]} an array of orders mapped eith driver and client names
- */
-async function MapOrders(orders) {
-  const mappedOrders = await Promise.all(
-    orders.map(async (order) => {
-      const {
-        pickup,
-        destination,
-        charges,
-        load,
-        status,
-        orderDate,
-        clientId,
-        driverId,
-        _id: id,
-      } = order;
-
-      const designatedDriver = await DRIVER.findOne({
-        _id: driverId,
-      });
-      const driver = await USER.findOne({
-        _id: designatedDriver.userId,
-      });
-
-      const client = await USER.findOne({
-        _id: clientId,
-      });
-
-      return {
-        id,
-        driver: {
-          firstname: driver.firstname,
-          lastname: driver.lastname,
-          truckno: designatedDriver.truckno,
-        },
-        client: {
-          firstname: client.firstname,
-          lastname: client.lastname,
-        },
-        pickup,
-        destination,
-        charges,
-        load,
-        status,
-        orderDate,
-      };
-    })
-  );
-  return mappedOrders;
-}

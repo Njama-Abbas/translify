@@ -12,4 +12,6 @@ Router.post(
 
 Router.post("/update", ordersController.updateOrder);
 
+Router.post("/review", ordersController.reviewOrder);
+
 module.exports = Router;

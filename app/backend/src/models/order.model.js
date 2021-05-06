@@ -46,6 +46,26 @@ const Order = mongoose.model(
       type: Date,
       default: new Date(),
     },
+    review: {
+      client: {
+        status: {
+          type: Boolean,
+          default: false,
+        },
+        grade: {
+          type: Number,
+        },
+      },
+      driver: {
+        status: {
+          type: Boolean,
+          default: false,
+        },
+        grade: {
+          type: Number,
+        },
+      },
+    },
   })
 );
 
