@@ -7,7 +7,7 @@ const config = require("../config/auth.config"),
 
 const USER = db.user,
   ROLE = db.role;
-const { userResponseObject } = require("../utils/response.utils");
+const { composeUserResponseObj } = require("../utils/response.utils");
 module.exports = {
   signup: async (req, res) => {
     const {
@@ -463,7 +463,7 @@ module.exports = {
     // }
     const role = await ROLE.findById($user.role);
 
-    res.status(201).json(userResponseObject($user, role));
+    res.status(201).json(composeUserResponseObj($user, role));
   },
   resetPassword: async (req, res) => {
     const { userId, auth_code, newPassword } = req.body;
@@ -512,6 +512,6 @@ module.exports = {
 
     const role = await ROLE.findById($user.role);
 
-    res.status(201).json(userResponseObject($user, role));
+    res.status(201).json(composeUserResponseObj($user, role));
   },
 };

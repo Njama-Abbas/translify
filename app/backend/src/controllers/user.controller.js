@@ -1,7 +1,7 @@
 const db = require("../models");
 const USER = db.user;
 const ROLE = db.role;
-const { userResponseObject } = require("../utils/response.utils");
+const { composeUserResponseObj } = require("../utils/response.utils");
 
 module.exports = {
   allAccess: async (_req, res) => {
@@ -19,6 +19,6 @@ module.exports = {
       _id: user.role,
     });
 
-    res.status(200).json(userResponseObject(user, role));
+    res.status(200).json(composeUserResponseObj(user, role));
   },
 };
