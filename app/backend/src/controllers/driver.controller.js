@@ -47,24 +47,6 @@ module.exports = {
     });
   },
 
-  check_account_status: async (req, res) => {
-    const { userid: userId } = req.headers;
-
-    const driver = await DRIVER.findOne({
-      userId,
-    });
-
-    if (!driver) {
-      res.status(404).json({
-        message: "Sorry!! You are not a registered driver Yet",
-      });
-      return;
-    }
-    res.status(200).json({
-      account_status: driver.account_status,
-    });
-  },
-
   getById: async (req, res) => {
     const id = req.headers.driverid;
 

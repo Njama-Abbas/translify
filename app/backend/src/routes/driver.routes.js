@@ -8,7 +8,6 @@ Router.get("/findone", driverController.getById);
 Router.get("/on-call", driverController.getOnCall);
 
 Router.get("/check-approval", driverController.check_approval);
-Router.get("/check-account-status", driverController.check_account_status);
 
 Router.post(
   "/complete-registration",
