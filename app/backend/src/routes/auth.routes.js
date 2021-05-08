@@ -17,6 +17,8 @@ Router.post("/signin", AuthController.signin);
 
 Router.post("/verify-account", AuthController.verify);
 
+Router.post("/refresh_token", AuthController.refresh);
+
 Router.post("/resend-vcode", AuthController.resendVerificationCode);
 
 Router.put("/update-info", AuthController.updateInfo);

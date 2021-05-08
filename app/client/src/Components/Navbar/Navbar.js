@@ -6,6 +6,8 @@ import { IconContext } from "react-icons/lib";
 import { DecisionDialog } from "../index";
 import { AuthAPI } from "../../Api";
 import UserNav from "./UserNav";
+import { useSelector } from "react-redux";
+import { selectAccessToken, selectUser } from "../../State/user.slice";
 
 import {
   Nav,
@@ -21,9 +23,12 @@ import {
 const Navbar = () => {
   const history = useHistory();
 
+  const accessToken = useSelector(selectAccessToken);
+  const user = useSelector(selectUser);
+
   const [click, setClick] = useState(false);
   const [button, setButton] = useState(true);
-  const [currentUser, setCurrentUser] = useState(undefined);
+  // const [currentUser, setCurrentUser] = useState(undefined);
   const [userBoard, setUserBoard] = useState(false);
 
   const toggleMobileMenu = () =>
@@ -52,13 +57,6 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const user = AuthAPI.getCurrentUser();
-
-    if (user) {
-      setCurrentUser(user);
-      setUserBoard(true);
-    }
-
     showButton();
   }, []);
 
@@ -66,8 +64,8 @@ const Navbar = () => {
 
   return (
     <Fragment>
-      {userBoard ? (
-        <UserNav user={currentUser} logOutCallBack={logOutCallBack} />
+      {accessToken ? (
+        <UserNav user={user} logOutCallBack={logOutCallBack} />
       ) : (
         <IconContext.Provider
           value={{

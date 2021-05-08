@@ -4,7 +4,7 @@ import { useToasts } from "react-toast-notifications";
 import Glitch from "../../Resources/Utils/error";
 import { AuthAPI } from "../../Api";
 import { useDispatch } from "react-redux";
-import { userSet } from "../../State/user.slice";
+import { userSet, accessTokenSet } from "../../State/user.slice";
 
 import {
   MdLockOutline,
@@ -66,31 +66,24 @@ export default function SignUp({ route }) {
     const { username, password } = user;
     setLoading(true);
 
-    AuthAPI.login(username, password, role).then(
-      (response) => {
-        dispatch(
-          userSet({
-            UID: response.id,
-            phoneno: response.phoneno,
-            verified: true,
-          })
-        );
+    AuthAPI.login(username, password, role)
+      .then((response) => {
+        console.log(response);
+        dispatch(accessTokenSet(response.data.accesstoken));
         history.push(`/${route}`);
         setLoading(false);
-      },
-
-      (error) => {
+      })
+      .catch((error) => {
+        console.log(error);
         if (error.response.status && error.response.status === 401) {
           //unverified
-          const { UID, phoneno, message } = error.response.data;
           dispatch(
             userSet({
-              UID,
-              phoneno,
+              ...error.response.data,
               verified: false,
             })
           );
-          addToast(message, {
+          addToast(error.response.data.message, {
             appearance: "warning",
           });
           // redirect to verification page
@@ -102,8 +95,7 @@ export default function SignUp({ route }) {
           });
         }
         setLoading(false);
-      }
-    );
+      });
   };
 
   let content;

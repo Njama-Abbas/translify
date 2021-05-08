@@ -1,22 +1,14 @@
 import axios from "axios";
 import { BASE_URL } from "./api.config";
-
 const API_URL = BASE_URL + "auth/";
 
 class AuthAPI {
   login(username, password, role) {
-    return axios
-      .post(API_URL + "signin", {
-        username,
-        password,
-        role,
-      })
-      .then((response) => {
-        if (response.data.accessToken) {
-          localStorage.setItem("user", JSON.stringify(response.data));
-        }
-        return response.data;
-      });
+    return axios.post(API_URL + "signin", {
+      username,
+      password,
+      role,
+    });
   }
 
   logout() {
@@ -33,9 +25,12 @@ class AuthAPI {
       role,
     });
   }
-
   getCurrentUser() {
-    return JSON.parse(localStorage.getItem("user"));
+    axios.defaults.withCredentials = true;
+    return axios.post(API_URL + "refresh_token", {
+      withCredentials: true,
+      credentials: "include",
+    });
   }
 
   verify(ID, v_code) {

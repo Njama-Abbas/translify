@@ -1,8 +1,8 @@
 require("dotenv").config();
 const express = require("express"),
   bodyParser = require("body-parser"),
-  cors = require("cors");
-
+  cors = require("cors"),
+  cookieParser = require("cookie-parser");
 const dbConfig = require("./config/db.config"),
   db = require("./models");
 
@@ -15,9 +15,11 @@ const { user, orders, mpesa, auth, driver, photos } = require("./routes");
 const URI = `mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`,
   app = express(),
   corsOptions = {
-    origin: ["http://localhost:3000"],
+    origin: "http://localhost:3000",
+    credentials: true,
   };
 
+app.use(cookieParser());
 app.use(cors(corsOptions));
 
 app.use(bodyParser.json());

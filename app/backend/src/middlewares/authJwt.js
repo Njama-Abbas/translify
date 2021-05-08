@@ -6,18 +6,19 @@ const ROLE = db.role;
 
 module.exports = {
   verifyToken: async (req, res, next) => {
-    let token = req.headers["x-access-token"];
+    //  let token = req.headers["x-access-token"];
+    let token = req.cookies.refreshtoken;
 
     if (!token) {
       return res.status(403).json({
-        message: "No token provided!"
+        message: "No token provided!",
       });
     }
 
-    jwt.verify(token, config.secret, (err, decoded) => {
+    jwt.verify(token, config.REFRESH_TOKEN_SECRET, (err, decoded) => {
       if (err) {
         return res.status(401).json({
-          message: "Unauthourized"
+          message: "Unauthourized",
         });
       }
       req.userId = decoded.id;
@@ -39,7 +40,8 @@ module.exports = {
 
     if (!user.verification.status) {
       res.status(403).json({
-        message: "You are Not authorized to view this page. Please Verify your account",
+        message:
+          "You are Not authorized to view this page. Please Verify your account",
       });
       return;
     }

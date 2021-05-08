@@ -1,12 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  user: {
-    ID: null,
-    phoneno: null,
-    verified: false,
-    profilePic: null,
-  },
+  data: {},
+  accesstoken: null,
   status: "idle",
   error: null,
 };
@@ -16,10 +12,10 @@ const UserSlice = createSlice({
   initialState,
   reducers: {
     userSet(state, action) {
-      const { UID, phoneno, verified } = action.payload;
-      state.user.ID = UID;
-      state.user.phoneno = phoneno;
-      state.user.verified = verified;
+      state.data = action.payload;
+    },
+    accessTokenSet(state, action) {
+      state.accesstoken = action.payload;
     },
     userVerified(state, action) {
       state.user.verified = action.payload;
@@ -30,9 +26,15 @@ const UserSlice = createSlice({
   },
 });
 
-export const { userSet, userVerified, profilePicSet } = UserSlice.actions;
+export const {
+  userSet,
+  userVerified,
+  profilePicSet,
+  accessTokenSet,
+} = UserSlice.actions;
 
-export const selectUser = (state) => state.user.user;
+export const selectUser = (state) => state.user.data;
 export const selectUserStatus = (state) => state.user.status;
+export const selectAccessToken = (state) => state.user.accesstoken;
 
 export default UserSlice.reducer;

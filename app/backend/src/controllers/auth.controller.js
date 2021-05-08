@@ -2,7 +2,8 @@ const config = require("../config/auth.config"),
   db = require("../models"),
   phoneToken = require("generate-sms-verification-code"),
   jwt = require("jsonwebtoken"),
-  bcrypt = require("bcrypt");
+  bcrypt = require("bcrypt"),
+  auth = require("../utils/auth.utils");
 
 const USER = db.user,
   ROLE = db.role;
@@ -198,7 +199,7 @@ module.exports = {
     if (!valid) {
       let e = IN_ERR.UNAUTHORIZED_ERROR();
       res.status(e.status).json({
-        accessToken: null,
+        accesstoken: null,
         message: e.message,
       });
       return;
@@ -216,13 +217,72 @@ module.exports = {
     }
 
     // if verified give the access token
-    let token = jwt.sign({ id: user.id }, config.secret, {
-      expiresIn: 86400,
-    });
+    let accessToken = auth.createAccessToken(user.id);
+    let refreshToken = auth.createRefreshToken(user.id);
 
-    res.status(200).json(composeUserResponseObj(user, $role, token));
+    const activeUser = await USER.findByIdAndUpdate(
+      user.id,
+      {
+        refreshToken,
+      },
+      { new: true }
+    );
+
+    auth.sendRefreshToken(res, refreshToken);
+    auth.sendAccessToken(res, accessToken, activeUser.username);
   },
 
+  async refresh(req, res) {
+    console.log(req.cookies);
+    const token = req.cookies.refreshtoken;
+    // If no access_token in  request
+    if (!token) {
+      return res.status(401).json({ accesstoken: "" });
+    }
+    let payload = null;
+    try {
+      payload = jwt.verify(token, config.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      return res.status(401).json({ accesstoken: "" });
+    }
+
+    // token is valid, check if user exist
+    const user = await USER.findById(payload.userId);
+
+    if (!user) {
+      res.status(401).json({
+        accesstoken: "",
+      });
+      return;
+    }
+
+    // user exist, check if refreshtoken exist on user
+    if (user.refreshtoken !== token) {
+      res.status(402).json({
+        accesstoken: "",
+      });
+      return;
+    }
+    // token exist, create new Refresh- and accesstoken
+    const accesstoken = auth.createAccessToken(user.id);
+    const refreshtoken = auth.createRefreshToken(user.id);
+
+    // update refreshtoken on user in db
+    const activeUser = await USER.findByIdAndUpdate(
+      user.id,
+      {
+        refreshToken,
+      },
+      { new: true }
+    );
+
+    // All good to go, send new refreshtoken and accesstoken
+    auth.sendRefreshToken(res, refreshtoken);
+    console.log(accesstoken);
+    return res.status(200).json({
+      accesstoken,
+    });
+  },
   resendVerificationCode: async (req, res) => {
     //generate sms verification code
     const generated_code = phoneToken(8, {

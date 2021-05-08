@@ -37,6 +37,10 @@ const User = mongoose.model(
       enum: ["ACTIVE", "SUSPENDED"],
       default: "ACTIVE",
     },
+    refreshToken: {
+      type: String,
+      default: null,
+    },
   })
 );
 
