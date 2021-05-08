@@ -103,8 +103,8 @@ exports.createSampleUsers = function () {
       const sample_admin = await USER.create({
         firstname: "Priyanka",
         lastname: "Chopra",
-        phoneno: "0712345678",
-        email: "priyanka@gmail.com",
+        phoneno: "254701010101",
+        username: "priyanka",
         password: bcrypt.hashSync("123Asd", 10),
         role: admin_role._id,
         account_balance: 100000,
