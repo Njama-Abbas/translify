@@ -425,9 +425,6 @@ module.exports = {
     }
 
     const structuredOrders = await composeOrderResponseObj([reviewedOrder]);
-    res.status(200).json({
-      order: structuredOrders[0],
-      ratedUser,
-    });
+    res.status(200).json(structuredOrders[0]);
   },
 };
