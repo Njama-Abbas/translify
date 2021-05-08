@@ -91,9 +91,10 @@ module.exports = {
       return;
     }
 
-    //get all users who have a role of driver
+    //get all users who have a role of driver and account status is active
     const users = await USER.find({
       role: driver_role._id,
+      account_status: "ACTIVE",
     });
 
     if (!users) {
