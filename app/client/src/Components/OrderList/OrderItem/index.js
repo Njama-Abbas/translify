@@ -3,7 +3,11 @@ import { OrderContainer, OrderItemHeader, OrderItemRow } from "./elements";
 import { useDispatch } from "react-redux";
 import { Button } from "../../../Resources/Styles/global";
 import ViewOrderDetailsDialog from "../OrderDetails";
-import { updateOrder, ordersFilterChanged } from "../../../State/orders.slice";
+import {
+  updateOrder,
+  ordersFilterChanged,
+  orderReviewed,
+} from "../../../State/orders.slice";
 
 import Grid from "@material-ui/core/Grid";
 const OrderItem = ({ order, user }) => {
@@ -37,6 +41,9 @@ const OrderItem = ({ order, user }) => {
     dispatch(ordersFilterChanged("successfull"));
   };
 
+  const handleOrderReview = (grade) => {
+    dispatch(orderReviewed({ UID, OID, grade }));
+  };
   return (
     <OrderContainer elevation={6}>
       <Grid container justify="space-between">
@@ -98,6 +105,7 @@ const OrderItem = ({ order, user }) => {
                   cancel: handleOrderCancel,
                   accept: handleOrderAccept,
                   complete: handleOrderComplete,
+                  review: handleOrderReview,
                 }}
               />
             </Grid>
