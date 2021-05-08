@@ -9,7 +9,7 @@ const USER = db.user,
 
 const { sendText } = require("../utils/sms.utils");
 const { composeUserResponseObj } = require("../utils/response.utils");
-const IN_ERR = require("../utils/error.utils");
+const systemError = require("../utils/error.utils");
 
 module.exports = {
   /**
@@ -50,7 +50,7 @@ module.exports = {
         },
       });
     } catch (error) {
-      let e = IN_ERR.CREATION_ERROR("user");
+      let e = systemError.CREATION_ERROR("user");
       res.status(e.status).json({
         message: e.message,
         error,
@@ -92,7 +92,7 @@ module.exports = {
     const user = await USER.findById(ID);
 
     if (!user) {
-      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      let e = systemError.NOT_FOUND_ERROR("user");
       res.status(e.status).json({
         message: e.message,
       });
@@ -109,7 +109,7 @@ module.exports = {
     }
 
     if (user.verification.code !== Number(v_code)) {
-      let e = IN_ERR.CONFLICT_ERROR("verifcation code");
+      let e = systemError.CONFLICT_ERROR("verifcation code");
       res.status(e.status).json({
         message: e.message,
       });
@@ -177,7 +177,7 @@ module.exports = {
 
     //user is not in the database
     if (!user) {
-      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      let e = systemError.NOT_FOUND_ERROR("user");
       res.status(e.status).json({
         message: e.message,
       });
@@ -186,7 +186,7 @@ module.exports = {
 
     const isCorrectRole = String(user.role) === String($role._id);
     if (!isCorrectRole) {
-      let e = IN_ERR.FORBIDDEN_ERROR($role.name);
+      let e = systemError.FORBIDDEN_ERROR($role.name);
       res.status(e.status).json({
         message: e.message,
       });
@@ -196,7 +196,7 @@ module.exports = {
     let valid = bcrypt.compareSync(password, user.password);
 
     if (!valid) {
-      let e = IN_ERR.UNAUTHORIZED_ERROR();
+      let e = systemError.UNAUTHORIZED_ERROR();
       res.status(e.status).json({
         accessToken: null,
         message: e.message,
@@ -206,7 +206,7 @@ module.exports = {
 
     //Take care of a user signing in and is not verified
     if (!user.verification.status) {
-      let e = IN_ERR.UNAUTHORIZED_ERROR();
+      let e = systemError.UNAUTHORIZED_ERROR();
       res.status(e.status).json({
         message: `FAILED!\n You are not Verified`,
         UID: user._id,
@@ -243,7 +243,7 @@ module.exports = {
         { new: true }
       );
     } catch (error) {
-      let e = IN_ERR.UPDATE_ERROR("user");
+      let e = systemError.UPDATE_ERROR("user");
       res.status(e.status).json({
         message: e.message,
         errror,
@@ -257,7 +257,7 @@ module.exports = {
     );
 
     if (!sms.message || sms.error) {
-      let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
+      let e = systemError.TWILIO_ERROR(sms.error.status || 401);
       res.status(e.status).json({
         message: e.message,
         error: sms.error,
@@ -277,7 +277,7 @@ module.exports = {
     try {
       user = await USER.findByIdAndUpdate(userId, data, { new: true });
     } catch (error) {
-      let e = IN_ERR.UPDATE_ERROR("user");
+      let e = systemError.UPDATE_ERROR("user");
       res.status(e.status).json({
         message: e.message,
       });
@@ -285,7 +285,7 @@ module.exports = {
     }
 
     if (!user) {
-      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      let e = systemError.NOT_FOUND_ERROR("user");
       res.status(e.status).json({
         message: e.message,
       });
@@ -300,7 +300,7 @@ module.exports = {
     const user = await USER.findById(userId);
 
     if (!user) {
-      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      let e = systemError.NOT_FOUND_ERROR("user");
       res.status(e.status).json({
         message: e.message,
       });
@@ -311,7 +311,7 @@ module.exports = {
     const valid = bcrypt.compareSync(currentPassword, user.password);
 
     if (!valid) {
-      let e = IN_ERR.UNAUTHORIZED_ERROR();
+      let e = systemError.UNAUTHORIZED_ERROR();
       res.status(e.status).json({
         message: `FAILED! 
         Your current password is Incorrect
@@ -339,7 +339,7 @@ module.exports = {
         { new: true }
       );
     } catch (error) {
-      let e = IN_ERR.UPDATE_ERROR("user");
+      let e = systemError.UPDATE_ERROR("user");
       res.status(e.status).json({
         message: e.message,
         error,
@@ -354,7 +354,7 @@ module.exports = {
     );
 
     if (!sms.message || sms.error) {
-      let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
+      let e = systemError.TWILIO_ERROR(sms.error.status || 401);
       res.status(e.status).json({
         message: e.message,
         error: sms.error,
@@ -370,7 +370,7 @@ module.exports = {
     const user = await USER.findById(userId);
 
     if (!user) {
-      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      let e = systemError.NOT_FOUND_ERROR("user");
       res.status(e.status).json({
         message: e.message,
       });
@@ -457,7 +457,7 @@ module.exports = {
     const user = await USER.findById(userId);
 
     if (!user) {
-      let e = IN_ERR.NOT_FOUND_ERROR("user");
+      let e = systemError.NOT_FOUND_ERROR("user");
       res.status(e.status).json({
         message: e.message,
       });
@@ -465,7 +465,7 @@ module.exports = {
     }
 
     if (Number(auth_code) !== user.verification.code) {
-      let e = IN_ERR.CONFLICT_ERROR("verifcation code");
+      let e = systemError.CONFLICT_ERROR("verifcation code");
       res.status(403).json({
         message: `Failed 
          Invalid Authentication Code
@@ -489,7 +489,7 @@ module.exports = {
       });
       await $user.save();
     } catch (error) {
-      let e = IN_ERR.UPDATE_ERROR("user");
+      let e = systemError.UPDATE_ERROR("user");
       res.status(e.status).json({
         message: e.message,
         error,
