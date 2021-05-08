@@ -42,6 +42,14 @@ class OrderAPI {
       UID,
     });
   }
+
+  reveiewOrder(userId, grade, orderId) {
+    return axios.post(API_URL + "review", {
+      userId,
+      grade,
+      orderId,
+    });
+  }
 }
 
 export default new OrderAPI();
