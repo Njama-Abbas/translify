@@ -10,8 +10,9 @@ import {
 } from "./elements";
 
 import { Button } from "../../../Resources/Styles/global";
-
 import { Dialog, DialogContent, Slide } from "@material-ui/core";
+import Review from "../Review";
+import ReadOnlyReview from "../Review/ReadOnlyReview";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -70,6 +71,15 @@ const OrderDetails = ({ user, close, order, controls }) => {
         <OrderItem>Status: </OrderItem>
         <OrderStatus>{order.status}</OrderStatus>
       </OrderColumn>
+      {order.review[user.role === "driver" ? "client" : "driver"] && (
+        <OrderColumn>
+          <ReadOnlyReview
+            reviewValue={
+              order.review[user.role === "driver" ? "client" : "driver"]
+            }
+          />
+        </OrderColumn>
+      )}
       {order.status === "pending" &&
         (user.role === "driver" ? (
           <OrderColumn>
@@ -96,7 +106,7 @@ const OrderDetails = ({ user, close, order, controls }) => {
           )
         ))}
 
-      {order.status === "in-progress" && user.role === "driver" ? (
+      {order.status === "in-progress" && user.role === "driver" && (
         <OrderColumn>
           <Button warning small onClick={controls.complete}>
             Complete
@@ -105,10 +115,9 @@ const OrderDetails = ({ user, close, order, controls }) => {
             Exit
           </Button>
         </OrderColumn>
-      ) : (
-        <Button small secondary onClick={close}>
-          Exit
-        </Button>
+      )}
+      {order.status === "successfull" && !order.review[user.role] && (
+        <Review handlereview={controls.review} />
       )}
     </OrderDetailsContainer>
   );
@@ -128,7 +137,7 @@ export default function ViewOrderDetailsDialog({ user, order, controls }) {
   return (
     <div>
       <Button small onClick={handleClickOpen}>
-        view
+        Detailed View
       </Button>
       <Dialog
         open={open}
