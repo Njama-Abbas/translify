@@ -29,6 +29,11 @@ export const updateOrder = createAsyncThunk("orders/update", async (order) => {
   return response.data;
 });
 
+export const orderReviewed = createAsyncThunk("orders/review", async (data) => {
+  const response = await OrderAPI.reveiewOrder(data.UID, data.grade, data.OID);
+  return response.data;
+});
+
 const OrdersSlice = createSlice({
   name: "orders",
   initialState,
@@ -60,6 +65,12 @@ const OrdersSlice = createSlice({
     [updateOrder.fulfilled]: (state, action) => {
       state.status = "succeeded";
       state.orders = action.payload;
+    },
+    [orderReviewed.fulfilled]: (state, action) => {
+      let reviewedIndex = state.orders.findIndex(
+        (order) => order.id === action.payload.id
+      );
+      state.orders[reviewedIndex] = action.payload;
     },
   },
 });
