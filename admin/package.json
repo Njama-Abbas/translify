@@ -4,7 +4,7 @@
   "description": "Web application for a freight forwarding agency",
   "main": "index.js",
   "scripts": {
-    "client": "npm start --prefix client",
+    "client": "npm start --prefix panel",
     "server": "npm start --prefix backend",
     "start": "concurrently \"yarn client\" \"yarn server\" "
   },
