@@ -25,7 +25,6 @@ const Driver = mongoose.model(
     },
     current_location_id: {
       type: String,
-      default: ""
     },
     address: {
       place_name: String,

@@ -6,7 +6,11 @@ const User = mongoose.model(
     firstname: String,
     lastname: String,
     phoneno: String,
-    email: String,
+    username: String,
+    account_balance: {
+      type: Number,
+      default: 0,
+    },
     password: String,
     verification: {
       status: {
@@ -27,6 +31,11 @@ const User = mongoose.model(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Role",
       required: "Role is required",
+    },
+    account_status: {
+      type: String,
+      enum: ["ACTIVE", "SUSPENDED"],
+      default: "ACTIVE",
     },
   })
 );
