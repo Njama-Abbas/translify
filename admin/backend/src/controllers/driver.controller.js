@@ -1,16 +1,21 @@
-const bcrypt = require("bcrypt");
-const db = require("../models");
+const bcrypt = require("bcrypt"),
+  db = require("../models"),
+  systemError = require("../utils/error.utils");
+const {
+  composeDriverResponseObj,
+  composeUserResponseObj,
+} = require("../utils/response.utils");
 const USER = db.user;
 const ROLE = db.role;
 const DRIVER = db.driver;
 
 module.exports = {
-  create: async (req, res) => {
+  async create(req, res) {
     const {
       firstname,
       lastname,
       phoneno,
-      email,
+      username,
       password: userPassword,
       address,
       dlno,
@@ -22,8 +27,9 @@ module.exports = {
     });
 
     if (!$role) {
-      res.status(404).json({
-        message: "Role not found",
+      let e = systemError.NOT_FOUND_ERROR("Role");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
@@ -34,15 +40,15 @@ module.exports = {
         firstname,
         lastname,
         phoneno,
-        email,
+        username,
         password: bcrypt.hashSync(userPassword, 10),
         role: $role._id,
       });
       await user.save();
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED!
-        Process to create 'USER' for role 'DRIVER' UNSUCCESSFUL`,
+      let e = systemError.CREATION_ERROR("User");
+      res.status(e.status).json({
+        message: e.message,
         error,
       });
       return;
@@ -59,16 +65,16 @@ module.exports = {
       });
       await driver.save();
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED!
-        Process to register 'DRIVER' UNSUCCESSFUL`,
+      let e = systemError.CREATION_ERROR("Driver");
+      res.status(e.status).json({
+        message: e.message,
         error,
       });
       return;
     }
-    res.status(200).json(driverResponseObject(driver, user));
+    res.status(200).json(composeDriverResponseObj(driver, user));
   },
-  fetch: async (req, res) => {
+  async fetch(req, res) {
     const driver_role = await ROLE.findOne({
       name: "driver",
     });
@@ -85,9 +91,9 @@ module.exports = {
     });
 
     if (!users) {
-      res.status(404).json({
-        message: `FAILED!
-        Drivers Not Found`,
+      let e = systemError.NOT_FOUND_ERROR("Drivers");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
@@ -97,70 +103,72 @@ module.exports = {
           userId: user._id,
         });
         if (exists) {
-          return driverResponseObject(exists, user);
+          return composeDriverResponseObj(exists, user);
         }
       })
     );
     res.set("Content-Range", drivers.length);
-    res.status(200).json(drivers);
+    res.status(200).json(drivers.filter((driver) => driver));
   },
 
-  get: async (req, res) => {
+  async get(req, res) {
     const driver_id = req.params.id;
-
-    const driver = await DRIVER.findOne({
-      _id: driver_id,
-    });
+    const driver = await DRIVER.findById(driver_id);
 
     if (!driver) {
-      res.status(404).json({
-        message: `FAILED!
-        Driver Not Found`,
+      let e = systemError.NOT_FOUND_ERROR("Driver");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
 
-    const user = await USER.findOne({
-      _id: driver.userId,
-    });
+    const user = await USER.findById(driver.userId);
 
     if (!user) {
-      res.status(404).json({
-        message: `FAILED!
-        User Not Found`,
+      let e = systemError.NOT_FOUND_ERROR("User");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
-
-    res.status(200).json(driverResponseObject(driver, user));
+    res.status(200).json(composeDriverResponseObj(driver, user));
   },
 
-  approve: async (req, res) => {
+  async approve(req, res) {
     const { driverId, status } = req.body;
 
+    console.log(driverId);
     let approvedDriver;
     try {
-      approvedDriver = await DRIVER.findByIdAndUpdate(driverId, {
-        approval_status: status,
-      });
-      await approvedDriver.save();
+      approvedDriver = await DRIVER.findByIdAndUpdate(
+        driverId,
+        {
+          approval_status: status,
+        },
+        { new: true }
+      );
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED!
-         Driver Approval Unsuccessful
-         `,
+      let e = systemError.UPDATE_ERROR("Driver Approval");
+      res.status(e.status).json({
+        message: e.message,
+        error,
       });
+      return;
     }
+    let user = await USER.findById(approvedDriver.userId);
+
+    res.status(200).json(composeDriverResponseObj(approvedDriver, user));
   },
-  delete: async (req, res) => {
+  async delete(req, res) {
     const driverId = req.params.id;
-
+    console.log(driverId);
     const driver = await DRIVER.findById(driverId);
-
+    console.log(driver);
     if (!driver) {
-      res.status(404).json({
-        message: `FAILED!
-        Driver Not Found`,
+      let e = systemError.NOT_FOUND_ERROR("Driver");
+      res.status(e.status).json({
+        message: e.message,
       });
       return;
     }
@@ -169,9 +177,9 @@ module.exports = {
     try {
       deletedUser = await USER.findByIdAndDelete(driver.userId);
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED!
-        Deletion process unsuccessful`,
+      let e = systemError.DELETE_ERROR("User");
+      res.status(e.status).json({
+        message: e.message,
         error,
       });
       return;
@@ -181,43 +189,43 @@ module.exports = {
     try {
       deletedDriver = await DRIVER.findByIdAndDelete(driver._id);
     } catch (error) {
-      res.status(500).json({
-        message: `FAILED!
-        Could not delete driver`,
+      let e = systemError.DELETE_ERROR("Driver");
+      res.status(e.status).json({
+        message: e.message,
         error,
       });
       return;
     }
-    res.status(204).json({
-      message: "DELETE == SUCCESS",
-    });
+    res.status(204).json({});
+  },
+  async update(req, res) {
+    const { userId, status } = req.body;
+    console.log(userId);
+    let updatedUser;
+    try {
+      updatedUser = await USER.findByIdAndUpdate(
+        userId,
+        {
+          account_status: status,
+        },
+        { new: true }
+      );
+    } catch (error) {
+      let e = systemError.UPDATE_ERROR("User Status");
+      res.status(e.status).json({
+        message: e.message,
+        error,
+      });
+      return;
+    }
+    if (!updatedUser) {
+      let e = systemError.NOT_FOUND_ERROR("User");
+      res.status(e.status).json({
+        message: e.message,
+      });
+      return;
+    }
+    const role = await ROLE.findById(updatedUser.role);
+    res.status(200).json(composeUserResponseObj(updatedUser, role));
   },
 };
-
-const format_approval = (value) => {
-  switch (value) {
-    case "A":
-      return "Approved";
-    case "D":
-      return "Declined";
-    case "P":
-    default:
-      return "Pending";
-  }
-};
-
-const driverResponseObject = (driver, user) => ({
-  id: driver._id,
-  userId: user._id,
-  firstname: user.firstname,
-  lastname: user.lastname,
-  phoneno: user.phoneno,
-  email: user.email,
-  rating: user.rating,
-  v_status: user.verification.status,
-  truckno: driver.truckno,
-  dlno: driver.dlno,
-  address: driver.address.place_name,
-  approval_status: format_approval(driver.approval_status),
-  created_at: new Date(driver.dateOfReg),
-});

@@ -1,5 +1,6 @@
-const config = require("../config/auth.config");
-const db = require("../models");
+const config = require("../config/auth.config"),
+  db = require("../models"),
+  systemError = require("../utils/error.utils");
 const User = db.user;
 const Role = db.role;
 
@@ -7,13 +8,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 exports.signin = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   const admin_role = await Role.findOne({
     name: "admin",
   });
 
   const admin = await User.findOne({
-    email,
+    username,
     role: admin_role._id,
   });
 
@@ -27,23 +28,25 @@ exports.signin = async (req, res) => {
   const valid = bcrypt.compareSync(password, admin.password);
 
   if (!valid) {
-    return res.status(401).json({
-      accessToken: null,
-      message: "Invalid Login Details",
+    let e = systemError.UNAUTHORIZED_ERROR();
+    res.status(e.status).json({
+      accesstoken: null,
+      message: e.message,
     });
+    return;
   }
 
   let token = jwt.sign({ id: user.id }, config.secret, {
     expiresIn: 86400,
   });
 
-  const { _id: id, firstname, lastname, phoneno, email } = user;
+  const { _id: id, firstname, lastname, phoneno, userame } = user;
 
   res.status(200).json({
     id,
     firstname,
     lastname,
-    email,
+    username,
     phoneno,
     role: role.name,
     accessToken: token,
