@@ -12,8 +12,11 @@ const { initializeDB } = require("./utils/initializeDB");
 const { user, orders, mpesa, auth, driver, photos } = require("./routes");
 
 //mongodb connection
-const URI = `mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`,
-  app = express(),
+//const URI = `mongodb://${dbConfig.local.HOST}:${dbConfig.local.PORT}/${dbConfig.local.DB}`,
+const URI = `mongodb+srv://${dbConfig.user}:${dbConfig.password}@aedb.dmvyj.mongodb.net/${dbConfig.db_name}?retryWrites=true&w=majority`,
+
+
+const  app = express(),
   corsOptions = {
     origin: ["http://localhost:3000"],
   };
@@ -33,6 +36,7 @@ app.use(function (_req, res, next) {
     "Access-Control-Allow-Headers",
     "x-access-token, Origin, Content-Type, Accept"
   );
+    res.header("Access-Control-Allow-Origin', '*'");
   next();
 });
 
