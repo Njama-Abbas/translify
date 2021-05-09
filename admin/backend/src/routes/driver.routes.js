@@ -6,7 +6,7 @@ const Router = require("express").Router();
 Router.post(
   "/create",
   [
-    user_sift.checkDuplicateEmail,
+    user_sift.checkDuplicateUserName,
     user_sift.checkDuplicatePhoneNo,
     user_sift.checkRolesExisted,
     driver_sift.checkDuplicateUserId,
@@ -20,7 +20,9 @@ Router.get("/", driverController.fetch);
 
 Router.get("/:id", driverController.get);
 
-Router.put("/:id", driverController.approve);
+Router.post("/approve", driverController.approve);
+
+Router.post("/update_status", driverController.update);
 
 Router.delete("/:id", driverController.delete);
 
