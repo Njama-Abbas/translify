@@ -3,12 +3,10 @@ const DRIVER = db.driver;
 
 module.exports = {
   checkDuplicateUserId: async (req, res, next) => {
-    const {
-      userId
-    } = req.body;
+    const { userId } = req.body;
 
-    const driver = DRIVER.findOne({
-      userId
+    const driver = await DRIVER.findOne({
+      userId,
     });
 
     if (driver) {
@@ -22,12 +20,10 @@ module.exports = {
     next();
   },
   checkDuplicateTruckNo: async (req, res, next) => {
-    const {
-      truckno
-    } = req.body;
+    const { truckno } = req.body;
 
-    const driver = DRIVER.findOne({
-      truckno
+    const driver = await DRIVER.findOne({
+      truckno,
     });
 
     if (driver) {
@@ -41,12 +37,10 @@ module.exports = {
     next();
   },
   checkDuplicateDlno: async (req, res, next) => {
-    const {
-      dlno
-    } = req.body;
+    const { dlno } = req.body;
 
-    const driver = DRIVER.findOne({
-      dlno
+    const driver = await DRIVER.findOne({
+      dlno,
     });
 
     if (driver) {
@@ -57,5 +51,5 @@ module.exports = {
       return;
     }
     next();
-  }
-}
+  },
+};
