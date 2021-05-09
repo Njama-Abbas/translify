@@ -7,10 +7,12 @@ const express = require("express"),
 const dbConfig = require("./config/db.config"),
   db = require("./models");
 
-const URI = `mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`,
+//const URI = `mongodb://${dbConfig.local.HOST}:${dbConfig.local.PORT}/${dbConfig.local.DB}`,
+
+const URI = `mongodb+srv://${dbConfig.user}:${dbConfig.password}@aedb.dmvyj.mongodb.net/${dbConfig.db_name}?retryWrites=true&w=majority`,
   app = express(),
   corsOptions = {
-    origin: ["http://localhost:903"],
+    origin: ["http://192.168.1.114:903"],
   };
 
 app.use(cors(corsOptions));
@@ -24,6 +26,8 @@ app.use(
 );
 
 app.use(function (_req, res, next) {
+  res.header("Access-Control-Expose-Headers", "Content-Range");
+  res.header("Access-Control-Allow-Origin', '*'");
   res.header(
     "Access-Control-Allow-Headers",
     "x-access-token, Origin, Content-Type, Accept"
@@ -42,18 +46,28 @@ db.mongoose
   })
   .catch((err) => {
     console.error("Connection err", err);
-    process.exit;
+    process.exit(1);
   });
 
 /**
  * Handle database errors
  */
 app.use(function handleDatabaseError(error, request, response, next) {
-  if (error instanceof db.mongoose.Error) {
-    return response.status(500).json({
-      type: "MongoError",
-      message: error.message,
-    });
+  if (error instanceof MongoError) {
+    console.log(error.message);
+    if (error.code === 11000) {
+      return response.status(409).json({
+        httpStatus: 409,
+        type: "MongoError",
+        message: error.message,
+      });
+    } else {
+      return response.status(503).json({
+        httpStatus: 503,
+        type: "MongoError",
+        message: error.message,
+      });
+    }
   }
   next(error);
 });
@@ -65,7 +79,8 @@ app.use(function handleDatabaseError(error, request, response, next) {
 app.use("/api/drivers", driver);
 app.use("/api/clients", client);
 app.use("/api/orders", order);
-app.get("/", (_req, res) => res.send("Hello World!"));
+
+app.get("/", (_req, res) => res.send("Hello World! Translify Admin"));
 
 const PORT = process.env.PORT || 901;
 
