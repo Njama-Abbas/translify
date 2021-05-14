@@ -20,5 +20,6 @@
   "homepage": "https://github.com/barakamulumia/translify#readme",
   "devDependencies": {
     "concurrently": "^6.0.0"
-  }
+  },
+  "dependencies": {}
 }
