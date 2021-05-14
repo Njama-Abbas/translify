@@ -1,24 +1,82 @@
-import logo from "./logo.svg";
-import "./App.css";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import { Switch, Route, Redirect } from "react-router-dom";
+import { DataContainer } from "./components/container";
+import { Clients, Drivers, NavBar } from "./components";
+import GlobalStyle from "./Resources/Styles/global";
+import { ToastProvider } from "react-toast-notifications";
+import ScrollToTop from "./components/ScrollToTop";
+import SignIn from "./components/Account/SignIn";
+import { UserAPI } from "./api";
+import { useEffect, useState } from "react";
+
+function Admin({ children }) {
+  const [redirect, setRedirect] = useState(false);
+
+  useEffect(function () {
+    UserAPI.getAdminBoard().then(
+      (response) => {
+        setRedirect(false);
+      },
+      (error) => {
+        setRedirect("/");
+      }
+    );
+  }, []);
+
+  let content;
+  if (redirect) {
+    content = <Redirect to={redirect} />;
+  } else {
+    content = <div>{children}</div>;
+  }
+
+  return content;
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ToastProvider autoDismiss autoDismissTimeout={10000}>
+      <GlobalStyle />
+      <ScrollToTop />
+      <CssBaseline />
+      <Switch>
+        <Route path="/admin/clients" exact>
+          <Admin>
+            <NavBar />
+            <DataContainer>
+              <Clients />
+            </DataContainer>
+          </Admin>
+        </Route>
+        <Route path="/admin/drivers" exact>
+          <Admin>
+            <NavBar />
+            <DataContainer>
+              <Drivers />
+            </DataContainer>
+          </Admin>
+        </Route>
+        <Route path="/admin/settings" exact>
+          <Admin>
+            <NavBar />
+            <DataContainer>
+              <h1>Settings Page</h1>
+            </DataContainer>
+          </Admin>
+        </Route>
+        <Route path={["/admin", "/admin/home"]} exact>
+          <Admin>
+            <NavBar />
+            <DataContainer>
+              <h1>Home Page</h1>
+            </DataContainer>
+          </Admin>
+        </Route>
+        <Route path="/" exact>
+          <SignIn />
+        </Route>
+      </Switch>
+    </ToastProvider>
   );
 }
 

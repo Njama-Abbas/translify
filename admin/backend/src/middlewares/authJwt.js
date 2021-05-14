@@ -40,13 +40,14 @@ const isAdmin = async (req, res, next) => {
 
   const $role = await ROLE.findById(user.role);
 
-  if (!role || $role.name !== "admin") {
+  if (!$role || $role.name !== "admin") {
     res.status(403).json({
       message: `FAILED!
      Require Admin ROLE`,
     });
     return;
   }
+  req.userId = user.id;
   next();
 };
 

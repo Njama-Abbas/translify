@@ -138,7 +138,6 @@ module.exports = {
   async approve(req, res) {
     const { driverId, status } = req.body;
 
-    console.log(driverId);
     let approvedDriver;
     try {
       approvedDriver = await DRIVER.findByIdAndUpdate(
@@ -162,9 +161,7 @@ module.exports = {
   },
   async delete(req, res) {
     const driverId = req.params.id;
-    console.log(driverId);
     const driver = await DRIVER.findById(driverId);
-    console.log(driver);
     if (!driver) {
       let e = systemError.NOT_FOUND_ERROR("Driver");
       res.status(e.status).json({
@@ -199,12 +196,21 @@ module.exports = {
     res.status(204).json({});
   },
   async update(req, res) {
-    const { userId, status } = req.body;
-    console.log(userId);
+    const { id, status } = req.body;
+    const driver = await DRIVER.findById(id);
+
+    if (!driver) {
+      let e = systemError.NOT_FOUND_ERROR("User");
+      res.status(e.status).json({
+        message: e.message,
+      });
+      return;
+    }
+
     let updatedUser;
     try {
       updatedUser = await USER.findByIdAndUpdate(
-        userId,
+        driver.userId,
         {
           account_status: status,
         },
@@ -225,7 +231,7 @@ module.exports = {
       });
       return;
     }
-    const role = await ROLE.findById(updatedUser.role);
-    res.status(200).json(composeUserResponseObj(updatedUser, role));
+
+    res.status(200).json(composeDriverResponseObj(driver, updatedUser));
   },
 };

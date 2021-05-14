@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { client, driver, order } = require("./routes");
+const { client, driver, order, user, auth, photo } = require("./routes");
 
 const express = require("express"),
   bodyParser = require("body-parser"),
@@ -7,12 +7,11 @@ const express = require("express"),
 const dbConfig = require("./config/db.config"),
   db = require("./models");
 
-//const URI = `mongodb://${dbConfig.local.HOST}:${dbConfig.local.PORT}/${dbConfig.local.DB}`,
-
-const URI = `mongodb+srv://${dbConfig.user}:${dbConfig.password}@aedb.dmvyj.mongodb.net/${dbConfig.db_name}?retryWrites=true&w=majority`,
+const URI = `mongodb://${dbConfig.local.HOST}:${dbConfig.local.PORT}/${dbConfig.local.DB}`,
+  // const URI = `mongodb+srv://${dbConfig.user}:${dbConfig.password}@aedb.dmvyj.mongodb.net/${dbConfig.db_name}?retryWrites=true&w=majority`,
   app = express(),
   corsOptions = {
-    origin: ["http://192.168.1.114:903"],
+    origin: ["http://localhost:903"],
   };
 
 app.use(cors(corsOptions));
@@ -79,7 +78,9 @@ app.use(function handleDatabaseError(error, request, response, next) {
 app.use("/api/drivers", driver);
 app.use("/api/clients", client);
 app.use("/api/orders", order);
-
+app.use("/api/user", user);
+app.use("/api/auth", auth);
+app.use("/api/photos", photo);
 app.get("/", (_req, res) => res.send("Hello World! Translify Admin"));
 
 const PORT = process.env.PORT || 901;
