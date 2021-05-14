@@ -294,7 +294,21 @@ module.exports = {
 
     res.status(204);
   },
+  async accountBalance(req, res) {
+    const id = req.headers.userid;
+    const user = await USER.findById(id);
+    if (!user) {
+      let e = systemError.NOT_FOUND_ERROR("user");
+      res.status(e.status).json({
+        message: e.message,
+      });
+      return;
+    }
 
+    res.status(200).json({
+      account_balance: user.account_balance,
+    });
+  },
   sendPasswordChangeAuthCode: async (req, res) => {
     const { userId, currentPassword } = req.body;
     const user = await USER.findById(userId);

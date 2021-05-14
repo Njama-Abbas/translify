@@ -19,6 +19,8 @@ Router.post("/verify-account", AuthController.verify);
 
 Router.post("/resend-vcode", AuthController.resendVerificationCode);
 
+Router.get("/acc_balance", AuthController.accountBalance);
+
 Router.put("/update-info", AuthController.updateInfo);
 
 Router.post("/change-password-auth", AuthController.sendPasswordChangeAuthCode);

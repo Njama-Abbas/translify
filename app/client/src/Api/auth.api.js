@@ -92,6 +92,13 @@ class AuthAPI {
       newPassword,
     });
   }
+  getAccountBalance(userid) {
+    return axios.get(API_URL + "acc_balance", {
+      headers: {
+        userid,
+      },
+    });
+  }
 }
 
 export default new AuthAPI();
