@@ -10,6 +10,7 @@ import {
 } from "../../../State/orders.slice";
 
 import Grid from "@material-ui/core/Grid";
+import TrackOrderDialog from "../../MapView";
 const OrderItem = ({ order, user }) => {
   const formatMoveType = (moveType) =>
     moveType === "hm"
@@ -95,6 +96,19 @@ const OrderItem = ({ order, user }) => {
                   complete
                 </Button>
               </Grid>
+            ) : order.status === "in-progress" && user.role === "client" ? (
+              <TrackOrderDialog
+                directions={{
+                  origin: {
+                    lat: order.pickup.latlng.lat,
+                    lng: order.pickup.latlng.lng,
+                  },
+                  destination: {
+                    lat: order.destination.latlng.lat,
+                    lng: order.destination.latlng.lat,
+                  },
+                }}
+              />
             ) : null}
 
             <Grid item>

@@ -33,6 +33,8 @@ import {
   SortControlsContainer,
   SortText,
 } from "./elements";
+import Analytics from "./Analytics";
+import OrderAnalysis from "../../Resources/Utils/analytics";
 
 const Orders = ({ user }) => {
   const dispatch = useDispatch();
@@ -56,6 +58,22 @@ const Orders = ({ user }) => {
       dispatch(fetchOrders());
     }
   }, [dispatch, order_status]);
+
+  // useEffect(() => {
+  //   let regularFecth;
+  //   try {
+  //     regularFecth = setInterval(async () => {
+  //       dispatch(fetchOrders());
+  //     }, 10000);
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  //   return () => {
+  //     if (regularFecth) {
+  //       clearInterval(regularFecth);
+  //     }
+  //   };
+  // }, [dispatch]);
 
   let content;
 
@@ -100,6 +118,11 @@ const Orders = ({ user }) => {
         <Grid container direction="column">
           <Grid item xs={12}>
             <OrderCardHeader>My Transits</OrderCardHeader>
+          </Grid>
+          <Grid item xs={12}>
+            {allOrders.length && (
+              <Analytics data={OrderAnalysis(allOrders, user.role)} />
+            )}
           </Grid>
           <Grid item>
             <OrderCardContainer>
