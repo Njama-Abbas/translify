@@ -42,13 +42,22 @@ export default function Profile() {
         {userReady ? (
           <ImageBgContainer>
             <GreetingLine>
-              {/**to be determined by current time */}
-              Greetings&nbsp;&nbsp;{currentUser.firstname}
+              Hello, &nbsp;{currentUser.firstname} &nbsp;
+              {currentUser.lastname}
             </GreetingLine>
-            <ProfilePhoto />
-            <Grid container spacing={2} justify="center">
-              <PersonalDetails user={currentUser} setLoading={handleLoading} />
-              <PersonalActions user={currentUser} />
+            <Grid container spacing={2} justify="center" alignContent="center">
+              <Grid item md={6} sm={12}>
+                <ProfilePhoto />
+              </Grid>
+              <Grid item md={6} sm={12}>
+                <Grid container spacing={2} justify="center" direction="column">
+                  <PersonalDetails
+                    user={currentUser}
+                    setLoading={handleLoading}
+                  />
+                  <PersonalActions user={currentUser} />
+                </Grid>
+              </Grid>
             </Grid>
           </ImageBgContainer>
         ) : null}

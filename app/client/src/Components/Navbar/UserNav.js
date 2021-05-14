@@ -12,7 +12,9 @@ import {
   NameTag,
 } from "./UserNav.elements";
 
-import { MdAccountCircle, MdVerifiedUser, MdLock } from "react-icons/md";
+import { MdAccountCircle } from "react-icons/md";
+import { FaPowerOff, FaUserAlt } from "react-icons/fa";
+
 import { BsThreeDotsVertical } from "react-icons/bs";
 import DutySwitch from "../DutySwitch";
 const useStyles = makeStyles((theme) => ({
@@ -103,9 +105,9 @@ export default function UserNav({ user, logOutCallBack }) {
       className={classes.profmenu}
     >
       <MenuItem onClick={handleMenuClose}>
-        <NavLink primary to={`/client/profile`}>
+        <NavLink primary to={`/${user.role}/profile`}>
           <IconButton color="inherit">
-            <MdVerifiedUser />
+            <FaUserAlt />
           </IconButton>
           <p>Profile</p>
         </NavLink>
@@ -117,7 +119,7 @@ export default function UserNav({ user, logOutCallBack }) {
           onClick={(e) => e.preventDefault()}
         >
           <IconButton color="inherit">
-            <MdLock />
+            <FaPowerOff />
           </IconButton>
           <p>Log out</p>
         </NavLink>
@@ -170,12 +172,6 @@ export default function UserNav({ user, logOutCallBack }) {
               <NavLink to={`/client/order-truck`}>Order</NavLink>
             )}
           </div>
-          <div>
-            {user.role === "driver" && (
-              <NavLink to={`/driver/orders-list`}>Transits</NavLink>
-            )}
-          </div>
-
           <div className={classes.sectionDesktop}>
             <IconButton
               edge="end"

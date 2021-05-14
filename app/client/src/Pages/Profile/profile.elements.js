@@ -5,6 +5,6 @@ export const GreetingLine = styled.h3`
   line-height: 48px;
   text-align: center;
   text-transform: capitalize;
-  color: #810101;
+  color: #ddd;
   padding: 8px;
 `;

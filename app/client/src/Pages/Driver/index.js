@@ -94,44 +94,6 @@ export default function Driver() {
                     logOutCallBack={logOutCallBack}
                   />
                 ) : approval_status === "A" && account_status === "ACTIVE" ? (
-                  <div>
-                    <Container>
-                      <Navbar />
-                    </Container>
-                    <p>Comming soon</p>
-                  </div>
-                ) : approval_status === "D" && account_status === "ACTIVE" ? (
-                  <MessageDisplay
-                    message="We regret to notify you that your registration has been denied please try again after a period of 3 months"
-                    logOutCallBack={logOutCallBack}
-                  />
-                ) : approval_status === "P" && account_status === "ACTIVE" ? (
-                  <MessageDisplay
-                    message="Registration successful pending approval please wait ..."
-                    logOutCallBack={logOutCallBack}
-                  />
-                ) : (
-                  <PageContainer
-                    container
-                    justify="center"
-                    alignContent="center"
-                  >
-                    <Grid item xs={12} sm={6} md={6}>
-                      <DriverRegistrationForm USER_ID={user.userId} />
-                    </Grid>
-                  </PageContainer>
-                )}
-              </Box>
-            </Route>
-
-            <Route path={`${path}/orders-list`} exact>
-              <Box container justify="space-between">
-                {account_status === "SUSPENDED" ? (
-                  <MessageDisplay
-                    message="We regret to notify you that your Account has been suspended please contact the adminstration for more information"
-                    logOutCallBack={logOutCallBack}
-                  />
-                ) : approval_status === "A" && account_status === "ACTIVE" ? (
                   <Container>
                     <Navbar />
                     <OrderList user={user} />
