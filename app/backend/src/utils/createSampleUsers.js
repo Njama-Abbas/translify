@@ -108,6 +108,10 @@ exports.createSampleUsers = function () {
         password: bcrypt.hashSync("123Asd", 10),
         role: admin_role._id,
         account_balance: 100000,
+        verification: {
+          status: true,
+          code: 10011001,
+        },
       });
       await sample_admin.save();
       console.log("Default 'ADMIN' created");
