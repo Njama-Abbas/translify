@@ -19,6 +19,9 @@ import {
 
 import { Form, SubmitButton, FormPaper, FormAvatar } from "../Account/elements";
 import { Label } from "./elements";
+import Glitch from "../../Resources/Utils/error";
+import { useToasts } from "react-toast-notifications";
+import { RenderErrorMessage } from "../Error/Validation";
 
 export default function DriverRegistration({ USER_ID }) {
   const [truckno, setTruckNo] = useState("");
@@ -32,35 +35,46 @@ export default function DriverRegistration({ USER_ID }) {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState("");
 
+  const removeMessage = () => {
+    setMessage("");
+  };
+
   const handleSelect = async (selectedAddress) => {
     const results = await geocodeByAddress(selectedAddress);
     setPlaceId(results[0].place_id);
     setPlaceName(results[0].formatted_address);
   };
-
+  const { addToast } = useToasts();
   const onSubmit = (e) => {
     e.preventDefault();
     // setLoading(true);
     DriverAPI.complete_registration(USER_ID, truckno, dlno, {
       place_name,
       place_id,
-    }).then(
-      (response) => {
-        setMessage(response.data.message);
+    })
+      .then(
+        (response) => {
+          setMessage(response.data.message);
+          setLoading(false);
+          window.location.reload(false);
+        },
+        (error) => {
+          const errorMessage = Glitch.message(error);
+          if (error.response && error.response.status === 409) {
+            addToast(errorMessage, {
+              appearance: "error",
+            });
+            setMessage(errorMessage);
+          } else {
+            addToast(errorMessage, {
+              appearance: "error",
+            });
+          }
+        }
+      )
+      .finally(() => {
         setLoading(false);
-        window.location.reload(false);
-      },
-      (error) => {
-        setMessage(
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-            error.message ||
-            error.toString()
-        );
-        setLoading(false);
-      }
-    );
+      });
   };
 
   return (
@@ -91,7 +105,10 @@ export default function DriverRegistration({ USER_ID }) {
                 label="Truck No"
                 name="truckno"
                 autoComplete="truckno"
-                onChange={(e) => setTruckNo(e.target.value)}
+                onChange={(e) => {
+                  setTruckNo(e.target.value);
+                  removeMessage();
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -110,7 +127,10 @@ export default function DriverRegistration({ USER_ID }) {
                 label="Driving Licence"
                 name="dlno"
                 autoComplete="dlno"
-                onChange={(e) => setDlNo(e.target.value)}
+                onChange={(e) => {
+                  setDlNo(e.target.value);
+                  removeMessage();
+                }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -174,8 +194,8 @@ export default function DriverRegistration({ USER_ID }) {
           <SubmitButton type="submit" secondary disabled={loading}>
             Finish
           </SubmitButton>
+          {message && <RenderErrorMessage msg={message} />}
           <br />
-          <p>{message ? message : ""}</p>
           <br />
         </Form>
       </FormPaper>

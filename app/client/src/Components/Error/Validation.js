@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 
 import { ErrorMessage } from "./validation.elements";
 
-const RenderErrorMessage = ({ msg }) => (
+export const RenderErrorMessage = ({ msg }) => (
   <ErrorMessage variant="caption">{msg}</ErrorMessage>
 );
 

@@ -5,7 +5,7 @@ import { useToasts } from "react-toast-notifications";
 import { AuthAPI } from "../../Api";
 import { useDispatch } from "react-redux";
 import { userSet } from "../../State/user.slice";
-
+import Glitch from "../../Resources/Utils/error";
 import {
   MdLockOutline,
   MdVisibility,
@@ -33,7 +33,7 @@ import {
   FormContainer,
 } from "./elements";
 
-import ValidationError from "../Error/Validation";
+import ValidationError, { RenderErrorMessage } from "../Error/Validation";
 import ValidationPatterns from "../../Resources/Patterns/validation";
 import LoadingComponent from "../LoadingComponent";
 
@@ -41,7 +41,7 @@ export default function SignUp({ route }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const { addToast } = useToasts();
-
+  const [message, setMessage] = useState("");
   const { register, handleSubmit, errors } = useForm({
     reValidateMode: "onChange",
     mode: "onBlur",
@@ -58,7 +58,9 @@ export default function SignUp({ route }) {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
+  const handleChange = () => {
+    setMessage("");
+  };
   const role = route;
   const onSubmit = (user) => {
     const { firstname, lastname, phoneno, username, password } = user;
@@ -83,12 +85,10 @@ export default function SignUp({ route }) {
         history.push(`/verify-account`);
       },
       (error) => {
-        const resMessage =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
+        const resMessage = Glitch.message(error);
+        if (error.response && error.response.status === 409) {
+          setMessage(resMessage);
+        }
         addToast(resMessage, { appearance: "error" });
         setIsLoading(false);
       }
@@ -120,6 +120,7 @@ export default function SignUp({ route }) {
                       minLength: 4,
                     })}
                     autoComplete="fname"
+                    onChange={handleChange}
                     name="firstname"
                     variant="outlined"
                     required
@@ -142,6 +143,7 @@ export default function SignUp({ route }) {
                       pattern: ValidationPatterns.name,
                       minLength: 4,
                     })}
+                    onChange={handleChange}
                     variant="outlined"
                     fullWidth
                     required
@@ -164,6 +166,7 @@ export default function SignUp({ route }) {
                       required: true,
                       pattern: /^[a-z0-9_-]{3,16}$/gi,
                     })}
+                    onChange={handleChange}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -195,6 +198,7 @@ export default function SignUp({ route }) {
                       required: true,
                       pattern: ValidationPatterns.phoneno,
                     })}
+                    onChange={handleChange}
                     name="phoneno"
                     label="Phoneno"
                     type="number"
@@ -223,6 +227,7 @@ export default function SignUp({ route }) {
                       required: true,
                       pattern: ValidationPatterns.password,
                     })}
+                    onChange={handleChange}
                     placeholder=" e.g 123Asd"
                     InputProps={{
                       startAdornment: (
@@ -267,6 +272,7 @@ export default function SignUp({ route }) {
               <SubmitButton type="submit" secondary>
                 Continue
               </SubmitButton>
+              {message && <RenderErrorMessage msg={message} />}
               <br />
               <br />
               <Grid container justify="flex-end">

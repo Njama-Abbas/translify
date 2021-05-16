@@ -34,7 +34,7 @@ import {
   FormContainer,
 } from "./elements";
 
-import ValidationError from "../Error/Validation";
+import ValidationError, { RenderErrorMessage } from "../Error/Validation";
 import LoadingComponent from "../LoadingComponent";
 
 export default function SignUp({ route }) {
@@ -49,6 +49,7 @@ export default function SignUp({ route }) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setLoading] = useState("");
   const [redirect, setRedirect] = useState(null);
+  const [message, setMessage] = useState("");
 
   const handleShowPassword = () => {
     setShowPassword((prevState) => {
@@ -60,6 +61,9 @@ export default function SignUp({ route }) {
     event.preventDefault();
   };
 
+  const handleChange = () => {
+    setMessage("");
+  };
   const role = route;
 
   const onSubmit = (user) => {
@@ -80,21 +84,31 @@ export default function SignUp({ route }) {
       },
 
       (error) => {
-        if (error.response.status && error.response.status === 401) {
-          //unverified
-          const { UID, phoneno, message } = error.response.data;
-          dispatch(
-            userSet({
-              UID,
-              phoneno,
-              verified: false,
-            })
-          );
-          addToast(message, {
-            appearance: "warning",
-          });
-          // redirect to verification page
-          setRedirect("/verify-account");
+        if (error.response) {
+          if (error.response.status === 401) {
+            //unverified
+            const { UID, phoneno, message } = error.response.data;
+            dispatch(
+              userSet({
+                UID,
+                phoneno,
+                verified: false,
+              })
+            );
+            addToast(message, {
+              appearance: "warning",
+            });
+            // redirect to verification page
+            setRedirect("/verify-account");
+          } else if (
+            error.response.status === 403 ||
+            error.response.status === 404
+          ) {
+            addToast("You entered wrong credentials", {
+              appearance: "error",
+            });
+            setMessage("Password or Username is Incorrect");
+          }
         } else {
           const ErrorMessage = Glitch.message(error);
           addToast(ErrorMessage, {
@@ -140,6 +154,7 @@ export default function SignUp({ route }) {
                     }}
                     variant="outlined"
                     required
+                    onChange={handleChange}
                     fullWidth
                     id="username"
                     label="Username / Phone-No"
@@ -167,6 +182,7 @@ export default function SignUp({ route }) {
                     type={showPassword ? "text" : "password"}
                     id="password"
                     autoComplete="password"
+                    onChange={handleChange}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -196,6 +212,7 @@ export default function SignUp({ route }) {
               <SubmitButton type="submit" secondary disabled={isLoading}>
                 Continue
               </SubmitButton>
+              {message && <RenderErrorMessage msg={message} />}
               <br />
               <br />
               <Grid container justify="flex-end">

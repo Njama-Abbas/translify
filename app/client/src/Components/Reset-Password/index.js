@@ -49,7 +49,9 @@ export default function ResetPassword() {
     reValidateMode: "onChange",
     mode: "onBlur",
   });
-
+  const handleChange = () => {
+    setMessage("");
+  };
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState("");
 
@@ -66,7 +68,7 @@ export default function ResetPassword() {
     const { auth_code, password_y, password_x } = formData;
     let newPassword = null;
     if (password_y !== password_x) {
-      setMessage("Passwords Did not match");
+      setMessage("Passwords Do not match");
     } else {
       setIsLoading(true);
       newPassword = password_y;
@@ -83,13 +85,18 @@ export default function ResetPassword() {
           setRedirect(`/${user.role}/sign-in`);
         })
         .catch((error) => {
+          console.log(error);
+          if (error.response) {
+            if (error.response.status === 403) {
+              setMessage(Glitch.message(error));
+            }
+          }
           addToast(Glitch.message(error), {
             appearance: "error",
           });
         })
         .finally(() => {
           setIsLoading(false);
-          setMessage("");
         });
     }
     setIsLoading(false);
@@ -125,6 +132,7 @@ export default function ResetPassword() {
                       minLength: 8,
                     })}
                     name="auth_code"
+                    onChange={handleChange}
                     label="Short-Code"
                     type="number"
                     id="auth_code"
@@ -155,6 +163,7 @@ export default function ResetPassword() {
                     placeholder=" e.g 123Asd"
                     variant="outlined"
                     required
+                    onChange={handleChange}
                     fullWidth
                     name="password_y"
                     label="Enter New Password"
@@ -198,6 +207,7 @@ export default function ResetPassword() {
                       pattern: ValidationPatterns.password,
                     })}
                     placeholder=" e.g 123Asd"
+                    onChange={handleChange}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -235,13 +245,15 @@ export default function ResetPassword() {
                     patternErrorMsg="Password must be 6 to 20 characters which contain at least one numeric digit, one uppercase and one lowercase letter"
                     requiredErrorMsg="Password is Required"
                   />
-                  {message && <ErrorMessage>{message}</ErrorMessage>}
                 </Grid>
               </Grid>
               <br />
               <SubmitButton type="submit" secondary>
                 Continue
               </SubmitButton>
+              {message && <ErrorMessage>{message}</ErrorMessage>}
+              <br />
+              <br />
             </Form>
           </FormPaper>
         </Container>
