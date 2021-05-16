@@ -113,6 +113,7 @@ module.exports = {
         if (driver) {
           return {
             id: driver._id,
+            userId: user._id,
             firstname: user.firstname,
             lastname: user.lastname,
             phoneno: user.phoneno,

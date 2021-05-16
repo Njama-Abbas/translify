@@ -115,7 +115,7 @@ export default function Driver() {
                     alignContent="center"
                   >
                     <Grid item xs={12} sm={6} md={6}>
-                      <DriverRegistrationForm USER_ID={user.userId} />
+                      <DriverRegistrationForm USER_ID={user.id} />
                     </Grid>
                   </PageContainer>
                 )}
