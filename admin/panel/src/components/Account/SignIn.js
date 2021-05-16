@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, Redirect, useHistory } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import Glitch from "../../Resources/Utils/error";
 import { AuthAPI } from "../../api";
@@ -42,7 +42,7 @@ export default function SignIn() {
     reValidateMode: "onChange",
     mode: "onBlur",
   });
-  const history = useHistory();
+  // const history = useHistory();
   const dispatch = useDispatch();
   const { addToast } = useToasts();
 

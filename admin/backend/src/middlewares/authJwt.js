@@ -15,7 +15,7 @@ const verifyToken = (req, res, next) => {
     });
   }
 
-  jwt.verify(token, config.secret, (err, decoded) => {
+  jwt.verify(token, config.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).json({
         message: `FAILED!

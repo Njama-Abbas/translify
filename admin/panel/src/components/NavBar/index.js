@@ -10,6 +10,9 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { MdMenu, MdSearch, MdMore, MdNotifications } from "react-icons/md";
+import { useSelector } from "react-redux";
+import { selectPending } from "../../state/driver.slice";
+import { NavLink } from "./elements";
 import Drawer from "./drawer";
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -92,7 +95,7 @@ export default function PrimarySearchAppBar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  const pending = useSelector(selectPending);
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -123,12 +126,14 @@ export default function PrimarySearchAppBar() {
       }}
     >
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
-            <MdNotifications />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
+        <NavLink to="/admin/pending-approvals">
+          <IconButton aria-label="show  new notifications" color="inherit">
+            <Badge badgeContent={pending.length} color="secondary">
+              <MdNotifications />
+            </Badge>
+          </IconButton>
+          <p>Notifications</p>
+        </NavLink>
       </MenuItem>
     </Menu>
   );
@@ -164,11 +169,18 @@ export default function PrimarySearchAppBar() {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="secondary">
-                <MdNotifications />
-              </Badge>
-            </IconButton>
+            <NavLink
+              to="/admin/pending-approvals"
+              style={{
+                color: "white",
+              }}
+            >
+              <IconButton aria-label="show new notifications" color="inherit">
+                <Badge badgeContent={pending.length} color="secondary">
+                  <MdNotifications />
+                </Badge>
+              </IconButton>
+            </NavLink>
           </div>
           <div className={classes.sectionMobile}>
             <IconButton

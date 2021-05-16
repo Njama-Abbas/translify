@@ -7,6 +7,15 @@ const initialState = {
   error: null,
 };
 
+const sort_ = (a, b) =>
+  a.approval_status < b.approval_status
+    ? 1
+    : a.approval_status > b.approval_status
+    ? -1
+    : 0;
+
+const PendingFirst = (arr) => arr.sort(sort_);
+
 export const fetchDrivers = createAsyncThunk("/drivers/fetch", async () => {
   let response = await DriverAPI.fetch();
   return response.data;
@@ -43,7 +52,7 @@ const driverSlice = createSlice({
     },
     [fetchDrivers.fulfilled]: (state, action) => {
       state.status = "succeeded";
-      state.list = action.payload;
+      state.list = PendingFirst(action.payload);
     },
     [fetchDrivers.rejected]: (state, action) => {
       state.status = "failed";
@@ -68,7 +77,7 @@ const driverSlice = createSlice({
       const new_list = state.list.filter(
         (driver) => driver.id !== action.payload
       );
-      state.list = new_list;
+      state.list = PendingFirst(new_list);
       state.status = "succeeded";
     },
     [changeApprovalStatus.pending]: (state, action) => {
@@ -85,5 +94,8 @@ const driverSlice = createSlice({
     },
   },
 });
+
+export const selectPending = (state) =>
+  state.drivers.list.filter((x) => x.approval_status === "Pending");
 
 export default driverSlice.reducer;

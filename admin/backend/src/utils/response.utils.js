@@ -18,7 +18,16 @@ module.exports = {
       account_status: user.account_status,
     };
   },
-
+  composeAdminResponseObj(user, role) {
+    return {
+      username: user.username,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      phoneno: user.phoneno,
+      role: role.name,
+      id: user.id,
+    };
+  },
   /**
    *
    * @param {[]} orders

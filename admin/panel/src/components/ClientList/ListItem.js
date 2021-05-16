@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
-import { MdImage } from "react-icons/md";
+import IMG from "../../Resources/Images/undraw_profile_pic.svg";
 import { DataItem, ListRow } from "./elements";
 import { ChangeStatusButton, DeleteButton } from "../controls";
 import { useDispatch } from "react-redux";
 import { updateStatus, deleteUser } from "../../state/cliets.slice";
-
+import { PhotoAPI } from "../../api";
 export default function ListItem({
   username,
   phoneno,
@@ -15,6 +15,17 @@ export default function ListItem({
   id,
 }) {
   const dispatch = useDispatch();
+  const [profileImageId, setProfileImageId] = useState(null);
+  useEffect(() => {
+    PhotoAPI.getProfileID(id).then(
+      (response) => {
+        setProfileImageId(response.data.photo_id);
+      },
+      (error) => {
+        setProfileImageId(null);
+      }
+    );
+  }, [id]);
 
   const handleStatusChange = () => {
     dispatch(
@@ -32,9 +43,13 @@ export default function ListItem({
   return (
     <ListRow>
       <ListItemAvatar>
-        <Avatar>
-          <MdImage />
-        </Avatar>
+        <Avatar
+          src={
+            profileImageId
+              ? `http://localhost:901/api/photos/${profileImageId}`
+              : IMG
+          }
+        ></Avatar>
       </ListItemAvatar>
       <DataItem>{username}</DataItem>
       <DataItem>{phoneno}</DataItem>

@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
-import { MdImage, MdCancel, MdPlaylistAddCheck } from "react-icons/md";
+import { MdCancel, MdPlaylistAddCheck } from "react-icons/md";
 import { DataItem, ListRow } from "../ClientList/elements";
 import { useDispatch } from "react-redux";
 import {
@@ -9,25 +9,36 @@ import {
   deleteDriver,
   changeApprovalStatus,
 } from "../../state/driver.slice";
-
+import IMG from "../../Resources/Images/undraw_profile_pic.svg";
 import {
   ApproveButton,
   ChangeStatusButton,
   DeclineButton,
   DeleteButton,
 } from "../controls";
-
+import { PhotoAPI } from "../../api";
 export default function ListItem({
   username,
   rating,
   account_status,
   id,
+  userId,
   dlno,
   approval_status,
   truckno,
 }) {
   const dispatch = useDispatch();
-
+  const [profileImageId, setProfileImageId] = useState(null);
+  useEffect(() => {
+    PhotoAPI.getProfileID(userId).then(
+      (response) => {
+        setProfileImageId(response.data.photo_id);
+      },
+      (error) => {
+        setProfileImageId(null);
+      }
+    );
+  }, [userId]);
   const handleStatusChange = () => {
     dispatch(
       updateStatus({
@@ -61,9 +72,13 @@ export default function ListItem({
   return (
     <ListRow cols={10}>
       <ListItemAvatar>
-        <Avatar>
-          <MdImage />
-        </Avatar>
+        <Avatar
+          src={
+            profileImageId
+              ? `http://localhost:901/api/photos/${profileImageId}`
+              : IMG
+          }
+        ></Avatar>
       </ListItemAvatar>
       <DataItem>{username}</DataItem>
       <DataItem>{dlno}</DataItem>
