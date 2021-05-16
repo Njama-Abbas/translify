@@ -671,11 +671,6 @@ gauge@~2.7.3:
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
 
-generate-sms-verification-code@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/generate-sms-verification-code/-/generate-sms-verification-code-1.0.5.tgz#491bdad6195cfe002543548cc01e79552bde99bb"
-  integrity sha512-0dDejJxK60bs+5P5PfSyo9PvHSpjvnYb8if8FBEOFVycDJs3OSByc2JOrkJOGVLTjIMdvLqQv5/aesQlvYPQ7w==
-
 get-intrinsic@^1.0.2:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/get-intrinsic/-/get-intrinsic-1.1.1.tgz#15f59f376f855c446963948f0d24cd3637b4abc6"

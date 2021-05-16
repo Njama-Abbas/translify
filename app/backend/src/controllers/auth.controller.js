@@ -339,9 +339,13 @@ module.exports = {
     //valid change password
     let updatedUser;
     try {
-      updatedUser = await USER.findByIdAndUpdate(user._id, {
-        password: bcrypt.hashSync(newPassword, 10),
-      });
+      updatedUser = await USER.findByIdAndUpdate(
+        user._id,
+        {
+          password: bcrypt.hashSync(newPassword, 10),
+        },
+        { new: true }
+      );
       await updatedUser.save();
     } catch (error) {
       res.status(500).json({
@@ -441,14 +445,17 @@ module.exports = {
     let $user;
     //change the existing verification code in the database;
     try {
-      $user = await USER.findByIdAndUpdate(user._id, {
-        password: bcrypt.hashSync(newPassword, 10),
-        verification: {
-          code: generated_code,
-          status: true,
+      $user = await USER.findByIdAndUpdate(
+        user._id,
+        {
+          password: bcrypt.hashSync(newPassword, 10),
+          verification: {
+            code: generated_code,
+            status: true,
+          },
         },
-      });
-      await $user.save();
+        { new: true }
+      );
     } catch (error) {
       let e = systemError.UPDATE_ERROR("user");
       res.status(e.status).json({
