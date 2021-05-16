@@ -61,19 +61,19 @@ module.exports = {
     const user = await new_user.save();
 
     //send verification text message
-    // let sms = await sendText(
-    //   user.phoneno,
-    //   `Auth-Code: ${user.verification.code}`
-    // );
+    let sms = await sendText(
+      user.phoneno,
+      `Auth-Code: ${user.verification.code}`
+    );
 
-    // if (!sms.message || sms.error) {
-    //   let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
-    //   res.status(e.status).json({
-    //     message: e.message,
-    //     error: sms.error,
-    //   });
-    //   return;
-    // }
+    if (!sms.message || sms.error) {
+      let e = IN_ERR.TWILIO_ERROR(sms.error.status || 401);
+      res.status(e.status).json({
+        message: e.message,
+        error: sms.error,
+      });
+      return;
+    }
 
     res.status(201).json({
       UID: user._id,
@@ -190,6 +190,7 @@ module.exports = {
       res.status(e.status).json({
         message: e.message,
       });
+      return;
     }
 
     //decrypt and validate password
@@ -197,7 +198,7 @@ module.exports = {
 
     if (!valid) {
       let e = systemError.UNAUTHORIZED_ERROR();
-      res.status(e.status).json({
+      res.status(403).json({
         accessToken: null,
         message: e.message,
       });
@@ -292,7 +293,7 @@ module.exports = {
       return;
     }
 
-    res.status(204);
+    res.status(200).json({});
   },
   async accountBalance(req, res) {
     const id = req.headers.userid;
@@ -309,8 +310,10 @@ module.exports = {
       account_balance: user.account_balance,
     });
   },
-  sendPasswordChangeAuthCode: async (req, res) => {
-    const { userId, currentPassword } = req.body;
+
+  changePassword: async (req, res) => {
+    const { userId, currentPassword, newPassword } = req.body;
+
     const user = await USER.findById(userId);
 
     if (!user) {
@@ -320,7 +323,6 @@ module.exports = {
       });
       return;
     }
-
     //validate current password
     const valid = bcrypt.compareSync(currentPassword, user.password);
 
@@ -334,85 +336,11 @@ module.exports = {
       return;
     }
 
-    //valid generate sms verification code
-    const generated_code = phoneToken(8, {
-      type: "number",
-    });
-
-    //change the existing verification code in the database;
-    let $user;
-    try {
-      $user = await USER.findByIdAndUpdate(
-        user._id,
-        {
-          verification: {
-            code: generated_code,
-            status: true,
-          },
-        },
-        { new: true }
-      );
-    } catch (error) {
-      let e = systemError.UPDATE_ERROR("user");
-      res.status(e.status).json({
-        message: e.message,
-        error,
-      });
-      return;
-    }
-
-    //send verification text message
-    let sms = await sendText(
-      $user.phoneno,
-      `Auth-Code: ${$user.verification.code}`
-    );
-
-    if (!sms.message || sms.error) {
-      let e = systemError.TWILIO_ERROR(sms.error.status || 401);
-      res.status(e.status).json({
-        message: e.message,
-        error: sms.error,
-      });
-      return;
-    }
-    res.status(204);
-  },
-
-  changePassword: async (req, res) => {
-    const { newPassword, userId, v_code } = req.body;
-
-    const user = await USER.findById(userId);
-
-    if (!user) {
-      let e = systemError.NOT_FOUND_ERROR("user");
-      res.status(e.status).json({
-        message: e.message,
-      });
-      return;
-    }
-
-    //validate verification code
-    if (user.verification.code !== Number(v_code)) {
-      let e = res.status(401).json({
-        message: `FAILED!
-        You entered the Wrong verification code`,
-      });
-      return;
-    }
-
-    const generated_code = phoneToken(8, {
-      type: "number",
-    });
-
     //valid change password
     let updatedUser;
     try {
       updatedUser = await USER.findByIdAndUpdate(user._id, {
         password: bcrypt.hashSync(newPassword, 10),
-        verification: {
-          code: generated_code,
-          status: true,
-        },
       });
       await updatedUser.save();
     } catch (error) {
@@ -423,8 +351,7 @@ module.exports = {
       });
       return;
     }
-
-    res.status(204);
+    res.status(204).json({});
   },
   sendPasswordResetAuthCode: async (req, res) => {
     const { phoneno } = req.body;
@@ -449,13 +376,16 @@ module.exports = {
     //change the existing verification code in the database;
     let $user;
     try {
-      $user = await USER.findByIdAndUpdate(user._id, {
-        verification: {
-          code: generated_code,
-          status: false,
+      $user = await USER.findByIdAndUpdate(
+        user._id,
+        {
+          verification: {
+            code: generated_code,
+            status: false,
+          },
         },
-      });
-      await $user.save();
+        { new: true }
+      );
     } catch (error) {
       res.status(500).json({
         message: `FAILED!
@@ -464,8 +394,25 @@ module.exports = {
       });
       return;
     }
-    res.status(204);
+    //send verification text message
+    let sms = await sendText(
+      $user.phoneno,
+      `Auth-Code: ${$user.verification.code}`
+    );
+
+    if (!sms.message || sms.error) {
+      let e = systemError.TWILIO_ERROR(sms.error.status || 401);
+      res.status(e.status).json({
+        message: e.message,
+        error: sms.error,
+      });
+      return;
+    }
+
+    const role = await ROLE.findById($user.role);
+    res.status(200).json(composeUserResponseObj($user, role));
   },
+
   resetPassword: async (req, res) => {
     const { userId, auth_code, newPassword } = req.body;
     const user = await USER.findById(userId);
@@ -510,6 +457,7 @@ module.exports = {
       });
       return;
     }
-    res.status(204);
+    const role = await ROLE.findById($user.role);
+    res.status(200).json(composeUserResponseObj($user, role));
   },
 };

@@ -1,6 +1,7 @@
 const db = require("../models"),
   sms = require("../utils/sms.utils");
-
+const { sendText } = require("../utils/sms.utils");
+const systemError = require("../utils/error.utils");
 const {
   composeOrderResponseObj,
   averageRating,
@@ -13,15 +14,8 @@ const ORDER = db.order,
 
 module.exports = {
   creteOrder: async (req, res) => {
-    const {
-      moveType,
-      clientId,
-      driverId,
-      pickup,
-      destination,
-      load,
-      charges,
-    } = req.body;
+    const { moveType, clientId, driverId, pickup, destination, load, charges } =
+      req.body;
 
     const CheckoutRequestID = req.CheckoutRequestID;
 
@@ -65,21 +59,25 @@ module.exports = {
 
     const system_account_balance = admin.account_balance + charges;
 
-    const updated_admin = await USER.findByIdAndUpdate(admin._id, {
-      account_balance: system_account_balance,
-    });
-
-    await updated_admin.save();
+    const updated_admin = await USER.findByIdAndUpdate(
+      admin._id,
+      {
+        account_balance: system_account_balance,
+      },
+      { new: true }
+    );
 
     //Reserve driver until the order is completed
-
     let designatedDriver;
 
     try {
-      designatedDriver = await DRIVER.findByIdAndUpdate(driverId, {
-        reserved: true,
-      });
-      await designatedDriver.save();
+      designatedDriver = await DRIVER.findByIdAndUpdate(
+        driverId,
+        {
+          reserved: true,
+        },
+        { new: true }
+      );
     } catch (err) {
       res.status(500).json({
         message: err,
@@ -92,22 +90,19 @@ module.exports = {
     /**
      * send text message to designated driver
      */
-    // let sendText;
-    // try {
-    //   sendText = await sms.messages.create({
-    //     body: `You have received a translify transit request
-    //     please login to the app and proceed accordingly
-    //     `,
-    //     to: driver.phoneno,
-    //     from: "+12027598622",
-    //   });
-    // } catch (error) {
-    //   res.status(500).json({
-    //     message: `Twillio Send Text Error ${e}`,
-    //     error,
-    //   });
-    //   return;
-    // }
+    let sms = await sendText(
+      driver.phoneno,
+      `You have received a translify order Request \n Login to the Application to continue`
+    );
+
+    if (!sms.message || sms.error) {
+      let e = systemError.TWILIO_ERROR(sms.error.status || 401);
+      res.status(e.status).json({
+        message: e.message,
+        error: sms.error,
+      });
+      return;
+    }
 
     const orders = [order];
     const mappedOrders = await composeOrderResponseObj(orders);
@@ -176,9 +171,13 @@ module.exports = {
     // updating the order
     let order;
     try {
-      order = await ORDER.findByIdAndUpdate(OID, {
-        status,
-      });
+      order = await ORDER.findByIdAndUpdate(
+        OID,
+        {
+          status,
+        },
+        { new: true }
+      );
     } catch (error) {
       res.status(500).json({
         message: `FAILED! Updating order unsuccessfull`,
@@ -216,9 +215,8 @@ module.exports = {
       });
     }
 
-    const driver = await DRIVER.findOne({
-      _id: order.driverId,
-    });
+    const driver = await DRIVER.findById(order.driverId);
+    const client = await USER.findById(order.clientId);
 
     if (!driver) {
       res.status(404).json({
@@ -228,7 +226,32 @@ module.exports = {
       return;
     }
 
-    if (status === "successfull") {
+    if (!client) {
+      res.status(404).json({
+        message: `FAILED!
+        Client not found`,
+      });
+      return;
+    }
+    //in progress
+    if (status === "in-progress") {
+      /**
+       * send text to client to await truck arrival
+       */
+      let sms = await sendText(
+        client.phoneno,
+        `Your Order has been confirmed \n Truck will arrive at pickup in less than 10-minutes`
+      );
+
+      if (!sms.message || sms.error) {
+        let e = systemError.TWILIO_ERROR(sms.error.status || 401);
+        res.status(e.status).json({
+          message: e.message,
+          error: sms.error,
+        });
+        return;
+      }
+    } else if (status === "successfull") {
       const admin_role = await ROLE.findOne({
         name: "admin",
       });
@@ -243,10 +266,13 @@ module.exports = {
 
       let updated_admin;
       try {
-        updated_admin = await USER.findByIdAndUpdate(admin._id, {
-          account_balance: system_account_balance,
-        });
-        await updated_admin.save();
+        updated_admin = await USER.findByIdAndUpdate(
+          admin._id,
+          {
+            account_balance: system_account_balance,
+          },
+          { new: true }
+        );
       } catch (error) {
         res.status(500).json({
           message: `FAILED! 
@@ -259,16 +285,26 @@ module.exports = {
 
       const designated_driver = await USER.findById(driver.userId);
 
-      //pay the driver
+      //pay & unreserve the driver
       const driver_account_balance =
         designated_driver.account_balance + payment;
 
-      let updated_driver;
+      let updated_driver, designatedDriver;
       try {
-        updated_driver = await USER.findByIdAndUpdate(driver.userId, {
-          account_balance: driver_account_balance,
-        });
-        await updated_driver.save();
+        updated_driver = await USER.findByIdAndUpdate(
+          driver.userId,
+          {
+            account_balance: driver_account_balance,
+          },
+          { new: true }
+        );
+        designatedDriver = await DRIVER.findByIdAndUpdate(
+          driver._id,
+          {
+            reserved: false,
+          },
+          { new: true }
+        );
       } catch (error) {
         res.status(500).json({
           message: `FAILED! 
@@ -278,15 +314,34 @@ module.exports = {
         });
         return;
       }
-    }
 
-    //unreserve driver
-    if (status == "cancelled" || status == "successfull") {
+      /**
+       * send text message to client to confirm goods arival
+       */
+      let sms = await sendText(
+        client.phoneno,
+        `Your Goods have Arrived \n Thank you for doing bussiness with translify`
+      );
+
+      if (!sms.message || sms.error) {
+        let e = systemError.TWILIO_ERROR(sms.error.status || 401);
+        res.status(e.status).json({
+          message: e.message,
+          error: sms.error,
+        });
+        return;
+      }
+    } else if (status == "cancelled") {
+      //unreserve the driver
       let designatedDriver;
       try {
-        designatedDriver = await DRIVER.findByIdAndUpdate(driver._id, {
-          reserved: false,
-        });
+        designatedDriver = await DRIVER.findByIdAndUpdate(
+          driver._id,
+          {
+            reserved: false,
+          },
+          { new: true }
+        );
       } catch (error) {
         res.status(500).json({
           message: "FAILED! Order Update unsuccessful",
@@ -294,7 +349,37 @@ module.exports = {
         });
         return;
       }
-      await designatedDriver.save();
+      /**Alert the driver of a canclled order */
+      let sms1 = await sendText(
+        driver.phoneno,
+        `Order: ${order.id} has been cancelled`
+      );
+
+      if (!sms1.message || sms1.error) {
+        let e = systemError.TWILIO_ERROR(sms1.error.status || 401);
+        res.status(e.status).json({
+          message: e.message,
+          error: sms1.error,
+        });
+        return;
+      }
+
+      /**
+       * send text message to client to confirm order has been cancelled
+       */
+      let sms = await sendText(
+        client.phoneno,
+        `Order: ${order.id} has been cancelled`
+      );
+
+      if (!sms.message || sms.error) {
+        let e = systemError.TWILIO_ERROR(sms.error.status || 401);
+        res.status(e.status).json({
+          message: e.message,
+          error: sms.error,
+        });
+        return;
+      }
     }
 
     let orders = null;
@@ -324,7 +409,6 @@ module.exports = {
     }
 
     const mappedOrders = await composeOrderResponseObj(orders);
-
     res.status(200).json(mappedOrders);
   },
 
@@ -348,9 +432,7 @@ module.exports = {
       });
     }
 
-    let order = await ORDER.findOne({
-      _id: orderId,
-    });
+    let order = await ORDER.findById(orderId);
 
     if (!order) {
       res.status(404).json({
