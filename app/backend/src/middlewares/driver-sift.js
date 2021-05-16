@@ -29,7 +29,7 @@ module.exports = {
     if (driver) {
       res.status(409).json({
         message: `FAILED! 
-        Truck ${truckno} + " is already registered"
+        Truck ${truckno}  is already registered
         `,
       });
       return;

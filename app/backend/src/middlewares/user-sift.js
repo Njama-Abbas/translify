@@ -13,7 +13,7 @@ module.exports = {
     if (user) {
       res.status(409).json({
         message: `FAILED!
-         Email is already in use`,
+         Username is already in use`,
       });
       return;
     }
@@ -24,7 +24,7 @@ module.exports = {
     const { phoneno: user_phoneno } = req.body;
 
     const user = await USER.findOne({
-      phoneno: user_phoneno.slice(-9),
+      phoneno: "254" + user_phoneno.slice(-9),
     });
 
     if (user) {
