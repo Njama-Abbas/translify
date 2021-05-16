@@ -10,15 +10,14 @@ import {
   FileInput,
   FormPaper,
   ProfileControls,
-  ProfileLoaderContainer,
 } from "./elements";
-import LoadingComponent from "../LoadingComponent";
 
 import imagePlaceHolder from "../../Resources/Images/undraw_profile_pic.svg";
 import { IconContext } from "react-icons/lib";
 import { Dialog, DialogContent, Slide } from "@material-ui/core";
 import { Button } from "../../Resources/Styles/global";
 import { FaEdit } from "react-icons/fa";
+import CircularIndeterminate from "../Progress";
 
 export default function FileUploadComponent() {
   const [profilePhotoID, setProfilePhotoID] = useState(null);
@@ -59,11 +58,7 @@ export default function FileUploadComponent() {
   let content;
 
   if (isLoading) {
-    content = (
-      <ProfileLoaderContainer>
-        <LoadingComponent small message="Updating your details.." />;
-      </ProfileLoaderContainer>
-    );
+    content = <CircularIndeterminate />;
   } else {
     content = (
       <Container>
