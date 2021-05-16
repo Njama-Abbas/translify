@@ -23,8 +23,6 @@ Router.get("/acc_balance", AuthController.accountBalance);
 
 Router.put("/update-info", AuthController.updateInfo);
 
-Router.post("/change-password-auth", AuthController.sendPasswordChangeAuthCode);
-
 Router.post("/reset-password-auth", AuthController.sendPasswordResetAuthCode);
 
 Router.post("/change-password", AuthController.changePassword);
