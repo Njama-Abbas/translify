@@ -90,7 +90,10 @@ app.use("/api/mpesa", mpesa);
 app.use("/api/auth", auth);
 app.use("/api/driver", driver);
 app.use("/api/photos", photos);
-
+app.post("/callBack", (req, res) => {
+  console.log("--------------STK-------------");
+  console.log(req.body);
+});
 app.get("/", (_req, res) => res.send("Hello World!"));
 
 const PORT = process.env.PORT || 801;

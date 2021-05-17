@@ -60,19 +60,16 @@ module.exports = {
     };
     console.log(headers);
 
-    let Password = generatePassword(),
-      Timestamp = timeStamp();
-
     let data = {
       BusinessShortCode: "174379",
-      Password,
-      Timestamp,
+      Password: generatePassword(),
+      Timestamp: timeStamp(),
       TransactionType: "CustomerPayBillOnline",
       Amount: "1",
       PartyA: "254748717044",
       PartyB: "174379",
       PhoneNumber: "254748717044",
-      CallBackURL: "http://{ipv4address}:801/callBack",
+      CallBackURL: "http://192.168.1.101:801/callBack",
       AccountReference: "TRANSLIFY",
       TransactionDesc: "Lipa na mpesa",
     };
@@ -84,24 +81,24 @@ module.exports = {
       .then(
         (response) => {
           /**await for 10 seconds and then query the status of the transaction  */
-          // let promise = new Promise(function (resolve, reject) {
-          //   setTimeout(() => resolve("done!"), 10000);
-          // });
+          let promise = new Promise(function (resolve, reject) {
+            setTimeout(() => resolve("done!"), 5000);
+          });
 
-          // promise.then((x) => {
-          //   req.CheckoutRequestID = response.data.CheckoutRequestID;
-          //   next();
-          // });
-          req.CheckoutRequestID = 1111;
-          next();
+          promise.then((x) => {
+            req.CheckoutRequestID = response.data.CheckoutRequestID;
+            next();
+          });
+          // req.CheckoutRequestID = 1111;
+          // next();
         },
         (err) => {
-          req.CheckoutRequestID = 1111;
-          next();
-          // res.status(500).json({
-          //   message: "Failed",
-          //   Error: err,
-          // });
+          // req.CheckoutRequestID = 1111;
+          // next();
+          res.status(500).json({
+            message: "Failed",
+            Error: err,
+          });
         }
       );
   },
